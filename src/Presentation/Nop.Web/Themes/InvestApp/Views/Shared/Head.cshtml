@@ -1,0 +1,32 @@
+﻿@using Nop.Core.Domain.Catalog
+@using Nop.Services.Helpers
+
+@inject CatalogSettings catalogSettings
+@inject IThemeContext themeContext
+@inject IUserAgentHelper userAgentHelper
+
+@{
+    Layout ="";
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
+    var supportRtl = await Html.ShouldUseRtlThemeAsync();
+
+    //add main CSS file
+    NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/styles{(supportRtl ? ".rtl" : "")}.css");
+
+    //add font-awesome file
+    NopHtml.AppendCssFileParts($"~/Themes/InvestApp/Content/Fonts/font-awesome-6.4.2.css");
+    NopHtml.AddScriptParts(ResourceLocation.Footer, $"~/Themes/InvestApp/Content/Fonts/font-awesome-6.4.2.js");
+
+    //add bootstrap file
+    NopHtml.AppendCssFileParts($"~/Themes/InvestApp/Content/Bootstrap/bootstrap.min-5.2.3.css");
+    NopHtml.AddScriptParts(ResourceLocation.Footer, $"~/Themes/InvestApp/Content/Bootstrap/bootstrap.min-5.2.3.js");
+    
+    //add swiper css file
+    if (catalogSettings.DisplayAllPicturesOnCatalogPages)
+    {
+        NopHtml.AppendCssFileParts("~/lib_npm/swiper/swiper-bundle.min.css");
+    }
+
+    //add jQuery UI css file
+    NopHtml.AppendCssFileParts("~/lib_npm/jquery-ui-dist/jquery-ui.min.css");
+}

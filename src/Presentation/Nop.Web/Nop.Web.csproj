@@ -45,6 +45,7 @@
     <!-- We copy the \Logs directory -->
     <Content Include="Logs\**" CopyToPublishDirectory="PreserveNewest" />
     <None Remove="Plugins\Uploaded\placeholder.txt" />
+    <_ContentIncludedByDefault Remove="themes\investapp\content\fonts\font-awesome-6.4.2.js" />
     <Content Include="Plugins\Uploaded\placeholder.txt">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

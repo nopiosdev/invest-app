@@ -50,6 +50,7 @@ using Nop.Services.Stores;
 using Nop.Services.Tax;
 using Nop.Services.Themes;
 using Nop.Services.Topics;
+using Nop.Services.Transactions;
 using Nop.Services.Vendors;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Menu;
@@ -307,6 +308,9 @@ namespace Nop.Web.Framework.Infrastructure
             var useAutofac = appSettings.Get<CommonConfig>().UseAutofac;
             if (!useAutofac)
                 services.AddScoped(typeof(Lazy<>), typeof(LazyInstance<>));
+
+            //NCT Back-end dev
+            services.AddScoped<ITransactionService, TransactionService>();
         }
 
         /// <summary>

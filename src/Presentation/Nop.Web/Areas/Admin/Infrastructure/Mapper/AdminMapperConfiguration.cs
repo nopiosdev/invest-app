@@ -25,6 +25,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Topics;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Infrastructure.Mapper;
 using Nop.Data.Configuration;
@@ -63,9 +64,11 @@ using Nop.Web.Areas.Admin.Models.Tasks;
 using Nop.Web.Areas.Admin.Models.Tax;
 using Nop.Web.Areas.Admin.Models.Templates;
 using Nop.Web.Areas.Admin.Models.Topics;
+using Nop.Web.Areas.Admin.Models.Transactions;
 using Nop.Web.Areas.Admin.Models.Vendors;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.WebOptimizer;
+using Org.BouncyCastle.Asn1.Misc;
 
 namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
 {
@@ -110,6 +113,9 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
             CreateTopicsMaps();
             CreateVendorsMaps();
             CreateWarehouseMaps();
+
+            //NCT Back-end dev
+            CreateNewEntitiesMaps();
 
             //add some generic mapping rules
             this.Internal().ForAllMaps((mapConfiguration, map) =>
@@ -575,9 +581,9 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                .ForMember(model => model.PictureIds, options => options.Ignore());
             CreateMap<ProductAttributeCombinationModel, ProductAttributeCombination>()
                .ForMember(entity => entity.AttributesXml, options => options.Ignore())
-                #pragma warning disable CS0618
+#pragma warning disable CS0618
                .ForMember(entity => entity.PictureId, options => options.Ignore());
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
 
             CreateMap<ProductAttribute, ProductAttributeModel>()
                 .ForMember(model => model.PredefinedProductAttributeValueSearchModel, options => options.Ignore())
@@ -619,9 +625,9 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
             CreateMap<ProductAttributeValueModel, ProductAttributeValue>()
                .ForMember(entity => entity.AttributeValueType, options => options.Ignore())
                .ForMember(entity => entity.Quantity, options => options.Ignore())
-                #pragma warning disable CS0618
+#pragma warning disable CS0618
                .ForMember(entity => entity.PictureId, options => options.Ignore());
-                #pragma warning restore CS0618
+#pragma warning restore CS0618
 
             CreateMap<ProductEditorSettings, ProductEditorSettingsModel>();
             CreateMap<ProductEditorSettingsModel, ProductEditorSettings>();
@@ -1732,6 +1738,16 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
             CreateMap<WarehouseModel, Warehouse>()
                 .ForMember(entity => entity.AddressId, options => options.Ignore());
         }
+
+        #region NCT Back-end dev
+
+        protected virtual void CreateNewEntitiesMaps()
+        {
+            CreateMap<Transaction, TransactionModel>();
+            CreateMap<TransactionModel, Transaction>();
+        }
+
+        #endregion
 
         #endregion
 

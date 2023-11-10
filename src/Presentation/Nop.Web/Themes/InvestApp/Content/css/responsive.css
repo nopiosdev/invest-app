@@ -1,0 +1,30 @@
+
+/*  laptop media css start  */
+@media screen and ( max-width:1024px) {
+  
+  /* drawer-wrapper css start */
+  .drawerMenu{ display: block; }
+  .drawer-wrapper{ position: relative; overflow: hidden; }
+  .side-drawer{ position: fixed; max-width: 300px; left: -300px; z-index: 99;  }
+  .side-drawer-content{ width: 100%;margin:0px; min-height: 100vh; }
+
+  .drawer-wrapper.open .drawerMenu > div span:first-child,
+  .drawer-wrapper.open .drawerMenu > div span:last-child{ opacity: 0; }
+  .drawer-wrapper.open .drawerMenu > div span:nth-child(2){ transform: rotate(45deg); }
+  .drawer-wrapper.open .drawerMenu > div span:nth-child(3){ transform: rotate(-45deg); }
+  .drawer-wrapper.open .side-drawer{ left: 0px; }
+  .drawer-wrapper.open .side-drawer-content{ transform: translateX(300px); }
+
+  /* account-dropdown css start */
+  .account-dropdown { position: unset; }
+  .account-dropdown .account-text{ display: none; }
+  .account-dropdown .dropdown-list{ left: 0px; }
+
+}
+
+/*  tablet media css start  */
+@media screen and ( max-width:1000px) {
+
+  /* drawer-wrapper css start */
+
+}

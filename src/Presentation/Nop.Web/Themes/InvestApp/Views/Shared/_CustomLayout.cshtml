@@ -1,0 +1,77 @@
+﻿@{
+    Layout = "_Root";
+}
+@{
+    //current category ID
+    var currentCategoryId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("category", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentCategoryId = Convert.ToInt32(Url.ActionContext.RouteData.Values["categoryId"].ToString());
+    }
+
+    //current manufacturer ID
+    var currentManufacturerId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("manufacturer", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentManufacturerId = Convert.ToInt32(Url.ActionContext.RouteData.Values["manufacturerId"].ToString());
+    }
+
+    //current product ID
+    var currentProductId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("product", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("productdetails", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentProductId = Convert.ToInt32(Url.ActionContext.RouteData.Values["productId"].ToString());
+    }
+}
+
+<div id="sideDrawer" class="drawer-wrapper">
+    <div class="side-drawer">
+        <div class="drawer-header">
+            <img src="@Url.Content("~/Themes/InvestApp/Content/images/stock-logo.svg")" />
+        </div>
+        <div class="drawer-body">
+            <div class="sub-container">
+                <ul class="drawer-total">
+                    <li class="portfolio-total">
+                        <h5>PORTFOLIO TOTAL:</h5>
+                        <h2>$26,123.66</h2>
+                    </li>
+                    <li class="profit-loss-total">
+                        <h6>PROFIT/LOSS:</h6>
+                        <h3>-$6,049.94</h3>
+                    </li>
+                </ul>
+                <ul class="drawer-list">
+                    <li class="active">
+                        <a hraf="#">Dashboard</a>
+                    </li>
+                    <li>
+                        <a hraf="#">Portfolio</a>
+                    </li>
+                    <li>
+                        <a hraf="#">Stock Picks</a>
+                    </li>
+                    <li>
+                        <a hraf="#">Crypto Picks</a>
+                    </li>
+                    <li>
+                        <a hraf="#">Tools</a>
+                    </li>
+                    <li>
+                        <a hraf="#">Notifications</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="drawer-footer"></div>
+    </div>
+    <div class="side-drawer-content">
+        @{ await Html.RenderPartialAsync("_Header"); }
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.MainColumnBefore })
+        @RenderBody()
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.MainColumnAfter })
+    </div>
+</div>

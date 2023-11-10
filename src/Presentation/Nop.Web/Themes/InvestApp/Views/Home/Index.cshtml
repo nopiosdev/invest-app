@@ -4,7 +4,7 @@
 @inject IStoreContext storeContext
 
 @{
-    Layout = "_ColumnsOne";
+    Layout = "_CustomLayout";
 
     var homepageTitle = await localizationService.GetLocalizedAsync(await storeContext.GetCurrentStoreAsync(), s => s.HomepageTitle);
 
@@ -27,6 +27,14 @@
 }
 <div class="page home-page">
     <div class="page-body">
+        <h1>Home page</h1>
+        <table style="border: 1px solid #fff;">
+            <tbody>
+                <tr>
+                    <td>Testing</td>
+                </tr>
+            </tbody>
+        </table>
         @*<div class="box-parent">
             <div class="table_box">
                     <div class="form-group search_box">

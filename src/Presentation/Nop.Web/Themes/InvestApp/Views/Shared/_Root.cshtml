@@ -15,78 +15,18 @@
         AjaxCartFailure: "@T("AjaxCart.Failure")"
     };
     AjaxCart.init(false, '.header-links .cart-qty', '.header-links .wishlist-qty', '#flyout-cart', localized_data);
-
-    var button = document.getElementById('toggleSidebar');
-    button.addEventListener('click',()=>{
-
-    console.log("TEST",button)
-    })
-
-    $(document).ready(function () {
-        $('#toggleSidebar').click(function () {
-            var sidebarWrapper = $('#sidebar-wrapper');
-            var header = $('.header');
-            var row = $('.row');
-
-            sidebarWrapper.toggleClass('sidebar_visible');
-            header.toggleClass('move-left');
-            row.toggleClass('move');
-        });
-    });
-
-
-
 </script>
-<div class="row">
-    <div class="sidebar_container">
-        <div class="nav_toggler" id="toggleSidebar">
-            <div id="nav-icon"><span></span><span></span><span></span><span></span></div>
-        </div>
-        <div id="sidebar-wrapper">
-            <div class="logo_container">
-                <img src="https://stock-i-app.azurewebsites.net/static/media/logo.f1ad4be4.svg" />
-            </div>
-            <div class="sidebar-menu">
-                @await Component.InvokeAsync(typeof(TopMenuViewComponent))
-            </div>
-        </div>
-    </div>
-    <div style="padding:0;">
-        <div class="header">
-            <div class="search_box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" placeholder="Search by stock or market name">
-            </div>
-            <div class="dropdown">
-                <button class="dropdown-toggle avatar_box" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <div class="avatar_img_container">
-                        <img src="~/images/default-avatar.jpg" />
-                    </div>
-                    <div class="user_info_box">
-                        <span>admin@defaulttenant.com</span>
-                        <span>Hi, admin</span>
-                    </div>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="" href="#">Action</a></li>
-                    <li><a class="" href="#">Another action</a></li>
-                    <li><a class="" href="#">Something else here</a></li>
-                </ul>
-            </div>
-            <div class="master-wrapper-content" id="main" role="main">
-                @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ContentBefore })
+<div class="master-wrapper-content" role="main">
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ContentBefore })
 
-                @if (IsSectionDefined("Breadcrumb"))
-                {
-                    @RenderSection("Breadcrumb")
-                }
-                <div class="master-column-wrapper">
-                    @RenderBody()
-                </div>
-                @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ContentAfter })
-            </div>
-        </div>
+    @if (IsSectionDefined("Breadcrumb"))
+    {
+        @RenderSection("Breadcrumb")
+    }
+    <div class="master-column-wrapper">
+        @RenderBody()
     </div>
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ContentAfter })
 </div>
 @*@await Component.InvokeAsync(typeof(FooterViewComponent))*@
 @await Component.InvokeAsync(typeof(EuCookieLawViewComponent))

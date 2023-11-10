@@ -2,9 +2,10 @@
 @using Nop.Core
 @using Nop.Core.Domain.Customers
 
+
 @inject IWebHelper webHelper
 @{
-    Layout = "_ColumnsOne";
+    Layout = "_Root.Head";
 
     //title
     NopHtml.AddTitleParts(T("PageTitle.Login").Text);
@@ -14,104 +15,312 @@
     //register URL with return URL (if specified)
     var registerUrl = Url.RouteUrl("Register", new { returnUrl = this.Context.Request.Query["returnUrl"] }, webHelper.GetCurrentRequestProtocol());
 }
-<div class="page login-page">
-    <div class="page-title">
-        <h1>@T("Account.Login.Welcome")</h1>
-    </div>
-    @await Html.PartialAsync("_ExternalAuthentication.Errors")
-    <div class="page-body">
-        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LoginTop, additionalData = Model })
-        <div class="customer-blocks">
-            @if (Model.RegistrationType == UserRegistrationType.Disabled)
-            {
-                <div class="new-wrapper">
-                    <div class="title">
-                        @T("Account.Register")
-                    </div>
-                    <div class="text">
-                        @T("Account.Register.Result.Disabled")
-                    </div>
+
+<style>
+
+    .login-image {
+        background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA3ySX-GMjfzKM5o70Vbg6gY8tBUGNEW3ymA&usqp=CAU');
+        background-size: cover;
+        background-position: 50%;
+        background-repeat: none;
+        flex-shrink: 1;
+        flex-basis: 50%;
+        height: 100vh;
+        flex-grow: 1;
+        max-width: 100%;
+    }
+
+     .user-layout {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+        background: #090d16;
+        align-items: center;
+        justify-content: center;
+    }
+    .heading{
+        margin-top: 0;
+        margin-bottom: 0.5em;
+        color: #fff;
+        font-weight: 500;
+        font-size:21px;
+    }
+    .login-inputs input{
+        height: 40px;
+        padding: 6px 11px 6px 30px;
+        font-size: 16px;
+        box-sizing: border-box;
+        margin: 0;
+        list-style: none;
+        font-feature-settings: "tnum","tnum";
+        display: inline-block;
+        width: 100%;
+        color: #fff;
+        line-height: 1.5;
+        background-color: #30333a;
+        background-image: none;
+        border: 1px solid #404040;
+        border-radius: 4px;
+        transition: all .3s;
+        margin-bottom: 25px;
+    }
+
+    .login-inputs input:focus, .login-inputs input:hover, .login-inputs input:focus-visible {
+        border-color: #46dbaa !important;
+        border-right-width: 1px !important;
+        outline: none;
+    }
+    .log-btn{
+        background-color: rgb(56, 173, 144);
+        color: white;
+        border-color: rgb(69, 214, 168);
+        border: 1px solid #404040;
+        margin-top: 25px;
+        border-radius: 2px !important;
+        line-height: 44px !important;
+        height: 44px !important;
+        text-transform: uppercase;
+        font-size: 12px !important;
+        padding: 0 25px !important;
+        font-weight: 600 !important;
+        font-size:14px;
+        position: relative;
+        display: inline-block;
+        white-space: nowrap;
+        text-align: center;
+        background-image: none;
+        transition: all .3s cubic-bezier(.645,.045,.355,1);
+        user-select: none;
+        touch-action: manipulation;
+        box-shadow: 0 2px 0 rgba(0,0,0,.045);
+        text-shadow: 0 -1px 0 rgba(0,0,0,.12);
+    }
+
+    .reg-btn {
+        color: #21ce99;
+        text-decoration: none;
+        background-color: transparent;
+        outline: none;
+        cursor: pointer;
+        -webkit-transition: color .3s;
+        transition: color .3s;
+        font-size: 14px;
+    }
+    .login-page {
+        margin-right: 52px;
+        margin-left: 52px;
+        max-width: 412px;
+    }
+
+    #RememberMe {
+        width: 14px;
+        height: 14px;
+        margin-right: 8px; 
+    }
+
+    .logo-full {
+        max-height: 60px;
+        margin: 0 0 30px;
+    }
+
+    .login-wrapper{
+        display: flex;
+        width: 100%;
+        align-items: center;
+    }
+
+    .login-inputs {
+        position: relative;
+    }
+
+    #Password-error, #Email-error {
+        color:red;
+        font-size:14px;
+        margin-bottom:5px;
+
+    }
+    .input-validation-error{
+        margin-bottom:0 !important;
+    }
+    .addMargin{
+        margin-top:5px;
+    }
+    .input-prefix{
+        position: absolute;
+        top: 32%;
+        z-index: 2;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: center;
+        align-items: center;
+        color: #fff;
+        line-height: 0;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        left:12px;
+    }
+    .preicon {
+        display: inline-block;
+        color: inherit;
+        font-style: normal;
+        line-height: 0;
+        text-align: center;
+        text-transform: none;
+        vertical-align: -0.125em;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+</style>
+
+<script>
+  $(document).ready(function () {
+    function checkInputValidation() {
+        if ($('.required').hasClass('input-validation-error')) {
+            $('.reversed').addClass('addMargin');
+        } else {
+            $('.reversed').removeClass('addMargin');
+        }
+    }
+
+    $('.required').on('input keyup', function () {
+        if ($(this).val() === '') {
+            $(this).css('border-color', 'red');
+        } else {
+            $(this).css('border-color', '');
+        }
+        checkInputValidation();
+    });
+
+    $('.log-btn').on('click', function () {
+        checkInputValidation();
+    });
+});
+
+
+</script>
+<div class="user-layout p-0">
+    <div class="row login-wrapper">
+        <div class="login-image col-12 col-md-10 col-lg-10 col-xl-10 d-none d-sm-block d-md-block col-12 col-md-10 col-lg-10 col-xl-10 p-0"></div>
+        <div class="col-12 col-md-6 col-lg-5 col-xl-6 col-sm-12 col-md-6 col-lg-5 col-xl-6 p-0">
+            <div class="page login-page">
+                <div>
+                    <img class="logo-full" src="https://stock-i-app.azurewebsites.net/static/media/logo-full.42727152.svg" alt="Logo">
                 </div>
-            }
-            else if (Model.CheckoutAsGuest)
-            {
-                <div class="new-wrapper checkout-as-guest-or-register-block">
-                    <div class="title">
-                        <strong>@T("Account.Login.CheckoutAsGuestOrRegister")</strong>
-                    </div>
-                    <div class="text">
-                        @await Component.InvokeAsync(typeof(TopicBlockViewComponent), new { systemName = "CheckoutAsGuestOrRegister" })
-                    </div>
-                    <div class="buttons">
-                        <button type="button" class="button-1 checkout-as-guest-button" onclick="location.href='@Url.RouteUrl("Checkout")'">@T("Account.Login.CheckoutAsGuest")</button>
-                        <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
-                    </div>
+                <div class="page-title">
+                    @* <h1>@T("Account.Login.Welcome")</h1> *@
+                    <h2 class="heading">Welcome to Intelligent Trades</h2>
                 </div>
-            }
-            else
-            {
-                <div class="new-wrapper register-block">
-                    <div class="title">
-                        <strong>@T("Account.Login.NewCustomer")</strong>
+                <div class="returning-wrapper fieldset">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
+                                <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
+                                <div class="title">
+                                    @* <strong>@T("Account.Login.ReturningCustomer")</strong> *@
+                                </div>
+                                <div class="form-fields">
+                                    @if (Model.UsernamesEnabled)
+                                    {
+                                        <div class="inputs login-inputs">
+                                            @* <label asp-for="Username" asp-postfix=":"></label> *@
+                                            <input asp-for="Username" class="username" autofocus="autofocus" />
+                                            <span asp-validation-for="Username"></span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="inputs login-inputs">
+                                           @*  <label asp-for="Email" asp-postfix=":"></label> *@
+                                           <span class="input-prefix"><i aria-label="icon: user" class="preicon anticon-user" style="color: rgba(255, 255, 255, 0.5);"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="user" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M858.5 763.6a374 374 0 0 0-80.6-119.5 375.63 375.63 0 0 0-119.5-80.6c-.4-.2-.8-.3-1.2-.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1-.4.2-.8.3-1.2.5-44.8 18.9-85 46-119.5 80.6a375.63 375.63 0 0 0-80.6 119.5A371.7 371.7 0 0 0 136 901.8a8 8 0 0 0 8 8.2h60c4.4 0 7.9-3.5 8-7.8 2-77.2 33-149.5 87.8-204.3 56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c.1 4.4 3.6 7.8 8 7.8h60a8 8 0 0 0 8-8.2c-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534z"></path></svg></i></span>
+                                            <input asp-for="Email" class="email required" autofocus="autofocus"/>
+                                            <span asp-validation-for="Email"></span>
+                                        </div>
+                                    }
+                                    <div class="inputs login-inputs reversed">
+                                       @*  <label asp-for="Password" asp-postfix=":"></label> *@
+                                        <span class="input-prefix"><i aria-label="icon: lock" class="preicon icon-lock" style="color: rgba(255, 255, 255, 0.5);"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="lock" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M832 464h-68V240c0-70.7-57.3-128-128-128H388c-70.7 0-128 57.3-128 128v224h-68c-17.7 0-32 14.3-32 32v384c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V496c0-17.7-14.3-32-32-32zM332 240c0-30.9 25.1-56 56-56h248c30.9 0 56 25.1 56 56v224H332V240zm460 600H232V536h560v304zM484 701v53c0 4.4 3.6 8 8 8h40c4.4 0 8-3.6 8-8v-53a48.01 48.01 0 1 0-56 0z"></path></svg></i></span>
+                                        <input asp-for="Password" class="password required"/>
+                                        <span asp-validation-for="Password"></span>
+                                    </div>
+                                    <div class="inputs reversed">
+                                        <input asp-for="RememberMe" />
+                                        <label style="font-size:14px; color:#fff;" asp-for="RememberMe"></label>
+
+                                        <div class="buttons">
+                                            <a class="button-1 register-button reg-btn" onclick="location.href='@registerUrl'"><span style="color:#fff;">Don't have an account?</span> @T("Account.Register")</a>
+                                        </div>
+
+                                        <span class="forgot-password">
+                                            <a class="reg-btn" asp-route="PasswordRecovery">@T("Account.Login.ForgotPassword")</a>
+                                        </span>
+                                    </div>
+                                    @if (Model.DisplayCaptcha)
+                                    {
+                                        <nop-captcha />
+                                    }
+                                </div>
+                                <div class="buttons">
+                                    <button type="submit" class="button-1 login-button log-btn">@T("Account.Login.LoginButton")</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <div class="text">
-                        @T("Account.Login.NewCustomerText")
-                    </div>
-                    <div class="buttons">
-                        <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
-                    </div>
-                </div>
-            }
-            <div class="returning-wrapper fieldset">
-                <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
-                    <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
-                    <div class="title">
-                        <strong>@T("Account.Login.ReturningCustomer")</strong>
-                    </div>
-                    <div class="form-fields">
-                        @if (Model.UsernamesEnabled)
+                </di>
+                @await Html.PartialAsync("_ExternalAuthentication.Errors")
+                <div class="page-body">
+                    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LoginTop, additionalData = Model })
+                    <div class="customer-blocks">
+                        @if (Model.RegistrationType == UserRegistrationType.Disabled)
                         {
-                            <div class="inputs">
-                                <label asp-for="Username" asp-postfix=":"></label>
-                                <input asp-for="Username" class="username" autofocus="autofocus" />
-                                <span asp-validation-for="Username"></span>
+                            <div class="new-wrapper">
+                                <div class="title">
+                                    @T("Account.Register")
+                                </div>
+                                <div class="text">
+                                    @T("Account.Register.Result.Disabled")
+                                </div>
                             </div>
                         }
-                        else
+                        else if (Model.CheckoutAsGuest)
                         {
-                            <div class="inputs">
-                                <label asp-for="Email" asp-postfix=":"></label>
-                                <input asp-for="Email" class="email" autofocus="autofocus" />
-                                <span asp-validation-for="Email"></span>
+                            <div class="new-wrapper checkout-as-guest-or-register-block">
+                                <div class="title">
+                                    <strong>@T("Account.Login.CheckoutAsGuestOrRegister")</strong>
+                                </div>
+                                <div class="text">
+                                    @await Component.InvokeAsync(typeof(TopicBlockViewComponent), new { systemName = "CheckoutAsGuestOrRegister" })
+                                </div>
+                                <div class="buttons">
+                                    <button type="button" class="button-1 checkout-as-guest-button" onclick="location.href='@Url.RouteUrl("Checkout")'">@T("Account.Login.CheckoutAsGuest")</button>
+                                    <button type="button" class="button-1 register-button" onclick="location.href='@registerUrl'">@T("Account.Register")</button>
+                                </div>
                             </div>
                         }
-                        <div class="inputs">
-                            <label asp-for="Password" asp-postfix=":"></label>
-                            <input asp-for="Password" class="password" />
-                            <span asp-validation-for="Password"></span>
-                        </div>
-                        <div class="inputs reversed">
-                            <input asp-for="RememberMe" />
-                            <label asp-for="RememberMe"></label>
-                            <span class="forgot-password">
-                                <a asp-route="PasswordRecovery">@T("Account.Login.ForgotPassword")</a>
-                            </span>
-                        </div>
-                        @if (Model.DisplayCaptcha)
+                        @* else
                         {
-                            <nop-captcha />
-                        }
+                            <div class="new-wrapper register-block">
+                                <div class="title">
+                                    <strong>@T("Account.Login.NewCustomer")</strong>
+                                </div>
+                                <div class="text">
+                                    @T("Account.Login.NewCustomerText")
+                                </div>
+                            </div> 
+
+                                
+                        } *@
+                        
                     </div>
-                    <div class="buttons">
-                        <button type="submit" class="button-1 login-button">@T("Account.Login.LoginButton")</button>
+                    <div class="external-authentication">
+                        @await Component.InvokeAsync(typeof(ExternalMethodsViewComponent), "ExternalAuthentication")
                     </div>
-                </form>
+                    @* @await Component.InvokeAsync(typeof(TopicBlockViewComponent), new { systemName = "LoginRegistrationInfo" }) *@
+                    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LoginBottom, additionalData = Model })
+                </div>
             </div>
         </div>
-        <div class="external-authentication">
-            @await Component.InvokeAsync(typeof(ExternalMethodsViewComponent), "ExternalAuthentication")
-        </div>
-        @await Component.InvokeAsync(typeof(TopicBlockViewComponent), new { systemName = "LoginRegistrationInfo" })
-        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LoginBottom, additionalData = Model })
     </div>
 </div>

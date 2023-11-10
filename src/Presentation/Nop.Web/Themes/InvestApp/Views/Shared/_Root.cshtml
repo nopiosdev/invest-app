@@ -21,17 +21,34 @@
 
     console.log("TEST",button)
     })
+
+    $(document).ready(function () {
+        $('#toggleSidebar').click(function () {
+            var sidebarWrapper = $('#sidebar-wrapper');
+            var header = $('.header');
+            var row = $('.row');
+
+            sidebarWrapper.toggleClass('sidebar_visible');
+            header.toggleClass('move-left');
+            row.toggleClass('move');
+        });
+    });
+
+
+
 </script>
 <div class="row">
     <div class="sidebar_container">
         <div class="nav_toggler" id="toggleSidebar">
-            <i class="fa-solid fa-bars"></i>
+            <div id="nav-icon"><span></span><span></span><span></span><span></span></div>
         </div>
-        <div class="logo_container">
-            <img src="https://stock-i-app.azurewebsites.net/static/media/logo.f1ad4be4.svg" />
-        </div>
-        <div class="sidebar-menu">
-            @await Component.InvokeAsync(typeof(TopMenuViewComponent))
+        <div id="sidebar-wrapper">
+            <div class="logo_container">
+                <img src="https://stock-i-app.azurewebsites.net/static/media/logo.f1ad4be4.svg" />
+            </div>
+            <div class="sidebar-menu">
+                @await Component.InvokeAsync(typeof(TopMenuViewComponent))
+            </div>
         </div>
     </div>
     <div style="padding:0;">

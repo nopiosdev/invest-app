@@ -1,0 +1,74 @@
+/* Grey Theme Css */
+
+.grey .side-drawer-content .page { background: #405056; }
+.grey .secondary-sidebar { background: hsla(0,0%,100%,.1); border-color: hsla(0,0%,100%,.2); }
+.grey .form-block .inputs select { background: #fff; color: #2a2a2a; border-color: #ccc; }
+.grey .custom-switch input:checked+.custom-slider { background-color: #21ce99; }
+.grey .sidebar {background: #4a616b; border-color: hsla(0,0%,100%,.2); box-shadow: none; }
+.grey .search-box form input { background: transparent; border-color: hsla(0,0%,100%,.2); }
+.grey .account-dropdown .account-wrapper { background: transparent; border-bottom-color: hsla(0,0%,100%,.2); color: #fff; border-left-color:  hsla(0,0%,100%,.2); }
+.grey .drawer-body .drawer-list li a { text-decoration: none; color: #eee; }
+.grey .secondary-sidebar li a {color: #9ba1a5;}
+.grey .form-block label {color: #aaa;}
+.grey .side-drawer { background-color: #4a616b; border-right-color: hsla(0,0%,100%,.2) } 
+.grey #small-search-box-form {background: #546167;}
+.grey .header { background-color: #546167; }
+.grey .form-block .inputs input:not([type="radio"],[type="checkbox"]) { background: #4f5f63; color: #fff; border-color: #ccc; }
+.grey .side-drawer .drawer-body .drawer-total { border-bottom-color: hsla(0,0%,100%,.2); }
+.grey .drawer-body .drawer-total .portfolio-total h5 { color: #fff; }
+.grey .account-dropdown {border-bottom: 1px solid #768185; border-left: 1px solid #768185;}
+.grey .form-block .inputs { border-bottom-color: hsla(0,0%,100%,.2); }
+.grey .custom-tabs-wrapper .tabs-navigation { border-bottom-color: hsla(0,0%,100%,.2); }
+
+/* Egg White Theme Css */
+
+.egg-white .side-drawer-content .page { background: #fff; }
+.egg-white .secondary-sidebar { border-color: #ddd; background: linear-gradient(180deg,#fff 0,#f0f0f0); filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff",endColorstr="#f0f0f0",GradientType=0); }
+.egg-white .form-block .inputs select { background: #fff; color: #2a2a2a; border-color: #ccc; }
+.egg-white .custom-switch input:checked+.custom-slider { background-color: #21ce99; }
+.egg-white .sidebar {background: #5c686d; border-color: hsla(0,0%,100%,.2); box-shadow: none; }
+.egg-white .search-box form input { background: transparent; border-color: #e6e6e6; color: #222}
+.egg-white .account-dropdown .account-wrapper { background: linear-gradient(180deg,#fff 0,#f0f0f0); filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff",endColorstr="#f0f0f0",GradientType=0); }
+.egg-white .drawer-body .drawer-list li a { text-decoration: none; color: #eee; }
+.egg-white .secondary-sidebar li a {color: #434343;}
+.egg-white .form-block label {color: #434343;}
+.egg-white .side-drawer { background: #5c686d; border-color: #e0e0e0; box-shadow: none; } 
+.egg-white #small-search-box-form { background: linear-gradient(180deg,#fff 0,#f0f0f0); filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff",endColorstr="#f0f0f0",GradientType=0); border-color: #e6e6e6; color: #222; }
+.egg-white .header  { background-color: transparent; } 
+.egg-white .form-block .inputs input:not([type="radio"],[type="checkbox"]) { background: #fff; color: #2a2a2a; border-color: #ccc; }
+.egg-white .side-drawer .drawer-body .drawer-total { border-color: rgba(0,0,0,.08); }
+.egg-white .drawer-body .drawer-total .portfolio-total h5 { color: #fff; }
+.egg-white .account-dropdown .account-text { color: #222; font-size: 14px; padding-left: 20px; }
+.egg-white .form-block .inputs { border-bottom-color: #e0e0e0; }
+.egg-white h1, .egg-white h2, .egg-white h3, .egg-white h4, .egg-white h5, .egg-white h6 { color: #434343; }
+.egg-white .custom-tabs-wrapper .tabs-navigation ul li a {color: #434343;}
+.egg-white .custom-tabs-wrapper .tabs-navigation ul li.active a { background-color: #1cb183; color: #fff !important;  }
+.egg-white .custom-tabs-wrapper .tabs-navigation {border-bottom-color: #ddd;}
+.egg-white .account-dropdown {border-bottom: 1px solid #e6e6e6; border-left: 1px solid #e6e6e6;}
+
+/* Light Theme Css */
+
+.light .side-drawer-content .page { background: #fff; }
+.light .secondary-sidebar { border-color: #ccc; background: #fff; }
+.light .form-block .inputs select { background: #fff; color: #2a2a2a; border-color: #ccc; }
+.light .custom-switch input:checked+.custom-slider { background-color: #21ce99; }
+.light .sidebar {background: #5c686d; border-color: hsla(0,0%,100%,.2); box-shadow: none; }
+.light .search-box form input { background: transparent; border-color: #e6e6e6; color: #222}
+.light .account-dropdown .account-wrapper { background: #fff; }
+.light .drawer-body .drawer-list li a { text-decoration: none; color: #82929f; }
+.light .secondary-sidebar li a {color: #434343;}
+.light .form-block label {color: #434343;}
+.light .side-drawer { background: #fff; border-color: #e0e0e0; box-shadow: none; } 
+.light #small-search-box-form { background:#fff; }
+.light .header  { background-color: transparent; } 
+.light .form-block .inputs input:not([type="radio"],[type="checkbox"]) { background: #fff; color: #2a2a2a; border-color: #ccc; }
+.light .side-drawer .drawer-body .drawer-total { border-color: rgba(0,0,0,.08); }
+.light .drawer-body .drawer-total .portfolio-total h5 { color: #82929f; }
+.light .account-dropdown .account-text { color: #222; }
+.light .form-block .inputs { border-bottom-color: #e0e0e0; }
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 { color: #434343; }
+.light .custom-tabs-wrapper .tabs-navigation ul li a {color: #434343;}
+.light .custom-tabs-wrapper .tabs-navigation ul li.active a { background-color: #1cb183; color: #fff !important;  }
+.light .custom-tabs-wrapper .tabs-navigation {border-bottom-color: #ddd;}
+.light .drawer-body .drawer-total .profit-loss-total h6 { color: #434343; }
+.light .account-dropdown {border-bottom: 1px solid #e6e6e6; border-left: 1px solid #e6e6e6;}

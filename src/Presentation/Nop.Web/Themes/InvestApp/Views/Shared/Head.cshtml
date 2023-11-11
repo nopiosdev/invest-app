@@ -10,6 +10,7 @@
     var themeName = await themeContext.GetWorkingThemeNameAsync();
     var supportRtl = await Html.ShouldUseRtlThemeAsync();
 
+    NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/theme.css");
     NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/responsive.css");
     NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/custom.css");
 

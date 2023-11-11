@@ -42,7 +42,7 @@
         </div>
         <div class="tabs-content">
             <div id="accountTab" class="tab from-left-animation active">
-                
+
                 <div class="col-xl-10">
                     <div class="custom-tab-container">
                         <div class="title my-25">
@@ -109,7 +109,7 @@
                     </div>
                     <div class="col-xl-10">
                         <div class="custom-tab-container">
-                            
+
                             <div class="title my-25">
                                 <h2>@T("Account.investment")</h2>
                             </div>
@@ -157,7 +157,7 @@
                                             <option value="3">Three</option>
                                         </select>
                                     </span>
-                                </div> 
+                                </div>
                             </div>
 
                             <div class="title mt-50">
@@ -214,7 +214,7 @@
                                             <option value="light">Light</option>
                                         </select>
                                     </span>
-                                </div> 
+                                </div>
                             </div>
 
                         </div>
@@ -229,7 +229,7 @@
             </div>
         </div>
     </div>
- 
+
 </div>
 
 <nop-label asp-for="GoalId" />
@@ -246,38 +246,38 @@
 <nop-label asp-for="InvestmentApproachId" />
 <nop-select asp-for="InvestmentApproachId" asp-items="Model.AvailableInvestmentApproach" />
 
-<nop-label asp-for="TwoFactorAuthentication"/>
+<nop-label asp-for="TwoFactorAuthentication" />
 <nop-editor asp-for="TwoFactorAuthentication" />
 
-<nop-label asp-for="EmailAlert"/>
+<nop-label asp-for="EmailAlert" />
 <nop-editor asp-for="EmailAlert" />
 
-<nop-label asp-for="TextAlert"/>
+<nop-label asp-for="TextAlert" />
 <nop-editor asp-for="TextAlert" />
 
 <script>
     $(document).ready(function () {
-      var selectedTheme = localStorage.getItem('selectedTheme');
+        var selectedTheme = localStorage.getItem('selectedTheme');
 
-      if (selectedTheme) {
-        $('html').addClass(selectedTheme);
-        $('#selectTheme').val(selectedTheme);
-      }
-
-      $('#selectTheme').change(function () {
-        var selectedValue = $(this).val();
-        $('html').removeClass('dark grey egg-white light');
-        if (selectedValue === 'dark') {
-          $('html').addClass('dark');
-        } else if (selectedValue === 'grey') {
-          $('html').addClass('grey');
-        } else if (selectedValue === 'egg-white') {
-          $('html').addClass('egg-white');
-        } else if (selectedValue === 'light') {
-          $('html').addClass('light');
+        if (selectedTheme) {
+            $('html').addClass(selectedTheme);
+            $('#selectTheme').val(selectedTheme);
         }
 
-        localStorage.setItem('selectedTheme', selectedValue);
-      });
+        $('#selectTheme').change(function () {
+            var selectedValue = $(this).val();
+            $('html').removeClass('dark grey egg-white light');
+            if (selectedValue === 'dark') {
+                $('html').addClass('dark');
+            } else if (selectedValue === 'grey') {
+                $('html').addClass('grey');
+            } else if (selectedValue === 'egg-white') {
+                $('html').addClass('egg-white');
+            } else if (selectedValue === 'light') {
+                $('html').addClass('light');
+            }
+
+            localStorage.setItem('selectedTheme', selectedValue);
+        });
     });
 </script>

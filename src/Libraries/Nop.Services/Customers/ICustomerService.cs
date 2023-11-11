@@ -647,5 +647,26 @@ namespace Nop.Services.Customers
         Task InsertCustomerAddressAsync(Customer customer, Address address);
 
         #endregion
+
+        #region NCT Back-end dev
+
+        #region Identity Verification
+
+        Task DeleteIdentityVerificationAsync(IdentityVerification verification);
+
+        Task InsertIdentityVerificationAsync(IdentityVerification verification);
+
+        Task<IdentityVerification> GetIdentityVerificationById(int verificationid);
+
+        Task UpdateIdentityVerificationAsync(IdentityVerification verification);
+
+
+        Task<IPagedList<IdentityVerification>> GetAllIdentityVerificationAsync(int formsubid, int proofaddressid,
+            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false);
+
+        #endregion
+
+        #endregion
+
     }
 }

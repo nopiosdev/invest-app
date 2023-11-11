@@ -1,5 +1,6 @@
 ﻿using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using Nop.Core;
 using Nop.Core.Domain;
@@ -45,7 +46,6 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Validators;
 using Nop.Web.Models.Customer;
-using NUglify.Helpers;
 using ILogger = Nop.Services.Logging.ILogger;
 
 namespace Nop.Web.Controllers
@@ -101,7 +101,7 @@ namespace Nop.Web.Controllers
         protected readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
         protected readonly StoreInformationSettings _storeInformationSettings;
         protected readonly TaxSettings _taxSettings;
-        
+        protected readonly INopFileProvider _fileProvider;
         protected readonly ITransactionService _transactionService;
 
         #endregion
@@ -153,7 +153,9 @@ namespace Nop.Web.Controllers
             MediaSettings mediaSettings,
             MultiFactorAuthenticationSettings multiFactorAuthenticationSettings,
             StoreInformationSettings storeInformationSettings,
-            TaxSettings taxSettings)
+            TaxSettings taxSettings,
+            INopFileProvider fileProvider,
+            ITransactionService transactionService)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -201,7 +203,8 @@ namespace Nop.Web.Controllers
             _multiFactorAuthenticationSettings = multiFactorAuthenticationSettings;
             _storeInformationSettings = storeInformationSettings;
             _taxSettings = taxSettings;
-            _transactionService=EngineContext.Current.Resolve<ITransactionService>();
+            _fileProvider = fileProvider;
+            _transactionService = transactionService;
         }
 
         #endregion
@@ -1981,6 +1984,100 @@ namespace Nop.Web.Controllers
             model = await _customerModelFactory.PrepareMultiFactorAuthenticationProviderModelAsync(model, providerSysName);
 
             return View(model);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region NCT Back-end dev
+
+        #region Identity Verification
+
+        public virtual async Task<IActionResult> IdentityVerification()
+        {
+            //if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
+            //    return Challenge();
+
+            //var model = await _customerModelFactory.PrepareCustomerAddressListModelAsync();
+
+            return View();
+        }
+
+        [HttpPost]
+        public virtual async Task<IActionResult> IdentityVerification(IdentityVerificationModel model)
+        {
+            //if (!await _customerservice.isregisteredasync(await _workcontext.getcurrentcustomerasync()))
+            //    return challenge();
+
+            //var model = await _customermodelfactory.preparecustomeraddresslistmodelasync();
+
+            if (model.FormId != null || model.ProofOfAddress != null || model.Document != null)
+            {
+                var allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".webp", ".doc", ".docx", ".pdf" };
+                var fileExtension = Path.GetExtension(model.FormId.FileName).ToLower();
+                var fileExtension1 = Path.GetExtension(model.ProofOfAddress.FileName).ToLower();
+                var fileExtension2 = Path.GetExtension(model.Document.FileName).ToLower();
+
+                if (allowedExtensions.Contains(fileExtension) || allowedExtensions.Contains(fileExtension1) || allowedExtensions.Contains(fileExtension2))
+                {
+                    var download = new Download
+                    {
+                        DownloadGuid = Guid.NewGuid(),
+                        UseDownloadUrl = false,
+                        DownloadUrl = string.Empty,
+                        DownloadBinary = await _downloadService.GetDownloadBitsAsync(model.FormId),
+                        ContentType = model.FormId.ContentType,
+                        Filename = _fileProvider.GetFileNameWithoutExtension(model.FormId.FileName),
+                        Extension = fileExtension,
+                        IsNew = true
+                    };
+
+                    await _downloadService.InsertDownloadAsync(download);
+
+                    var download2 = new Download
+                    {
+                        DownloadGuid = Guid.NewGuid(),
+                        UseDownloadUrl = false,
+                        DownloadUrl = string.Empty,
+                        DownloadBinary = await _downloadService.GetDownloadBitsAsync(model.ProofOfAddress),
+                        ContentType = model.FormId.ContentType,
+                        Filename = _fileProvider.GetFileNameWithoutExtension(model.ProofOfAddress.FileName),
+                        Extension = fileExtension1,
+                        IsNew = true
+                    };
+
+                    await _downloadService.InsertDownloadAsync(download2);
+
+                    var download3 = new Download
+                    {
+                        DownloadGuid = Guid.NewGuid(),
+                        UseDownloadUrl = false,
+                        DownloadUrl = string.Empty,
+                        DownloadBinary = await _downloadService.GetDownloadBitsAsync(model.Document),
+                        ContentType = model.FormId.ContentType,
+                        Filename = _fileProvider.GetFileNameWithoutExtension(model.Document.FileName),
+                        Extension = fileExtension2,
+                        IsNew = true
+                    };
+
+                    await _downloadService.InsertDownloadAsync(download3);
+
+
+                    var identityverification = new IdentityVerification
+                    {
+                        FormId = download.Id,
+                        ProofOfAddress = download2.Id,
+                        Document = download3.Id
+                    };
+
+                    await _customerService.InsertIdentityVerificationAsync(identityverification);
+                }
+              
+            }
+           
+          
+            return View();
         }
 
         #endregion

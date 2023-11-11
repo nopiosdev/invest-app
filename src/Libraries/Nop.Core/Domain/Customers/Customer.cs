@@ -238,6 +238,23 @@ namespace Nop.Core.Domain.Customers
         /// </summary>
         public int? ShippingAddressId { get; set; }
 
+        //NCT Back-end dev
+        
+        //Investment fields
+        public int GoalId { get; set; }
+        public int TimelineId { get; set; }
+        public int ExperienceId { get; set; }
+        public int RiskToleranceId { get; set; }
+        public int InvestmentApproachId { get; set; }
+        
+        //Security fields
+        public bool TwoFactorAuthentication { get; set; }
+        public bool Verified { get; set; }
+
+        //Alert fields
+        public bool EmailAlert { get; set; }
+        public bool TextAlert { get; set; }
+
         #region Custom properties
 
         /// <summary>

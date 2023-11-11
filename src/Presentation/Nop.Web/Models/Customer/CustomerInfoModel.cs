@@ -16,6 +16,12 @@ namespace Nop.Web.Models.Customer
             AssociatedExternalAuthRecords = new List<AssociatedExternalAuthModel>();
             CustomerAttributes = new List<CustomerAttributeModel>();
             GdprConsents = new List<GdprConsentModel>();
+
+            AvailableGoal = new List<SelectListItem>();
+            AvailableTimeline = new List<SelectListItem>();
+            AvailableExperience = new List<SelectListItem>();
+            AvailableRiskTolerance = new List<SelectListItem>();
+            AvailableInvestmentApproach = new List<SelectListItem>();
         }
 
         [DataType(DataType.EmailAddress)]
@@ -143,6 +149,36 @@ namespace Nop.Web.Models.Customer
         public IList<CustomerAttributeModel> CustomerAttributes { get; set; }
 
         public IList<GdprConsentModel> GdprConsents { get; set; }
+
+
+        [NopResourceDisplayName("Account.Goal")]
+        public int GoalId { get; set; }
+        public IList<SelectListItem> AvailableGoal { get; set; }
+
+        [NopResourceDisplayName("Account.Timeline")]
+        public int TimelineId { get; set; }
+        public IList<SelectListItem> AvailableTimeline { get; set; }
+
+        [NopResourceDisplayName("Account.Experience")]
+        public int ExperienceId { get; set; }
+        public IList<SelectListItem> AvailableExperience { get; set; }
+
+        [NopResourceDisplayName("Account.RiskTolerance")]
+        public int RiskToleranceId { get; set; }
+        public IList<SelectListItem> AvailableRiskTolerance { get; set; }
+
+        [NopResourceDisplayName("Account.InvestmentApproach")]
+        public int InvestmentApproachId { get; set; }
+        public IList<SelectListItem> AvailableInvestmentApproach { get; set; }
+
+        [NopResourceDisplayName("Account.TwoFactorAuthentication")]
+        public bool TwoFactorAuthentication { get; set; }
+
+        [NopResourceDisplayName("Account.EmailAlert")]
+        public bool EmailAlert { get; set; }
+
+        [NopResourceDisplayName("Account.TextAlert")]
+        public bool TextAlert { get; set; }
 
         #region Nested classes
 

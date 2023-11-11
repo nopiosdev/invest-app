@@ -230,3 +230,26 @@
     </div>
  
 </div>
+
+<nop-label asp-for="GoalId" />
+<nop-select asp-for="GoalId" asp-items="Model.AvailableGoal" />
+
+<nop-label asp-for="TimelineId" />
+<nop-select asp-for="TimelineId" asp-items="Model.AvailableTimeline" />
+
+<nop-label asp-for="ExperienceId" />
+<nop-select asp-for="ExperienceId" asp-items="Model.AvailableExperience" />
+<nop-label asp-for="RiskToleranceId" />
+<nop-select asp-for="RiskToleranceId" asp-items="Model.AvailableRiskTolerance" />
+
+<nop-label asp-for="InvestmentApproachId" />
+<nop-select asp-for="InvestmentApproachId" asp-items="Model.AvailableInvestmentApproach" />
+
+<nop-label asp-for="TwoFactorAuthentication"/>
+<nop-editor asp-for="TwoFactorAuthentication" />
+
+<nop-label asp-for="EmailAlert"/>
+<nop-editor asp-for="EmailAlert" />
+
+<nop-label asp-for="TextAlert"/>
+<nop-editor asp-for="TextAlert" />

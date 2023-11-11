@@ -375,6 +375,50 @@ namespace Nop.Web.Factories
                 }
             }
 
+            //NCT Back-end dev
+            model.AvailableGoal = new List<SelectListItem>()
+            {
+                new SelectListItem(){Text="Growth",Value="1" },
+                new SelectListItem(){Text="Investment",Value="2"},
+                new SelectListItem(){Text="Retirement",Value="3"},
+                new SelectListItem(){Text="Savings",Value="4"},
+                new SelectListItem(){Text="Income",Value="5"},
+                new SelectListItem(){Text="Something else",Value="6"},
+            };
+            model.AvailableTimeline = new List<SelectListItem>()
+            {
+                new SelectListItem(){Text="1-5 years",Value="1" },
+                new SelectListItem(){Text="5-10 years",Value="2"},
+                new SelectListItem(){Text="More than 10 years",Value="3"},
+            };
+            model.AvailableExperience = new List<SelectListItem>()
+            {
+                new SelectListItem(){Text="Not Much",Value="1"},
+                new SelectListItem(){Text="I'm okay",Value="2"},
+                new SelectListItem(){Text="I'm an expert",Value="3"},
+            };
+            model.AvailableRiskTolerance = new List<SelectListItem>()
+            {
+                new SelectListItem(){Text="High",Value="1"},
+                new SelectListItem(){Text="Medium",Value="2"},
+                new SelectListItem(){Text="Low",Value="3"},
+            };
+            model.AvailableInvestmentApproach = new List<SelectListItem>()
+            {
+                new SelectListItem(){Text="I do not like to lose money",Value="1"},
+                new SelectListItem(){Text="Willing to risk losing money in order to make more",Value="2"},
+                new SelectListItem(){Text="Not important to me",Value="3"},
+            };
+
+            model.GoalId = customer.GoalId;
+            model.TimelineId = customer.TimelineId;
+            model.ExperienceId = customer.ExperienceId;
+            model.RiskToleranceId = customer.RiskToleranceId;
+            model.InvestmentApproachId = customer.InvestmentApproachId;
+            model.TwoFactorAuthentication = customer.TwoFactorAuthentication;
+            model.EmailAlert = customer.EmailAlert;
+            model.TextAlert = customer.TextAlert;
+
             return model;
         }
 

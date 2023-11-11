@@ -10,6 +10,10 @@
     var themeName = await themeContext.GetWorkingThemeNameAsync();
     var supportRtl = await Html.ShouldUseRtlThemeAsync();
 
+    NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/theme.css");
+    NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/responsive.css");
+    NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/custom.css");
+
     //add main CSS file
     NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/styles{(supportRtl ? ".rtl" : "")}.css");
 
@@ -20,6 +24,9 @@
     //add bootstrap file
     NopHtml.AppendCssFileParts($"~/Themes/InvestApp/Content/Bootstrap/bootstrap.min-5.2.3.css");
     NopHtml.AddScriptParts(ResourceLocation.Footer, $"~/Themes/InvestApp/Content/Bootstrap/bootstrap.min-5.2.3.js");
+
+    NopHtml.AddScriptParts(ResourceLocation.Footer,$"~/Themes/{themeName}/Content/js/script.js");
+    
     
     //add swiper css file
     if (catalogSettings.DisplayAllPicturesOnCatalogPages)

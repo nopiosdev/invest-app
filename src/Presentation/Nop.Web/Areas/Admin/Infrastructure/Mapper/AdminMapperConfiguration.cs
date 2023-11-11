@@ -1745,6 +1745,9 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
         {
             CreateMap<Transaction, TransactionModel>();
             CreateMap<TransactionModel, Transaction>();
+
+            CreateMap<Transaction, Nop.Web.Models.Customer.TransactionModel>();
+            CreateMap<Nop.Web.Models.Customer.TransactionModel, Transaction>();
         }
 
         #endregion

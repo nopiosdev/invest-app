@@ -13,9 +13,11 @@ using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Events;
 using Nop.Core.Http;
 using Nop.Core.Http.Extensions;
+using Nop.Core.Infrastructure;
 using Nop.Services.Attributes;
 using Nop.Services.Authentication;
 using Nop.Services.Authentication.External;
@@ -34,6 +36,8 @@ using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Tax;
+using Nop.Services.Transactions;
+using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Extensions;
 using Nop.Web.Factories;
 using Nop.Web.Framework;
@@ -41,6 +45,7 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Validators;
 using Nop.Web.Models.Customer;
+using NUglify.Helpers;
 using ILogger = Nop.Services.Logging.ILogger;
 
 namespace Nop.Web.Controllers
@@ -96,6 +101,8 @@ namespace Nop.Web.Controllers
         protected readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
         protected readonly StoreInformationSettings _storeInformationSettings;
         protected readonly TaxSettings _taxSettings;
+        
+        protected readonly ITransactionService _transactionService;
 
         #endregion
 
@@ -194,6 +201,7 @@ namespace Nop.Web.Controllers
             _multiFactorAuthenticationSettings = multiFactorAuthenticationSettings;
             _storeInformationSettings = storeInformationSettings;
             _taxSettings = taxSettings;
+            _transactionService=EngineContext.Current.Resolve<ITransactionService>();
         }
 
         #endregion
@@ -1973,6 +1981,35 @@ namespace Nop.Web.Controllers
             model = await _customerModelFactory.PrepareMultiFactorAuthenticationProviderModelAsync(model, providerSysName);
 
             return View(model);
+        }
+
+        #endregion
+
+        #region Vault
+
+        //available even when a store is closed
+        [CheckAccessClosedStore(ignore: true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(ignore: true)]
+        public virtual IActionResult Vault()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        //available even when a store is closed
+        [CheckAccessClosedStore(ignore: true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(ignore: true)]
+        public virtual async Task<IActionResult> Vault(TransactionModel model)
+        {
+            var transaction = model.ToEntity<Transaction>();
+            transaction.CreatedOnUtc = DateTime.UtcNow;
+            transaction.Status = Status.Pending;
+
+            await _transactionService.InsertTransactionAsync(transaction);
+
+            return View();
         }
 
         #endregion

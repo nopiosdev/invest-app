@@ -742,6 +742,12 @@ namespace Nop.Web.Infrastructure
             //fallback is intended to handle cases when no other endpoint has matched
             //we use it to invoke [CheckLanguageSeoCode] and give a chance to find a localized route
             endpointRouteBuilder.MapFallbackToController("FallbackRedirect", "Common");
+
+            //NCT Back-end dev
+            //valut
+            endpointRouteBuilder.MapControllerRoute(name: "Vault",
+                pattern: $"{lang}/customer/vault",
+                defaults: new { controller = "Customer", action = "Vault" });
         }
 
         #endregion

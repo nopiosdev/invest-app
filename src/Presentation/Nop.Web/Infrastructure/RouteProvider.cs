@@ -84,6 +84,10 @@ namespace Nop.Web.Infrastructure
                 pattern: $"{lang}/customer/addresses",
                 defaults: new { controller = "Customer", action = "Addresses" });
 
+            endpointRouteBuilder.MapControllerRoute(name: "IdentityVerification",
+                pattern: $"{lang}/customer/identityverification",
+                defaults: new { controller = "Customer", action = "IdentityVerification" });
+
             //customer address delete (AJAX)
             endpointRouteBuilder.MapControllerRoute(name: "CustomerAddressDelete",
                 pattern: $"customer/addressdelete",
@@ -364,6 +368,10 @@ namespace Nop.Web.Infrastructure
             endpointRouteBuilder.MapControllerRoute(name: "CustomerChangePassword",
                 pattern: $"{lang}/customer/changepassword",
                 defaults: new { controller = "Customer", action = "ChangePassword" });
+
+            endpointRouteBuilder.MapControllerRoute(name: "CustomerIdentityVerification",
+               pattern: $"{lang}/customer/identityverification",
+               defaults: new { controller = "Customer", action = "IdentityVerification" });
 
             endpointRouteBuilder.MapControllerRoute(name: "CustomerAvatar",
                 pattern: $"{lang}/customer/avatar",

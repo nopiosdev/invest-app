@@ -1,4 +1,5 @@
 ﻿using System.Xml;
+using Irony.Parsing;
 using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Blogs;
@@ -31,6 +32,7 @@ namespace Nop.Services.Customers
         protected readonly IRepository<Address> _customerAddressRepository;
         protected readonly IRepository<BlogComment> _blogCommentRepository;
         protected readonly IRepository<Customer> _customerRepository;
+        protected readonly IRepository<IdentityVerification> _identityVerificationRepository;
         protected readonly IRepository<CustomerAddressMapping> _customerAddressMappingRepository;
         protected readonly IRepository<CustomerCustomerRoleMapping> _customerCustomerRoleMappingRepository;
         protected readonly IRepository<CustomerPassword> _customerPasswordRepository;
@@ -75,7 +77,8 @@ namespace Nop.Services.Customers
             IStaticCacheManager staticCacheManager,
             IStoreContext storeContext,
             ShoppingCartSettings shoppingCartSettings,
-            TaxSettings taxSettings)
+            TaxSettings taxSettings,
+            IRepository<IdentityVerification> identityVerificationRepository)
         {
             _customerSettings = customerSettings;
             _genericAttributeService = genericAttributeService;
@@ -100,6 +103,7 @@ namespace Nop.Services.Customers
             _storeContext = storeContext;
             _shoppingCartSettings = shoppingCartSettings;
             _taxSettings = taxSettings;
+            _identityVerificationRepository = identityVerificationRepository;
         }
 
         #endregion
@@ -1702,8 +1706,47 @@ namespace Nop.Services.Customers
             return await GetCustomerAddressAsync(customer.Id, customer.ShippingAddressId ?? 0);
         }
 
+
+
         #endregion
 
         #endregion
+
+        #region NCT Back-end dev
+
+        #region Identity Verification
+
+
+        public async Task DeleteIdentityVerificationAsync(IdentityVerification verification)
+        {
+            await _identityVerificationRepository.DeleteAsync(verification);
+
+        }
+
+        public async Task InsertIdentityVerificationAsync(IdentityVerification verification)
+        {
+            await _identityVerificationRepository.InsertAsync(verification);
+        }
+
+        public async Task<IdentityVerification> GetIdentityVerificationById(int verificationid)
+        {
+            return await _identityVerificationRepository.GetByIdAsync(verificationid, cache => default);
+        }
+
+        public async Task UpdateIdentityVerificationAsync(IdentityVerification verification)
+        {
+            await _identityVerificationRepository.UpdateAsync(verification);
+        }
+
+        public async Task<IPagedList<IdentityVerification>> GetAllIdentityVerificationAsync(int formsubid, int proofaddressid, int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        #endregion
+
+        #endregion
+
     }
 }

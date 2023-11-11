@@ -746,6 +746,18 @@ namespace Nop.Web.Factories
                 });
             }
 
+            #region NCT Back-end dev
+
+            model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+            {
+                RouteName = "IdentityVerification",
+                Title = await _localizationService.GetResourceAsync("PageTitle.IdentityVerification"),
+                Tab = (int)CustomerNavigationEnum.IdentityVerification,
+                ItemClass = "customer-identity-verification"
+
+            });
+
+            #endregion
             model.SelectedTab = selectedTabId;
 
             return model;

@@ -206,11 +206,12 @@
                                 <div class="inputs">
                                     <label>@T("Account.Theme")</label>
                                     <span>
-                                        <select class="form-select" aria-label="Default select example">
+                                        <select class="form-select" id="selectTheme" aria-label="Default select example">
                                             <option> </option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                            <option value="dark">Dark</option>
+                                            <option value="grey">Grey</option>
+                                            <option value="egg-white">Egg White</option>
+                                            <option value="light">Light</option>
                                         </select>
                                     </span>
                                 </div> 
@@ -253,3 +254,30 @@
 
 <nop-label asp-for="TextAlert"/>
 <nop-editor asp-for="TextAlert" />
+
+<script>
+    $(document).ready(function () {
+      var selectedTheme = localStorage.getItem('selectedTheme');
+
+      if (selectedTheme) {
+        $('html').addClass(selectedTheme);
+        $('#selectTheme').val(selectedTheme);
+      }
+
+      $('#selectTheme').change(function () {
+        var selectedValue = $(this).val();
+        $('html').removeClass('dark grey egg-white light');
+        if (selectedValue === 'dark') {
+          $('html').addClass('dark');
+        } else if (selectedValue === 'grey') {
+          $('html').addClass('grey');
+        } else if (selectedValue === 'egg-white') {
+          $('html').addClass('egg-white');
+        } else if (selectedValue === 'light') {
+          $('html').addClass('light');
+        }
+
+        localStorage.setItem('selectedTheme', selectedValue);
+      });
+    });
+</script>

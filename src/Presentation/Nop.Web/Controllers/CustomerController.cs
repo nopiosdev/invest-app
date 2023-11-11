@@ -14,6 +14,7 @@ using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Events;
 using Nop.Core.Http;
 using Nop.Core.Http.Extensions;
@@ -36,6 +37,8 @@ using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Tax;
+using Nop.Services.Transactions;
+using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Extensions;
 using Nop.Web.Factories;
 using Nop.Web.Framework;
@@ -99,6 +102,7 @@ namespace Nop.Web.Controllers
         protected readonly StoreInformationSettings _storeInformationSettings;
         protected readonly TaxSettings _taxSettings;
         protected readonly INopFileProvider _fileProvider;
+        protected readonly ITransactionService _transactionService;
 
         #endregion
 
@@ -150,7 +154,8 @@ namespace Nop.Web.Controllers
             MultiFactorAuthenticationSettings multiFactorAuthenticationSettings,
             StoreInformationSettings storeInformationSettings,
             TaxSettings taxSettings,
-            INopFileProvider fileProvider)
+            INopFileProvider fileProvider,
+            ITransactionService transactionService)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -199,6 +204,7 @@ namespace Nop.Web.Controllers
             _storeInformationSettings = storeInformationSettings;
             _taxSettings = taxSettings;
             _fileProvider = fileProvider;
+            _transactionService = transactionService;
         }
 
         #endregion

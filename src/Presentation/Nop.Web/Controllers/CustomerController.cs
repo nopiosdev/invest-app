@@ -2076,6 +2076,35 @@ namespace Nop.Web.Controllers
 
         #endregion
 
+        #region Vault
+
+        //available even when a store is closed
+        [CheckAccessClosedStore(ignore: true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(ignore: true)]
+        public virtual IActionResult Vault()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        //available even when a store is closed
+        [CheckAccessClosedStore(ignore: true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(ignore: true)]
+        public virtual async Task<IActionResult> Vault(TransactionModel model)
+        {
+            var transaction = model.ToEntity<Transaction>();
+            transaction.CreatedOnUtc = DateTime.UtcNow;
+            transaction.Status = Status.Pending;
+
+            await _transactionService.InsertTransactionAsync(transaction);
+
+            return View();
+        }
+
+        #endregion
+
         #endregion
     }
 }

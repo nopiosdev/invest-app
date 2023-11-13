@@ -753,9 +753,9 @@ namespace Nop.Web.Infrastructure
 
             //NCT Back-end dev
             //valut
-            endpointRouteBuilder.MapControllerRoute(name: "Vault",
-                pattern: $"{lang}/customer/vault",
-                defaults: new { controller = "Customer", action = "Vault" });
+            endpointRouteBuilder.MapControllerRoute(name: "Invest",
+                pattern: $"{lang}/customer/invest",
+                defaults: new { controller = "Customer", action = "Invest" });
         }
 
         #endregion

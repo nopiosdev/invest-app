@@ -12,6 +12,7 @@ using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
+using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Transaction;
@@ -103,6 +104,7 @@ namespace Nop.Web.Controllers
         protected readonly TaxSettings _taxSettings;
         protected readonly INopFileProvider _fileProvider;
         protected readonly ITransactionService _transactionService;
+        protected readonly IShoppingCartService _shoppingCartService;
 
         #endregion
 
@@ -155,7 +157,8 @@ namespace Nop.Web.Controllers
             StoreInformationSettings storeInformationSettings,
             TaxSettings taxSettings,
             INopFileProvider fileProvider,
-            ITransactionService transactionService)
+            ITransactionService transactionService,
+            IShoppingCartService shoppingCartService)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -205,6 +208,7 @@ namespace Nop.Web.Controllers
             _taxSettings = taxSettings;
             _fileProvider = fileProvider;
             _transactionService = transactionService;
+            _shoppingCartService = shoppingCartService;
         }
 
         #endregion
@@ -1988,8 +1992,6 @@ namespace Nop.Web.Controllers
 
         #endregion
 
-        #endregion
-
         #region NCT Back-end dev
 
         #region Identity Verification
@@ -2082,13 +2084,13 @@ namespace Nop.Web.Controllers
 
         #endregion
 
-        #region Vault
+        #region Invest
 
         //available even when a store is closed
         [CheckAccessClosedStore(ignore: true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(ignore: true)]
-        public virtual IActionResult Vault()
+        public virtual IActionResult Invest()
         {
             return View();
         }
@@ -2098,16 +2100,48 @@ namespace Nop.Web.Controllers
         [CheckAccessClosedStore(ignore: true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(ignore: true)]
-        public virtual async Task<IActionResult> Vault(TransactionModel model)
+        public virtual async Task<IActionResult> Invest(TransactionModel model)
         {
-            var transaction = model.ToEntity<Transaction>();
-            transaction.CreatedOnUtc = DateTime.UtcNow;
-            transaction.Status = Status.Pending;
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            var product = await _productService.GetProductByIdAsync(_customerSettings.TransactionProductId);
+            if (product is null)
+            {
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.TransactionFailed"));
+                //return View(model);
+            }
+            var store = await _storeContext.GetCurrentStoreAsync();
 
-            await _transactionService.InsertTransactionAsync(transaction);
+            var warnings = await _shoppingCartService.AddToCartAsync(customer: customer,
+                product: product,
+                shoppingCartType: ShoppingCartType.ShoppingCart,
+                storeId: store.Id,
+                customerEnteredPrice: model.TransactionAmount,
+                addRequiredProducts: false
+                );
+            foreach (var warning in warnings)
+            {
+                ModelState.AddModelError("", warning);
+            }
 
-            return View();
+            if (ModelState.IsValid)
+            {
+                return RedirectToRoute("CheckoutConfirm");
+
+                return RedirectToRoute("CheckoutPaymentMethod");
+            }
+            //var transaction = new Transaction()
+            //{
+
+            //};
+            //transaction.CreatedOnUtc = DateTime.UtcNow;
+            //transaction.Status = Status.Pending;
+
+            //await _transactionService.InsertTransactionAsync(transaction);
+
+            return View(model);
         }
+
+        #endregion
 
         #endregion
 

@@ -404,6 +404,9 @@ namespace Nop.Core.Domain.Customers
         /// </summary>
         public bool AcceptPrivacyPolicyEnabled { get; set; }
 
+        //NCT Back-end dev
+        public int TransactionProductId { get; set; }
+
         #endregion
     }
 }

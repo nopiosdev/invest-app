@@ -8,6 +8,7 @@ namespace Nop.Core.Domain.Transaction
 {
     public partial class Transaction : BaseEntity
     {
+
         public DateTime CreatedOnUtc { get; set; }
         public int CustomerId { get; set; }
         public decimal Balance { get; set; }
@@ -16,6 +17,9 @@ namespace Nop.Core.Domain.Transaction
         public decimal TransactionAmount { get; set; }
         public decimal UpdateBalance { get; set; }
         public int StatusId { get; set; }
+        public int? OrderId { get; set; }
+
+        
         public TransactionType TransactionType
         {
             get => (TransactionType)this.TransactionTypeId;

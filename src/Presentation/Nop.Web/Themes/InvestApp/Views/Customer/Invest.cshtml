@@ -1,0 +1,16 @@
+﻿@model TransactionModel
+
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    NopHtml.AddTitleParts(T("PageTitle.Invest").Text);
+    //page class
+    NopHtml.AppendPageCssClassParts("html-login-page");
+}
+<form method="post">
+    <nop-antiforgery-token />
+    <div asp-validation-summary="ModelOnly" class="message-error"></div>
+    <nop-editor asp-for="TransactionAmount" />
+    <button type="submit">@T("Customer.Invest.MakeTransaction")</button>
+</form>

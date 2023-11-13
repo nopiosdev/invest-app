@@ -9,6 +9,7 @@ namespace Nop.Web.Models.Customer
         public TransactionModel()
         {
             AvailableTransactionType = new List<SelectListItem>();
+            RecentTransactions = new List<TransactionModel>();
         }
 
         public DateTime CreateOnUtc { get; set; }
@@ -20,6 +21,8 @@ namespace Nop.Web.Models.Customer
         public decimal TransactionAmount { get; set; }
         public decimal UpdateBalance { get; set; }
         public int StatusId { get; set; }
+        public IList<TransactionModel> RecentTransactions { get; set; }
+
         public TransactionType TransactionType
         {
             get => (TransactionType)this.TransactionTypeId;

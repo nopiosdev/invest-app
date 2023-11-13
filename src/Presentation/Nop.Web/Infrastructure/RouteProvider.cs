@@ -752,10 +752,15 @@ namespace Nop.Web.Infrastructure
             endpointRouteBuilder.MapFallbackToController("FallbackRedirect", "Common");
 
             //NCT Back-end dev
-            //valut
+            //invest
             endpointRouteBuilder.MapControllerRoute(name: "Invest",
-                pattern: $"{lang}/customer/invest",
+                pattern: $"{lang}/customertransaction/invest",
                 defaults: new { controller = "Customer", action = "Invest" });
+
+            //withdraw
+            endpointRouteBuilder.MapControllerRoute(name: "Withdraw",
+                pattern: $"{lang}/customertransaction/withdraw",
+                defaults: new { controller = "Customer", action = "Withdraw" });
         }
 
         #endregion

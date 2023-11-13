@@ -11,6 +11,7 @@ using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Vendors;
+using Nop.Core.Infrastructure;
 using Nop.Services.Attributes;
 using Nop.Services.Authentication.External;
 using Nop.Services.Authentication.MultiFactor;
@@ -27,6 +28,8 @@ using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
+using Nop.Services.Transactions;
+using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Customer;
 
@@ -77,6 +80,9 @@ namespace Nop.Web.Factories
         protected readonly SecuritySettings _securitySettings;
         protected readonly TaxSettings _taxSettings;
         protected readonly VendorSettings _vendorSettings;
+
+        //NCT Back-end dev
+        protected readonly ITransactionService _transactionService;
 
         #endregion
 
@@ -159,6 +165,7 @@ namespace Nop.Web.Factories
             _securitySettings = securitySettings;
             _taxSettings = taxSettings;
             _vendorSettings = vendorSettings;
+            _transactionService = EngineContext.Current.Resolve<ITransactionService>();
         }
 
         #endregion
@@ -1126,6 +1133,23 @@ namespace Nop.Web.Factories
             }
 
             return result;
+        }
+
+        public virtual async Task<TransactionModel> PrepareTransactionModelAsync(Customer customer, TransactionModel model = null)
+        {
+            model ??= new TransactionModel();
+            if (customer is null)
+                return model;
+
+            var transactions = await _transactionService.GetAllTransactionsAsync(customerId: customer.Id);
+            model.RecentTransactions = transactions.TakeLast(2).Select(x => new TransactionModel()
+            {
+                TransactionNote = x.TransactionNote,
+                TransactionAmount = x.TransactionAmount,
+                CreateOnUtc = x.CreatedOnUtc,
+            }).ToList();
+
+            return model;
         }
 
         #endregion

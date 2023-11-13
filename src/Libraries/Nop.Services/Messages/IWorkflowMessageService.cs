@@ -660,5 +660,11 @@ namespace Nop.Services.Messages
             string fromEmail = null, string fromName = null, string subject = null);
 
         #endregion
+
+        #region Transaction
+
+        Task<IList<int>> SendTransactionDebitRequestAsync(decimal transactionAmount, int languageId, string senderEmail, string senderName);
+
+        #endregion
     }
 }

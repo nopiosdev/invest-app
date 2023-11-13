@@ -11,122 +11,18 @@
 
 <style>
 
-    .form-layout{
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        overflow: auto;
-        background: #090d16;
-    }
-    .registerWrapper {
-        display: flex;
-        height: 100%;
-        overflow: hidden;
-        width: 100%;
-    }
-    .formWrap {
-        min-width: 60%;
-        padding: 25px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-grow: 1;
-        overflow-y: auto;
-    }
-    .formWrap .form {
-        width: 650px;
-        max-width: 100%;
-    }
-    .reg-form{
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        color: #fff;
-        font-size: 14px;
-        font-variant: tabular-nums;
-        line-height: 1.5;
-        list-style: none;
-        -webkit-font-feature-settings: "tnum","tnum";
-        font-feature-settings: "tnum","tnum";
-    }
-    .reg-title{
-        padding-bottom: 15px;
-    }
-    .reg-inputs{
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-        padding: 0;
-        color: #fff;
-        font-size: 14px;
-        font-variant: tabular-nums;
-        line-height: 1.5;
-        list-style: none;
-        -webkit-font-feature-settings: "tnum","tnum";
-        font-feature-settings: "tnum","tnum";
-        margin: 0 0 24px;
-        vertical-align: top;
-    }
-    .reg-inputs input{
-        height: 40px;
-        padding: 6px 11px 6px 30px;
-        font-size: 16px;
-        box-sizing: border-box;
-        margin: 0;
-        list-style: none;
-        font-feature-settings: "tnum","tnum";
-        display: inline-block;
-        width: 100%;
-        color: #fff;
-        line-height: 1.5;
-        background-color: #30333a;
-        background-image: none;
-        border: 1px solid #404040;
-        border-radius: 4px;
-        transition: all .3s;
-    }
-
-    .reg-inputs input:focus, .reg-inputs input:hover, .reg-inputs input:focus-visible {
-        border-color: #46dbaa !important;
-        border-right-width: 1px !important;
-        outline: none;
-    }
-    .reg-btn{
-        border-radius: 2px!important;
-        line-height: 44px!important;
-        height: 44px!important;
-        text-transform: uppercase;
-        font-size: 12px!important;
-        padding: 0 25px!important;
-        font-weight: 600!important;
-        background-color: rgb(56, 173, 144);
-        color: white;
-        border-color: rgb(69, 214, 168);
-        text-shadow: 0 -1px 0 rgba(0,0,0,.12);
-        box-shadow: 0 2px 0 rgba(0,0,0,.045);
-        position: relative;
-        display: inline-block;
-        white-space: nowrap;
-        text-align: center;
-        background-image: none;
-        transition: all .3s cubic-bezier(.645,.045,.355,1);
-        border: 1px solid #404040;
-    }
-    .site-instruction {
-        margin: 50px 0 0;
-        color: #424e5a;
-    }
-    .textWrap {
-        width: 650px;
-        background: #313942;
-        padding: 50px 200px 50px 50px;
-        flex-direction: column;
-        display: flex;
-        justify-content: center;
-        color: #aaa;
-        line-height: 34px;
-        overflow-y: auto;
-    }
+    .form-layout{ display: flex; flex-direction: column; height: 100vh; overflow: auto; background: #090d16; }
+    .registerWrapper { display: flex; height: 100%; overflow: hidden; width: 100%; }
+    .formWrap { min-width: 60%; padding: 25px; display: flex; align-items: center; justify-content: center; flex-grow: 1; overflow-y: auto; }
+    .formWrap .form { width: 650px; max-width: 100%; }
+    .reg-form{ -webkit-box-sizing: border-box; box-sizing: border-box; margin: 0; padding: 0; color: #fff; font-size: 14px; font-variant: tabular-nums; line-height: 1.5; list-style: none; -webkit-font-feature-settings: "tnum","tnum"; font-feature-settings: "tnum","tnum"; }
+    .reg-title{ padding-bottom: 15px; }
+    .reg-inputs{ -webkit-box-sizing: border-box; box-sizing: border-box; padding: 0; color: #fff; font-size: 14px; font-variant: tabular-nums; line-height: 1.5; list-style: none; -webkit-font-feature-settings: "tnum","tnum"; font-feature-settings: "tnum","tnum"; margin: 0 0 24px; vertical-align: top; }
+    .reg-inputs input{ height: 40px; padding: 6px 11px 6px 30px; font-size: 16px; box-sizing: border-box; margin: 0; list-style: none; font-feature-settings: "tnum","tnum"; display: inline-block; width: 100%; color: #fff; line-height: 1.5; background-color: #30333a; background-image: none; border: 1px solid #404040; border-radius: 4px; transition: all .3s; }
+    .reg-inputs input:focus, .reg-inputs input:hover, .reg-inputs input:focus-visible { border-color: #46dbaa !important; border-right-width: 1px !important; outline: none; }
+    .reg-btn{ border-radius: 2px!important; line-height: 44px!important; height: 44px!important; text-transform: uppercase; font-size: 12px!important; padding: 0 25px!important; font-weight: 600!important; background-color: rgb(56, 173, 144); color: white; border-color: rgb(69, 214, 168); text-shadow: 0 -1px 0 rgba(0,0,0,.12); box-shadow: 0 2px 0 rgba(0,0,0,.045); position: relative; display: inline-block; white-space: nowrap; text-align: center; background-image: none; transition: all .3s cubic-bezier(.645,.045,.355,1); border: 1px solid #404040; }
+    .site-instruction { margin: 50px 0 0; color: #424e5a; }
+    .textWrap { width: 650px; background: #313942; padding: 50px 200px 50px 50px; flex-direction: column; display: flex; justify-content: center; color: #aaa; line-height: 34px; overflow-y: auto; }
     .textWrap h3 {font-size:16.5px;color:#fff;margin-top: 20px;}
     .textWrap p {font-size:14px;}
     .site-instruction p {font-size: 14px;}

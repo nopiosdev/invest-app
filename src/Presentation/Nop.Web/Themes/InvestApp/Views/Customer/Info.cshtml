@@ -45,7 +45,7 @@
 
                 <div class="col-xl-10">
                     <div class="custom-tab-container">
-                        <div class="title my-25">
+                        <div id="investmentSection" class="title my-25">
                             <h2>@T("Account.Account")</h2>
                         </div>
 
@@ -110,57 +110,37 @@
                     <div class="col-xl-10">
                         <div class="custom-tab-container">
 
-                            <div class="title my-25">
+                            <div id="tradingSection" class="title my-25">
                                 <h2>@T("Account.investment")</h2>
                             </div>
                             <div class="form-block">
                                 <div class="inputs">
                                     <label>@T("Account.Goal")</label>
                                     <span>
-                                        <select class="form-select" aria-label="Default select example">
-                                            <option selected>Open this select menu</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
+                                       <nop-select asp-for="GoalId" asp-items="Model.AvailableGoal" />
                                     </span>
                                 </div>
                                 <div class="inputs">
                                     <label>@T("Account.Timeline")</label>
                                     <span>
-                                        <select class="form-select" aria-label="Default select example">
-                                            <option selected>Open this select menu</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
+                                        <nop-select asp-for="TimelineId" asp-items="Model.AvailableTimeline" />
                                     </span>
                                 </div>
                                 <div class="inputs">
                                     <label>@T("Account.Experience")</label>
                                     <span>
-                                        <select class="form-select" aria-label="Default select example">
-                                            <option selected>Open this select menu</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
+                                        <nop-select asp-for="ExperienceId" asp-items="Model.AvailableExperience" />
                                     </span>
                                 </div>
                                 <div class="inputs">
                                     <label>@T("Account.RiskTolerance")</label>
                                     <span>
-                                        <select class="form-select" aria-label="Default select example">
-                                            <option selected>Open this select menu</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
+                                        <nop-select asp-for="RiskToleranceId" asp-items="Model.AvailableRiskTolerance" />
                                     </span>
                                 </div>
                             </div>
 
-                            <div class="title mt-50">
+                            <div id="securitySetion" class="title mt-50">
                                 <h2>@T("Account.investment")</h2>
                             </div>
                             <div class="form-block">
@@ -168,7 +148,7 @@
                                     <label>@T("Account.Security")</label>
                                     <span>
                                         <label class="custom-switch">
-                                            <input type="checkbox" checked>
+                                            <input type="checkbox" name="TwoFactorAuthentication" />
                                             <span class="custom-slider round"></span>
                                         </label>
                                     </span>
@@ -183,7 +163,7 @@
                                     <label>@T("Account.Email")</label>
                                     <span>
                                         <label class="custom-switch">
-                                            <input type="checkbox" checked>
+                                            <input type="checkbox" name="EmailAlert" />
                                             <span class="custom-slider round"></span>
                                         </label>
                                     </span>
@@ -192,14 +172,14 @@
                                     <label>@T("Account.Text")</label>
                                     <span>
                                         <label class="custom-switch">
-                                            <input type="checkbox" checked>
+                                            <input type="checkbox" name="TextAlert" />
                                             <span class="custom-slider round"></span>
                                         </label>
                                     </span>
                                 </div>
                             </div>
 
-                            <div class="title mt-50">
+                            <div id="preferenceSetion" class="title mt-50">
                                 <h2>@T("Account.Preference")</h2>
                             </div>
                             <div class="form-block">
@@ -229,31 +209,10 @@
             </div>
         </div>
     </div>
-
 </div>
 
-<nop-label asp-for="GoalId" />
-<nop-select asp-for="GoalId" asp-items="Model.AvailableGoal" />
-
-<nop-label asp-for="TimelineId" />
-<nop-select asp-for="TimelineId" asp-items="Model.AvailableTimeline" />
-
-<nop-label asp-for="ExperienceId" />
-<nop-select asp-for="ExperienceId" asp-items="Model.AvailableExperience" />
-<nop-label asp-for="RiskToleranceId" />
-<nop-select asp-for="RiskToleranceId" asp-items="Model.AvailableRiskTolerance" />
-
-<nop-label asp-for="InvestmentApproachId" />
-<nop-select asp-for="InvestmentApproachId" asp-items="Model.AvailableInvestmentApproach" />
-
-<nop-label asp-for="TwoFactorAuthentication" />
-<nop-editor asp-for="TwoFactorAuthentication" />
-
-<nop-label asp-for="EmailAlert" />
-<nop-editor asp-for="EmailAlert" />
-
-<nop-label asp-for="TextAlert" />
-<nop-editor asp-for="TextAlert" />
+<!-- <nop-label asp-for="InvestmentApproachId" />
+<nop-select asp-for="InvestmentApproachId" asp-items="Model.AvailableInvestmentApproach" /> -->
 
 <script>
     $(document).ready(function () {

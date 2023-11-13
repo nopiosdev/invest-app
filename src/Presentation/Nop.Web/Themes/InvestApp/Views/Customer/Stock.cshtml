@@ -1,5 +1,87 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Nop.Core
+@model CustomerInfoModel
+@inject Nop.Core.IWebHelper webHelper
 @{
+    Layout = "_CustomLayout";
 }
+
+
+<div class="page customer-stock-page">
+    <div class="custom-tabs-wrapper">
+        <div class="tabs-header">
+            <h2 class="tabs-heading">@T("Account.Stock.Picks")</h2>
+            <div class="tabs-navigation">
+                <ul>
+                    <li class="active">
+                        <a href="javascript:void(0)" data-id="breakthroughTradesTab">@T("Account.BreakthroughTrades")</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" data-id="longtermTradesTab">@T("Account.LongtermTrades")</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" data-id="quickProfitTab">@T("Account.Quickprofit")</a>
+                    </li> 
+                </ul>
+            </div>
+        </div>
+        <div class="tabs-content">
+
+            <div id="breakthroughTradesTab" class="tab from-left-animation active">
+                <table id="breakthroughTradesTable" class="stock-datatable" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Innovation</th>
+                            <th>Grade</th>
+                            <th>Buy Date</th>
+                            <th>Buy Price</th>
+                            <th>Current Return</th>
+                            <th>Buy Below</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="longtermTradesTab" class="tab from-left-animation">
+
+            </div>
+            <div id="quickProfitTab" class="tab from-left-animation">
+            
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script asp-location="Footer">
+
+    var stockData = {
+        "data":[
+            {
+                  
+            }
+        ]
+    };
+
+    function breakthroughTrades(){
+        var breakthroughTrades_Table = new DataTable('#breakthroughTradesTable', {
+            ajax: stockData,
+            columns: [
+                { data: 'Company' },
+                { data: 'Innovation' },
+                { data: 'Grade' },
+                { data: 'BuyDate' },
+                { data: 'BuyPrice' },
+                { data: 'CurrentReturn' },
+                { data: 'CurrentPrice' },
+                { data: 'BuyBelow' }
+            ]
+        });
+    }
+
+    $(document).ready(function(){
+        breakthroughTrades();
+    });
+
+</script>
+

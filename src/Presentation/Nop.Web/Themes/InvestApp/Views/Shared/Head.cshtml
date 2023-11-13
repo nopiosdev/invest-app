@@ -17,6 +17,13 @@
     //add main CSS file
     NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/styles{(supportRtl ? ".rtl" : "")}.css");
 
+    //chart_4.4
+    NopHtml.AddScriptParts($"~/Themes/InvestApp/Content/chatJs/chart_4.4.js");
+
+    //datatable
+    NopHtml.AppendCssFileParts($"~/Themes/InvestApp/Content/datatable_version_1.13.7/jquery.dataTables.min.css");
+    NopHtml.AddScriptParts(ResourceLocation.Footer, $"~/Themes/InvestApp/Content/datatable_version_1.13.7/jquery.dataTables.min.js");
+
     //add font-awesome file
     NopHtml.AppendCssFileParts($"~/Themes/InvestApp/Content/Fonts/font-awesome-6.4.2.css");
     NopHtml.AddScriptParts(ResourceLocation.Footer, $"~/Themes/InvestApp/Content/Fonts/font-awesome-6.4.2.js");

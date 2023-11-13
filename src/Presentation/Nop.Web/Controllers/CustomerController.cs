@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Net;
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
@@ -1993,6 +1994,32 @@ namespace Nop.Web.Controllers
         #endregion
 
         #region NCT Back-end dev
+
+        #region AJAX APIs
+
+        public virtual async Task<ObjectResult> GetTransactionData(TransactionType transactionType)
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+                return Unauthorized("");
+
+            var transactions = await _transactionService.GetAllTransactionsAsync(customerId: customer.Id,
+                transactionTypeId: (int)transactionType);
+
+            var transactionModel = await transactions
+                .Where(x => !x.Status.Equals(Status.Removed))
+                .SelectAwait(async x => new
+                {
+                    Date = x.CreatedOnUtc.ToShortDateString(),
+                    WithdrawlMethod = x.TransactionNote,
+                    Amount = x.TransactionAmount,
+                    Status = await _localizationService.GetLocalizedEnumAsync(x.Status),
+                }).ToListAsync();
+
+            return Ok(transactionModel);
+        }
+
+        #endregion
 
         #region Identity Verification
 

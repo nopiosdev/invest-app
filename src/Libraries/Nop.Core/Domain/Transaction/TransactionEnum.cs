@@ -16,6 +16,7 @@ namespace Nop.Core.Domain.Transaction
     {
         Completed = 100,
         Pending = 200,
-        Removed = 300
+        Removed = 300,
+        Declined = 400,
     }
 }

@@ -2143,6 +2143,15 @@ namespace Nop.Web.Controllers
 
         #endregion
 
+        #region Stock
+
+        public virtual IActionResult Stock()
+        {
+            return View();
+        }
+
+        #endregion
+
         #endregion
 
         #endregion

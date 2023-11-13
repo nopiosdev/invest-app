@@ -1,0 +1,14 @@
+{
+  "data":[
+      {
+          "Company" : "Company",
+          "Innovation" : "Innovation",
+          "Grade" : "Grade",
+          "BuyDate" : "Buy Date",
+          "BuyPrice" : "Buy Price",
+          "CurrentReturn" : "Current Return",
+          "CurrentPrice" : "Current Price",
+          "BuyBelow" : "Buy Below"
+      }
+  ]
+}

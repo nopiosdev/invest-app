@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using DocumentFormat.OpenXml.Wordprocessing;
+using System.Numerics;
 using Nop.Core;
 using Nop.Core.Domain.Blogs;
 using Nop.Core.Domain.Catalog;
@@ -2716,6 +2718,54 @@ namespace Nop.Services.Messages
 
             await _queuedEmailService.InsertQueuedEmailAsync(email);
             return email.Id;
+        }
+
+        #endregion
+
+
+        #region Transaction
+
+        public virtual async Task<IList<int>> SendTransactionDebitRequestAsync(decimal transactionAmount, int languageId, string senderEmail, string senderName)
+        {
+            if (senderEmail == null)
+                throw new ArgumentNullException(nameof(senderEmail));
+
+            var store = await _storeContext.GetCurrentStoreAsync();
+            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+
+            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.TransactionDebitNotification, store.Id);
+            if (!messageTemplates.Any())
+                return new List<int>();
+
+            //tokens
+            var commonTokens = new List<Token>
+            {
+                new Token("Transaction.DebitAmount", transactionAmount),
+            };
+
+            return await messageTemplates.SelectAwait(async messageTemplate =>
+            {
+                //email account
+                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
+
+                   string fromEmail = senderEmail,
+                    fromName = senderName;
+
+                var tokens = new List<Token>(commonTokens);
+                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
+
+                //event notification
+                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
+
+                var toEmail = emailAccount.Email;
+                var toName = emailAccount.DisplayName;
+
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
+                    fromEmail: fromEmail,
+                    fromName: fromName,
+                    replyToEmailAddress: senderEmail,
+                    replyToName: senderName);
+            }).ToListAsync();
         }
 
         #endregion

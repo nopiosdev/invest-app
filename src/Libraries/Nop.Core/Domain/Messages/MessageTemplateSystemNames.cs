@@ -270,6 +270,8 @@
         /// Represents system name of 'Contact vendor' message
         /// </summary>
         public const string ContactVendorMessage = "Service.ContactVendor";
+        
+        public const string TransactionDebitNotification = "Transaction.DebitNotification";
 
         #endregion
     }

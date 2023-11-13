@@ -4,7 +4,7 @@
     Layout = "_ColumnsOne";
 
     //title
-    NopHtml.AddTitleParts(T("PageTitle.Invest").Text);
+    NopHtml.AddTitleParts(T("PageTitle.Withdraw").Text);
     //page class
     NopHtml.AppendPageCssClassParts("html-login-page");
 }
@@ -12,10 +12,10 @@
     <nop-antiforgery-token />
     <div asp-validation-summary="ModelOnly" class="message-error"></div>
     <nop-editor asp-for="TransactionAmount" />
-    <button type="submit">@T("Customer.Invest.MakeTransaction")</button>
+    <button type="submit">@T("Customer.Withdraw.MakeTransaction")</button>
 </form>
 
-@foreach(var item in Model.RecentTransactions)
+@foreach (var item in Model.RecentTransactions)
 {
     <span>@item.TransactionNote</span>
     <span>@item.CreateOnUtc.ToShortDateString()</span>

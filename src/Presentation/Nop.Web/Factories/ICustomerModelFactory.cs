@@ -177,5 +177,7 @@ namespace Nop.Web.Factories
         /// The task result contains the list of the customer attribute model
         /// </returns>
         Task<IList<CustomerAttributeModel>> PrepareCustomCustomerAttributesAsync(Customer customer, string overrideAttributesXml = "");
+
+        Task<TransactionModel> PrepareTransactionModelAsync(Customer customer, TransactionModel model = null);
     }
 }

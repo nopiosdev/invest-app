@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Net;
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
@@ -1994,6 +1995,32 @@ namespace Nop.Web.Controllers
 
         #region NCT Back-end dev
 
+        #region AJAX APIs
+
+        public virtual async Task<ObjectResult> GetTransactionData(TransactionType transactionType)
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+                return Unauthorized("");
+
+            var transactions = await _transactionService.GetAllTransactionsAsync(customerId: customer.Id,
+                transactionTypeId: (int)transactionType);
+
+            var transactionModel = await transactions
+                .Where(x => !x.Status.Equals(Status.Removed))
+                .SelectAwait(async x => new
+                {
+                    Date = x.CreatedOnUtc.ToShortDateString(),
+                    WithdrawlMethod = x.TransactionNote,
+                    Amount = x.TransactionAmount,
+                    Status = await _localizationService.GetLocalizedEnumAsync(x.Status),
+                }).ToListAsync();
+
+            return Ok(transactionModel);
+        }
+
+        #endregion
+
         #region Identity Verification
 
         public virtual async Task<IActionResult> IdentityVerification()
@@ -2075,10 +2102,10 @@ namespace Nop.Web.Controllers
 
                     await _customerService.InsertIdentityVerificationAsync(identityverification);
                 }
-              
+
             }
-           
-          
+
+
             return View();
         }
 
@@ -2090,9 +2117,15 @@ namespace Nop.Web.Controllers
         [CheckAccessClosedStore(ignore: true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(ignore: true)]
-        public virtual IActionResult Invest()
+        public virtual async Task<IActionResult> Invest()
         {
-            return View();
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+                return Content(await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
+
+            var model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer);
+
+            return View(model);
         }
 
         [HttpPost]
@@ -2103,40 +2136,143 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> Invest(TransactionModel model)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            var product = await _productService.GetProductByIdAsync(_customerSettings.TransactionProductId);
-            if (product is null)
-            {
-                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.TransactionFailed"));
-                //return View(model);
-            }
-            var store = await _storeContext.GetCurrentStoreAsync();
-
-            var warnings = await _shoppingCartService.AddToCartAsync(customer: customer,
-                product: product,
-                shoppingCartType: ShoppingCartType.ShoppingCart,
-                storeId: store.Id,
-                customerEnteredPrice: model.TransactionAmount,
-                addRequiredProducts: false
-                );
-            foreach (var warning in warnings)
-            {
-                ModelState.AddModelError("", warning);
-            }
-
-            if (ModelState.IsValid)
-            {
-                return RedirectToRoute("CheckoutConfirm");
-
-                return RedirectToRoute("CheckoutPaymentMethod");
-            }
-            //var transaction = new Transaction()
+            //var product = await _productService.GetProductByIdAsync(_customerSettings.TransactionProductId);
+            //if (product is null)
             //{
+            //    ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.TransactionFailed"));
+            //    //return View(model);
+            //}
+            //var store = await _storeContext.GetCurrentStoreAsync();
 
-            //};
-            //transaction.CreatedOnUtc = DateTime.UtcNow;
-            //transaction.Status = Status.Pending;
+            //var warnings = await _shoppingCartService.AddToCartAsync(customer: customer,
+            //    product: product,
+            //    shoppingCartType: ShoppingCartType.ShoppingCart,
+            //    storeId: store.Id,
+            //    customerEnteredPrice: model.TransactionAmount,
+            //    addRequiredProducts: false
+            //    );
+            //foreach (var warning in warnings)
+            //{
+            //    ModelState.AddModelError("", warning);
+            //}
 
-            //await _transactionService.InsertTransactionAsync(transaction);
+            //if (ModelState.IsValid)
+            //{
+            //    return RedirectToRoute("CheckoutConfirm");
+
+            //    return RedirectToRoute("CheckoutPaymentMethod");
+            //}
+
+            try
+            {
+                var transaction = new Transaction()
+                {
+                    CustomerId = customer.Id,
+                    TransactionAmount = model.TransactionAmount,
+                    TransactionType = TransactionType.Credit,
+                    Status = Status.Completed,
+                    TransactionNote = string.Empty,
+                    CreatedOnUtc = DateTime.UtcNow,
+                };
+
+                await _transactionService.InsertTransactionAsync(transaction);
+
+                _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));
+
+                model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer, model);
+            }
+            catch (Exception ex)
+            {
+                await _logger.ErrorAsync($"Error on invest: {ex.Message}", ex, customer);
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Unsuccessfull"));
+            }
+
+            return View(model);
+        }
+
+        #endregion
+
+        #region Withdraw
+
+        //available even when a store is closed
+        [CheckAccessClosedStore(ignore: true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(ignore: true)]
+        public virtual async Task<IActionResult> Withdraw()
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+                return Content(await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
+
+            var model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        //available even when a store is closed
+        [CheckAccessClosedStore(ignore: true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(ignore: true)]
+        public virtual async Task<IActionResult> Withdraw(TransactionModel model)
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            //var product = await _productService.GetProductByIdAsync(_customerSettings.TransactionProductId);
+            //if (product is null)
+            //{
+            //    ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.TransactionFailed"));
+            //    //return View(model);
+            //}
+            //var store = await _storeContext.GetCurrentStoreAsync();
+
+            //var warnings = await _shoppingCartService.AddToCartAsync(customer: customer,
+            //    product: product,
+            //    shoppingCartType: ShoppingCartType.ShoppingCart,
+            //    storeId: store.Id,
+            //    customerEnteredPrice: model.TransactionAmount,
+            //    addRequiredProducts: false
+            //    );
+            //foreach (var warning in warnings)
+            //{
+            //    ModelState.AddModelError("", warning);
+            //}
+
+            //if (ModelState.IsValid)
+            //{
+            //    return RedirectToRoute("CheckoutConfirm");
+
+            //    return RedirectToRoute("CheckoutPaymentMethod");
+            //}
+
+            try
+            {
+                var transaction = new Transaction()
+                {
+                    CustomerId = customer.Id,
+                    TransactionAmount = model.TransactionAmount,
+                    TransactionType = TransactionType.Debit,
+                    Status = Status.Pending,
+                    TransactionNote = string.Empty,
+                    CreatedOnUtc = DateTime.UtcNow,
+                };
+
+                await _transactionService.InsertTransactionAsync(transaction);
+
+                await _workflowMessageService.SendTransactionDebitRequestAsync(transactionAmount: model.TransactionAmount,
+                    languageId: (await _workContext.GetWorkingLanguageAsync()).Id,
+                    senderEmail: customer.Email,
+                    senderName: await _customerService.GetCustomerFullNameAsync(customer));
+
+                _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.Successfull"));
+
+                model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer, model);
+            }
+            catch (Exception ex)
+            {
+                await _logger.ErrorAsync($"Error on withdrawal: {ex.Message}", ex, customer);
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.Unsuccessfull"));
+            }
+
 
             return View(model);
         }

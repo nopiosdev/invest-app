@@ -1,10 +1,17 @@
-﻿using Nop.Core.Domain.Transaction;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Nop.Core.Domain.Transaction;
 using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Transactions
 {
     public partial record TransactionModel : BaseNopEntityModel
     {
+        public TransactionModel()
+        {
+            AvaialableStatus = new List<SelectListItem>();
+            AvaialableTransactionType = new List<SelectListItem>();
+        }
+
         public DateTime CreateOnUtc { get; set; }
         public int CustomerId { get; set; }
         public decimal Balance { get; set; }
@@ -13,6 +20,8 @@ namespace Nop.Web.Areas.Admin.Models.Transactions
         public decimal TransactionAmount { get; set; }
         public decimal UpdateBalance { get; set; }
         public int StatusId { get; set; }
+        public IList<SelectListItem> AvaialableStatus { get; set; }
+        public IList<SelectListItem> AvaialableTransactionType { get; set; }
         public TransactionType TransactionType
         {
             get => (TransactionType)this.TransactionTypeId;

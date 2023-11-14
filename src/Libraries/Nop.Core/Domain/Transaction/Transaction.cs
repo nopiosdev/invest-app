@@ -10,6 +10,7 @@ namespace Nop.Core.Domain.Transaction
     {
 
         public DateTime CreatedOnUtc { get; set; }
+        public DateTime UpdatedOnUtc { get; set; }
         public int CustomerId { get; set; }
         public decimal Balance { get; set; }
         public int TransactionTypeId { get; set; }

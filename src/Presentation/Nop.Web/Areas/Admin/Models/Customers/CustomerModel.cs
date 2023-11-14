@@ -252,6 +252,11 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         public CustomerAssociatedExternalAuthRecordsSearchModel CustomerAssociatedExternalAuthRecordsSearchModel { get; set; }
 
+        //NCT back-end dev
+
+        [NopResourceDisplayName("Admin.Customers.Customers.Fields.Verified")]
+        public bool Verified { get; set; }
+
         #endregion
 
         #region Nested classes

@@ -68,6 +68,9 @@ namespace Nop.Services.Security
         //Security
         public static readonly PermissionRecord EnableMultiFactorAuthentication = new() { Name = "Security. Enable Multi-factor authentication", SystemName = "EnableMultiFactorAuthentication", Category = "Security" };
 
+        //NCT back-end dev
+        public static readonly PermissionRecord ManageTransaction = new() { Name = "Admin area. Manage Transaction", SystemName = "ManageTransaction", Category = "Customers" };
+        public static readonly PermissionRecord DeleteTransaction = new() { Name = "Admin area. Delete Transaction", SystemName = "DeleteTransaction", Category = "Customers" };
         /// <summary>
         /// Get permissions
         /// </summary>
@@ -129,7 +132,10 @@ namespace Nop.Services.Security
                 EnableWishlist,
                 PublicStoreAllowNavigation,
                 AccessClosedStore,
-                EnableMultiFactorAuthentication
+                EnableMultiFactorAuthentication,
+
+                ManageTransaction,
+                DeleteTransaction
             };
         }
 

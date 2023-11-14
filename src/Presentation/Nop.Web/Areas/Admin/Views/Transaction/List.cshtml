@@ -1,9 +1,9 @@
 ﻿@model TransactionSearchModel
 @{
     //page title
-    ViewBag.PageTitle = T("Admin.Transaction").Text;
+    ViewBag.PageTitle = T("Admin.Customers.Transactions").Text;
     //active menu item (system name)
-    NopHtml.SetActiveMenuItemSystemName("Transaction");
+    NopHtml.SetActiveMenuItemSystemName("Transactions");
 }
 
 @{
@@ -20,7 +20,6 @@
             <i class="fas fa-plus-square"></i>
             @T("Admin.Common.AddNew")
         </a>
-        @await Component.InvokeAsync(typeof(AdminWidgetViewComponent), new { widgetZone = AdminWidgetZones.VendorListButtons, additionalData = Model })
     </div>
 </div>
 
@@ -83,7 +82,7 @@
                             </div>
                             <div class="row">
                                 <div class="text-center col-12">
-                                    <button type="button" id="search-vendors" class="btn btn-primary btn-search">
+                                    <button type="button" id="search-transactions" class="btn btn-primary btn-search">
                                         <i class="fas fa-search"></i>
                                         @T("Admin.Common.Search")
                                     </button>
@@ -95,40 +94,40 @@
 
                 <div class="card card-default">
                     <div class="card-body">
-                        <nop-doc-reference asp-string-resource="@T("Admin.Documentation.Reference.VendorManagement", Docs.VendorManagement + Utm.OnAdmin)" />
-
                         @await Html.PartialAsync("Table", new DataTablesModel
                         {
-                        Name = "vendors-grid",
-                        UrlRead = new DataUrl("List", "Vendor", null),
-                        SearchButtonId = "search-vendors",
+                        Name = "transactions-grid",
+                        UrlRead = new DataUrl("List", "Transaction", null),
+                        SearchButtonId = "search-transactions",
                         Length = Model.PageSize,
                         LengthMenu = Model.AvailablePageSizes,
                         Filters = new List<FilterParameter>
                         {
-                        new FilterParameter(nameof(Model.SearchName)),
-                        new FilterParameter(nameof(Model.SearchEmail))
+                        new FilterParameter(nameof(Model.CreatedOnFrom)),
+                        new FilterParameter(nameof(Model.CreatedOnTo)),
+                        new FilterParameter(nameof(Model.StatusId)),
+                        new FilterParameter(nameof(Model.TransactionTypeId)),
                         },
                         ColumnCollection = new List<ColumnProperty>
                         {
-                        new ColumnProperty(nameof(VendorModel.Name))
+                        new ColumnProperty(nameof(TransactionModel.CreateOnUtc))
                         {
-                        Title = T("Admin.Transaction.Fields.Name").Text,
-                        Width = "300"
+                        Title = T("Admin.Transaction.Fields.CreateOnUtc").Text,
+                        Render = new RenderDate(),
                         },
-                        new ColumnProperty(nameof(VendorModel.Email))
+                        new ColumnProperty(nameof(TransactionModel.TransactionAmount))
                         {
-                        Title = T("Admin.Transaction.Fields.Email").Text,
-                        Width = "300"
+                        Title = T("Admin.Transaction.Fields.TransactionAmount").Text,
                         },
-                        new ColumnProperty(nameof(VendorModel.Active))
+                        new ColumnProperty(nameof(TransactionModel.Status))
                         {
-                        Title = T("Admin.Transaction.Fields.Active").Text,
-                        Width = "50",
-                        ClassName =  NopColumnClassDefaults.CenterAll,
-                        Render = new RenderBoolean()
+                        Title = T("Admin.Transaction.Fields.Status").Text,
                         },
-                        new ColumnProperty(nameof(VendorModel.Id))
+                        new ColumnProperty(nameof(TransactionModel.TransactionType))
+                        {
+                        Title = T("Admin.Transaction.Fields.TransactionType").Text,
+                        },
+                        new ColumnProperty(nameof(TransactionModel.Id))
                         {
                         Title = T("Admin.Common.Edit").Text,
                         Width = "50",

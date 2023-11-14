@@ -255,6 +255,9 @@ namespace Nop.Core.Domain.Customers
         public bool EmailAlert { get; set; }
         public bool TextAlert { get; set; }
 
+        //Identity Verification
+        public int IdentityVerificationId { get; set; }
+
         #region Custom properties
 
         /// <summary>

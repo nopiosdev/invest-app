@@ -149,6 +149,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 transaction = model.ToEntity(transaction);
+                transaction.UpdatedOnUtc = DateTime.UtcNow;
                 await _transactionService.UpdateTransactionAsync(transaction);
 
                 _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Transactions.Updated"));

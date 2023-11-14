@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Transaction;
+using Nop.Services.Customers;
+using Nop.Services.Helpers;
 using Nop.Services.Localization;
+using Nop.Services.Security;
 using Nop.Services.Transactions;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Transactions;
@@ -15,11 +18,26 @@ namespace Nop.Web.Areas.Admin.Factories
 
         private readonly ITransactionService _transactionService;
         private readonly ILocalizationService _localizationService;
+        private readonly ICustomerService _customerService;
+        private readonly IPermissionService _permissionService;
+        private readonly IDateTimeHelper _dateTimeHelper;
 
         #endregion
 
         #region Ctor
 
+        public TransactionModelFactory(ITransactionService transactionService,
+            ILocalizationService localizationService,
+            ICustomerService customerService,
+            IPermissionService permissionService,
+            IDateTimeHelper dateTimeHelper)
+        {
+            _transactionService = transactionService;
+            _localizationService = localizationService;
+            _customerService = customerService;
+            _permissionService = permissionService;
+            _dateTimeHelper = dateTimeHelper;
+        }
 
 
         #endregion
@@ -45,18 +63,19 @@ namespace Nop.Web.Areas.Admin.Factories
             var transactions = await _transactionService.GetAllTransactionsAsync(startOnUtc: searchModel.CreatedOnFrom,
                 endOnUtc: searchModel.CreatedOnTo,
                 statusId: searchModel.StatusId,
-                transactionTypeId: searchModel.TrancationTypeId,
+                transactionTypeId: searchModel.TransactionTypeId,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
             //prepare list model
             var model = await new TransactionListModel().PrepareToGridAsync(searchModel, transactions, () =>
             {
                 //fill in model values from the entity
-                return transactions.SelectAwait(async vendor =>
+                return transactions.SelectAwait(async transaction =>
                 {
-                    var vendorModel = vendor.ToModel<TransactionModel>();
+                    var transactionModel = transaction.ToModel<TransactionModel>();
+                    transactionModel.CreateOnUtc = await _dateTimeHelper.ConvertToUserTimeAsync(transaction.CreatedOnUtc, DateTimeKind.Utc);
 
-                    return vendorModel;
+                    return transactionModel;
                 });
             });
 
@@ -70,6 +89,8 @@ namespace Nop.Web.Areas.Admin.Factories
                 if (model == null)
                 {
                     model = transaction.ToModel<TransactionModel>();
+                    model.CustomerInfo = (await _customerService.GetCustomerByIdAsync(transaction.CustomerId)).Email;
+                    model.CreateOnUtc = await _dateTimeHelper.ConvertToUserTimeAsync(transaction.CreatedOnUtc, DateTimeKind.Utc);
                 }
             }
 
@@ -87,6 +108,9 @@ namespace Nop.Web.Areas.Admin.Factories
                new SelectListItem(){Text=await _localizationService.GetLocalizedEnumAsync(TransactionType.Credit),Value=$"{(int)TransactionType.Credit}"},
                new SelectListItem(){Text=await _localizationService.GetLocalizedEnumAsync(TransactionType.Voided),Value=$"{(int)TransactionType.Voided}"},
             };
+
+            model.UserCanDelete = await _permissionService.AuthorizeAsync(StandardPermissionProvider.DeleteTransaction);
+
             return model;
         }
 

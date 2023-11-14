@@ -766,6 +766,11 @@ namespace Nop.Web.Infrastructure
             endpointRouteBuilder.MapControllerRoute(name: "GetTransactionData",
                 pattern: $"{lang}/GetTransactionData/{{transactionType}}",
                 defaults: new { controller = "Customer", action = "GetTransactionData" });
+
+            //Stock
+            endpointRouteBuilder.MapControllerRoute(name: "Stock",
+                pattern: $"{lang}/customertransaction/stock",
+                defaults: new { controller = "Customer", action = "Stock" });
         }
 
         #endregion

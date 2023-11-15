@@ -45,7 +45,7 @@ namespace Nop.Web.Areas.Admin.Factories
             var transactions = await _transactionService.GetAllTransactionsAsync(startOnUtc: searchModel.CreatedOnFrom,
                 endOnUtc: searchModel.CreatedOnTo,
                 statusId: searchModel.StatusId,
-                transactionTypeId: searchModel.TrancationTypeId,
+                //transactionTypeId: searchModel.TrancationTypeId,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
             //prepare list model

@@ -768,7 +768,7 @@ namespace Nop.Web.Infrastructure
                 defaults: new { controller = "Customer", action = "GetTransactionData" });
 
             //Stock
-            endpointRouteBuilder.MapControllerRoute(name: "Stock",
+            endpointRouteBuilder.MapControllerRoute(name: "StockPicks",
                 pattern: $"{lang}/customertransaction/stock",
                 defaults: new { controller = "Customer", action = "Stock" });
         }

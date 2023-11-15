@@ -20,11 +20,32 @@
   .account-dropdown .account-text{ display: none; }
   .account-dropdown .dropdown-list{ left: 0px; }
 
+  /* register css start */
+  .registration-page .textWrap {  padding: 50px; }
+
 }
 
 /*  tablet media css start  */
 @media screen and ( max-width:1000px) {
 
-  /* drawer-wrapper css start */
+  /* register css start */
+  .registration-page .textWrap { width: 100%; padding: 50px; }
+  .registration-page .registerWrapper { flex-direction: column; height: auto; overflow: unset; }
+
+}
+
+/*  tablet small css start  */
+@media (max-width: 767px){
+
+  /* login css start */
+  .login-page .login-image {  display:none !important; }
+
+  
+}
+
+/*  mobile css start  */
+@media (max-width: 480px){
+
+  .info-box{ margin-top:20px; }
 
 }

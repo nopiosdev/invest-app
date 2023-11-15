@@ -8,8 +8,12 @@ h1, h2, h3, h4, h5, h6 {   line-height: 1;  margin-top: 0;  margin-bottom: 0.5em
 .mt-50{ margin-top: 50px; }
 .w-83{ max-width: 83.33333333%;display: block; }
 
+::-webkit-scrollbar-track{background:#202328;}
+::-webkit-scrollbar-thumb{background:#37393E; border-radius: 3px;}
+::-webkit-scrollbar { width: 10px; }
 
-.buttons .custom-btn{ border-radius: 2px;line-height: 44px;height: 44px;text-transform: uppercase; border: 1px solid #404040;font-size: 12px;padding: 0 25px;font-weight: 600;text-shadow: 0 -1px 0 rgba(0,0,0,.12);-webkit-box-shadow: 0 2px 0 rgba(0,0,0,.045);box-shadow: 0 2px 0 rgba(0,0,0,.045); }
+
+.buttons .custom-btn{ border-radius: 2px;line-height: 44px;height: 44px;display: inline-block;text-decoration: none; text-transform: uppercase; border: 1px solid #404040;font-size: 12px;padding: 0 25px;font-weight: 600;text-shadow: 0 -1px 0 rgba(0,0,0,.12);-webkit-box-shadow: 0 2px 0 rgba(0,0,0,.045);box-shadow: 0 2px 0 rgba(0,0,0,.045); }
 .buttons .btn-success{ color: #fff;background-color: #21ce99;border-color: #21ce99; }
 .buttons .btn-danger{ color: #fff;background-color: #ff4d4f;border-color: #ff4d4f;}
 
@@ -100,7 +104,7 @@ h2.tabs-heading{ font-size: 1.5em; }
 .account-dropdown .account-text span{ white-space: nowrap;opacity: 0.8;cursor: pointer;user-select: none; }
 .account-dropdown .account-text .name{ font-size: 12px;font-weight: 700; }
 .account-dropdown.open .dropdown-list{ top: 70px;transform: rotateX(0deg);opacity: 1; }
-.account-dropdown .dropdown-list{ position: absolute;background-color: #30333a;transition: 0.3s; width: 100%;padding:0px;transform: rotateX(90deg);top: -10px;z-index: 1000;opacity: 0; }
+.account-dropdown .dropdown-list{ position: absolute;background-color: #30333a; -webkit-box-shadow: 0 2px 8px rgba(0,0,0,0.5);box-shadow: 0 2px 8px rgba(0,0,0,0.5);transition: 0.3s; width: 100%;padding:0px;transform: rotateX(90deg);top: -10px;z-index: 1000;opacity: 0; }
 .account-dropdown .dropdown-list li{ display: block; padding: 0px;margin: 0px; }
 .account-dropdown .dropdown-list li a{ display: block;text-decoration: none; margin: 0;padding: 5px 12px;color: #fff;font-weight: 400;font-size: 14px;line-height: 22px;white-space: nowrap;cursor: pointer;transition: 0.3s;cursor: pointer; }
 .account-dropdown .dropdown-list li a:hover{ background-color: #37393c; }
@@ -145,4 +149,94 @@ h2.tabs-heading{ font-size: 1.5em; }
 .dataTables_wrapper .dataTables_length,
 .dataTables_wrapper .dataTables_filter{ display: none; }
 
+
+
+
+/* login css start */
+.login-page .login-image { background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA3ySX-GMjfzKM5o70Vbg6gY8tBUGNEW3ymA&usqp=CAU'); background-size: cover; background-position: 50%; background-repeat: none; flex-shrink: 1; flex-basis: 50%; height: 100vh; flex-grow: 1; max-width: 100%; }
+.login-page .user-layout { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #090d16; align-items: center; justify-content: center; }
+.login-page .heading{ margin-top: 0; color: #fff; font-weight: 500; font-size:21px; margin-bottom: 17px; line-height: 2; }
+.login-page .login-inputs input{ height: 40px; padding: 6px 11px 6px 30px; font-size: 16px; box-sizing: border-box; margin: 0; list-style: none; font-feature-settings: "tnum","tnum"; display: inline-block; width: 100%; color: #fff; line-height: 1.5; background-color: #30333a; background-image: none; border: 1px solid #404040; border-radius: 4px; transition: all .3s; margin-bottom: 25px; }
+.login-page .login-inputs input:focus, 
+.login-page .login-inputs input:hover, 
+.login-page .login-inputs input:focus-visible { border-color: #46dbaa !important; border-right-width: 1px !important; outline: none; }
+.login-page .log-btn{ background-color: rgb(56, 173, 144); color: white; border-color: rgb(69, 214, 168); border: 1px solid #404040; margin-top: 25px; border-radius: 2px !important; line-height: 44px !important; height: 44px !important; text-transform: uppercase; font-size: 12px !important; padding: 0 25px !important; font-weight: 600 !important; font-size:14px; position: relative; display: inline-block; white-space: nowrap; text-align: center; background-image: none; transition: all .3s cubic-bezier(.645,.045,.355,1); user-select: none; touch-action: manipulation; box-shadow: 0 2px 0 rgba(0,0,0,.045); text-shadow: 0 -1px 0 rgba(0,0,0,.12); }
+.login-page .reg-btn { color: #21ce99; text-decoration: none; background-color: transparent; outline: none; cursor: pointer; -webkit-transition: color .3s; transition: color .3s; font-size: 14px; }
+.login-page .reg-btn:focus, 
+.login-page .reg-btn:hover, 
+.login-page .reg-btn:focus-visible { color: #21ce99; }
+.login-page .login-block { margin-right: 52px; margin-left: 52px; padding: 15px; max-width: 412px; }
+.login-page #RememberMe { width: 14px; height: 14px; margin-right: 8px; }
+.login-page .logo-full { max-height: 60px; margin: 0 0 30px; width: 204px }
+.login-page .login-wrapper{ display: flex; width: 100%; align-items: center; }
+.login-page .login-inputs { position: relative; min-height: 68px; }
+.login-page #Password-error, 
+.login-page #Email-error { font-size:14px; margin-bottom:5px; color:red !important; clear: both; min-height: 22px; margin-top: -2px; color: #ddd; font-size: 14px; line-height: 1.5; -webkit-transition: color .3s cubic-bezier(.215,.61,.355,1); transition: color .3s cubic-bezier(.215,.61,.355,1); }
+.login-page .input-prefix{ position: absolute; top: 32%; z-index: 2; display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; color: #fff; line-height: 0; -webkit-transform: translateY(-50%); -ms-transform: translateY(-50%); transform: translateY(-50%); left:12px; }
+.login-page .preicon { display: inline-block; color: inherit; font-style: normal; line-height: 0; text-align: center; text-transform: none; vertical-align: -0.125em; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.login-page .field-validation-error { position: absolute; left: 0px; bottom: 5px; }
+
+
+/* register css start */
+.registration-page .form-layout{ display: flex; flex-direction: column; height: 100vh; overflow: auto; background: #090d16; }
+.registration-page .registerWrapper { display: flex; height: 100%; overflow: hidden; width: 100%; }
+.registration-page .formWrap { min-width: 60%; padding: 25px; display: flex; align-items: center; justify-content: center; flex-grow: 1; overflow-y: auto; }
+.registration-page .formWrap .form { width: 650px; max-width: 100%; }
+.registration-page .reg-form{ -webkit-box-sizing: border-box; box-sizing: border-box; margin: 0; padding: 0; color: #fff; font-size: 14px; font-variant: tabular-nums; line-height: 1.5; list-style: none; -webkit-font-feature-settings: "tnum","tnum"; font-feature-settings: "tnum","tnum"; }
+.registration-page .reg-title{ padding-bottom: 15px; }
+.registration-page .reg-inputs .field-icon{ position: absolute;top: 7px;left: 10px; }
+.registration-page .reg-inputs{ -webkit-box-sizing: border-box; box-sizing: border-box;position: relative; padding: 0; color: #fff; font-size: 14px; font-variant: tabular-nums; line-height: 1.5; list-style: none; -webkit-font-feature-settings: "tnum","tnum"; font-feature-settings: "tnum","tnum"; margin: 0 0 24px; vertical-align: top; }
+.registration-page .reg-inputs input{ height: 40px; padding: 6px 11px 6px 30px; font-size: 16px; box-sizing: border-box; margin: 0; list-style: none; font-feature-settings: "tnum","tnum"; display: inline-block; width: 100%; color: #fff; line-height: 1.5; background-color: #30333a; background-image: none; border: 1px solid #404040; border-radius: 4px; transition: all .3s; }
+.registration-page .reg-inputs input:focus, 
+.registration-page .reg-inputs input:hover, 
+.registration-page .reg-inputs input:focus-visible { border-color: #46dbaa !important; border-right-width: 1px !important; outline: none; }
+.registration-page .reg-inputs input:-webkit-autofill{ background-color: #000 !important; }
+.registration-page .reg-btn{ border-radius: 2px!important; line-height: 44px!important; height: 44px!important; text-transform: uppercase; font-size: 12px!important; padding: 0 25px!important; font-weight: 600!important; background-color: rgb(56, 173, 144); color: white; border-color: rgb(69, 214, 168); text-shadow: 0 -1px 0 rgba(0,0,0,.12); box-shadow: 0 2px 0 rgba(0,0,0,.045); position: relative; display: inline-block; white-space: nowrap; text-align: center; background-image: none; transition: all .3s cubic-bezier(.645,.045,.355,1); border: 1px solid #404040; }
+.registration-page .site-instruction { margin: 50px 0 0; color: #424e5a; }
+.registration-page .textWrap { width: 650px; background: #313942; padding: 50px 200px 50px 50px; flex-direction: column; display: flex; justify-content: center; color: #aaa; line-height: 34px; overflow-y: auto; }
+.registration-page .textWrap h3 {font-size:16.5px;color:#fff;margin-top: 20px;}
+.registration-page .textWrap p {font-size:14px;}
+.registration-page .site-instruction p {font-size: 14px;}
+.registration-page .reg-title h3 {font-size:16.5px;}
+.registration-page .reg-title p {font-size:14px;}
+.registration-page .date-of-birth{}
+
+
+/* home-page css start */
+.home-page .custom-dash-wrapper{ border-bottom: 1px solid #444; }
+.home-page .dash-button button{ height: 35px;line-height: 35px;font-size: 12px;color: #fff;background-color: #21ce99;border-color: #21ce99;border-radius: 2px;line-height: 44px;height: 44px;text-transform: uppercase;border: 1px solid #404040;font-size: 12px;padding: 0 25px;font-weight: 600;float:right; }
+.home-page .dash-header{ display: flex;align-items: center;justify-content: space-between;flex-direction: row;flex-wrap: wrap;margin-bottom: 20px; } 
+.home-page .values{ display: flex;justify-content: space-between;flex-wrap: wrap;flex-direction: row;padding: 20px;margin-bottom: 20px; }
+.home-page .info-box{ border:1px solid #444; padding:20px;width:100%;height: 100%; }
+.home-page .child-box{ display: flex;justify-content: space-between;align-items: center; }
+.home-page .px-10{ padding-top:10px;padding-bottom: 15px; }
+.home-page .page-body p { font-size: 15px;color: #aaa;font-weight: 400;margin: 0; }
+.home-page .green{ color:#21ce99;}
+
+.home-page .line-chart-box,
+.home-page .info-box{ background-color: #282b31;border: 1px solid #424242; }
+.home-page .buttons{ display: flex;gap: 10px; }
+
+.home-page .buttons .custom-btn{ display: flex;align-items: center;gap: 10px; line-height: normal;min-height: 40px;height: auto; }
+.home-page .buttons .custom-btn .icon{ font-size: 20px;top: -2px;position: relative; }
+
+
+/* invest-page css start */
+.invest-page .page-title-header{ border-bottom: 1px solid #444; }
+.invest-page .invest-form{ display: block;width: 100%; }
+.invest-page .invest-form label{ display: block;font-size: 17px;color: #fff; } 
+.invest-page .invest-form .text-box{ display: block;width: 100%;min-height: 35px;outline: 0;background: #222428;border: 0;border-bottom: 1px solid #090d16;border-radius: 4px;color: #fff;font-size: 20px;padding: 7px 10px; } 
+.invest-page  .invest-amount-btn{ cursor: pointer; } 
+
+.invest-cards-group .invest-card{ border-color: #424242 !important;background-color: #282b31; }
+
+
+/* withdraw-page css start */
+.withdraw-page .page-title-header{ border-bottom: 1px solid #444; }
+.withdraw-page .withdraw-form{ display: block;width: 100%; }
+.withdraw-page .withdraw-form label{ display: block;font-size: 17px;color: #fff; } 
+.withdraw-page .withdraw-form .text-box{ display: block;width: 100%;min-height: 35px;outline: 0;background: #222428;border: 0;border-bottom: 1px solid #090d16;border-radius: 4px;color: #fff;font-size: 20px;padding: 7px 10px; } 
+.withdraw-page  .withdraw-amount-btn{ cursor: pointer; } 
+
+.withdraw-cards-group .withdraw-card{ border-color: #424242 !important;background-color: #282b31; }
 

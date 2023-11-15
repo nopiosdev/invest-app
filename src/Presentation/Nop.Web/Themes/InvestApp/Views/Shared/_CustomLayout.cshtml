@@ -46,22 +46,13 @@
                 </ul>
                 <ul class="drawer-list">
                     <li class="active">
-                        <a hraf="#">Dashboard</a>
+                        <a href="/">@T("Customer.Dashboard")</a>
                     </li>
                     <li>
-                        <a hraf="#">Portfolio</a>
+                        <a href="@Url.RouteUrl("StockPicks")">@T("Customer.StockPicks")</a>
                     </li>
                     <li>
-                        <a hraf="#">Stock Picks</a>
-                    </li>
-                    <li>
-                        <a hraf="#">Crypto Picks</a>
-                    </li>
-                    <li>
-                        <a hraf="#">Tools</a>
-                    </li>
-                    <li>
-                        <a hraf="#">Notifications</a>
+                        <a href="@Url.RouteUrl("Invest")">@T("Customer.Invest")</a>
                     </li>
                 </ul>
             </div>

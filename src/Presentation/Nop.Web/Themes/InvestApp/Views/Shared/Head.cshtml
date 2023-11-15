@@ -14,6 +14,7 @@
     NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/responsive.css");
     NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/custom.css");
 
+
     //add main CSS file
     NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/styles{(supportRtl ? ".rtl" : "")}.css");
 
@@ -41,4 +42,6 @@
 
     //add jQuery UI css file
     NopHtml.AppendCssFileParts("~/lib_npm/jquery-ui-dist/jquery-ui.min.css");
+
+
 }

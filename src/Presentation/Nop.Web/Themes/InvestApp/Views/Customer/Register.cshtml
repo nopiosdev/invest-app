@@ -9,46 +9,6 @@
     NopHtml.AppendPageCssClassParts("html-registration-page");
 }
 
-<style>
-
-    .form-layout{ display: flex; flex-direction: column; height: 100vh; overflow: auto; background: #090d16; }
-    .registerWrapper { display: flex; height: 100%; overflow: hidden; width: 100%; }
-    .formWrap { min-width: 60%; padding: 25px; display: flex; align-items: center; justify-content: center; flex-grow: 1; overflow-y: auto; }
-    .formWrap .form { width: 650px; max-width: 100%; }
-    .reg-form{ -webkit-box-sizing: border-box; box-sizing: border-box; margin: 0; padding: 0; color: #fff; font-size: 14px; font-variant: tabular-nums; line-height: 1.5; list-style: none; -webkit-font-feature-settings: "tnum","tnum"; font-feature-settings: "tnum","tnum"; }
-    .reg-title{ padding-bottom: 15px; }
-    .reg-inputs{ -webkit-box-sizing: border-box; box-sizing: border-box; padding: 0; color: #fff; font-size: 14px; font-variant: tabular-nums; line-height: 1.5; list-style: none; -webkit-font-feature-settings: "tnum","tnum"; font-feature-settings: "tnum","tnum"; margin: 0 0 24px; vertical-align: top; }
-    .reg-inputs input{ height: 40px; padding: 6px 11px 6px 30px; font-size: 16px; box-sizing: border-box; margin: 0; list-style: none; font-feature-settings: "tnum","tnum"; display: inline-block; width: 100%; color: #fff; line-height: 1.5; background-color: #30333a; background-image: none; border: 1px solid #404040; border-radius: 4px; transition: all .3s; }
-    .reg-inputs input:focus, .reg-inputs input:hover, .reg-inputs input:focus-visible { border-color: #46dbaa !important; border-right-width: 1px !important; outline: none; }
-    .reg-btn{ border-radius: 2px!important; line-height: 44px!important; height: 44px!important; text-transform: uppercase; font-size: 12px!important; padding: 0 25px!important; font-weight: 600!important; background-color: rgb(56, 173, 144); color: white; border-color: rgb(69, 214, 168); text-shadow: 0 -1px 0 rgba(0,0,0,.12); box-shadow: 0 2px 0 rgba(0,0,0,.045); position: relative; display: inline-block; white-space: nowrap; text-align: center; background-image: none; transition: all .3s cubic-bezier(.645,.045,.355,1); border: 1px solid #404040; }
-    .site-instruction { margin: 50px 0 0; color: #424e5a; }
-    .textWrap { width: 650px; background: #313942; padding: 50px 200px 50px 50px; flex-direction: column; display: flex; justify-content: center; color: #aaa; line-height: 34px; overflow-y: auto; }
-    .textWrap h3 {font-size:16.5px;color:#fff;margin-top: 20px;}
-    .textWrap p {font-size:14px;}
-    .site-instruction p {font-size: 14px;}
-    .reg-title h3 {font-size:16.5px;}
-    .reg-title p {font-size:14px;}
-    ::-webkit-scrollbar-track{background:#202328;}
-    ::-webkit-scrollbar-thumb{background:#37393E; border-radius: 3px;}
-    ::-webkit-scrollbar { width: 10px; }
-
-    @@media (max-width: 1200px){
-        .textWrap {
-        padding: 50px;
-        }
-    }
-    @@media (max-width: 900px){
-        .textWrap {
-            width: 100%;
-            padding: 50px;
-        }
-        .registerWrapper {
-            flex-direction: column;
-            height: auto;
-            overflow: unset;
-        }
-    }
-</style>
 
 <div class="page registration-page">
     <!-- <div class="page-title">
@@ -106,6 +66,9 @@
                                                         {
                                                             <div class="reg-inputs">
                                                                 <!-- <label asp-for="FirstName" asp-postfix=":"></label> -->
+                                                                <span class="field-icon">
+                                                                    <i aria-label="icon: user" class="anticon anticon-user" style="color: rgba(255, 255, 255, 0.5);"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="user" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M858.5 763.6a374 374 0 0 0-80.6-119.5 375.63 375.63 0 0 0-119.5-80.6c-.4-.2-.8-.3-1.2-.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1-.4.2-.8.3-1.2.5-44.8 18.9-85 46-119.5 80.6a375.63 375.63 0 0 0-80.6 119.5A371.7 371.7 0 0 0 136 901.8a8 8 0 0 0 8 8.2h60c4.4 0 7.9-3.5 8-7.8 2-77.2 33-149.5 87.8-204.3 56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c.1 4.4 3.6 7.8 8 7.8h60a8 8 0 0 0 8-8.2c-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534z"></path></svg></i>
+                                                                </span>
                                                                 <input placeholder="First Name @(Model.FirstNameRequired ? "*" : "")" asp-for="FirstName" />
                                                                 <span asp-validation-for="FirstName"></span>
                                                             </div>
@@ -122,6 +85,9 @@
                                                         {
                                                             <div class="reg-inputs">
                                                                 <!-- <label asp-for="LastName" asp-postfix=":"></label> -->
+                                                                <span class="field-icon">
+                                                                    <i aria-label="icon: user" class="anticon anticon-user" style="color: rgba(255, 255, 255, 0.5);"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="user" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M858.5 763.6a374 374 0 0 0-80.6-119.5 375.63 375.63 0 0 0-119.5-80.6c-.4-.2-.8-.3-1.2-.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1-.4.2-.8.3-1.2.5-44.8 18.9-85 46-119.5 80.6a375.63 375.63 0 0 0-80.6 119.5A371.7 371.7 0 0 0 136 901.8a8 8 0 0 0 8 8.2h60c4.4 0 7.9-3.5 8-7.8 2-77.2 33-149.5 87.8-204.3 56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c.1 4.4 3.6 7.8 8 7.8h60a8 8 0 0 0 8-8.2c-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534z"></path></svg></i>
+                                                                </span>
                                                                 <input placeholder="Last Name @(Model.LastNameRequired ? "*" : "")" asp-for="LastName" />
                                                                 <span asp-validation-for="LastName"></span>
                                                             </div>
@@ -164,6 +130,9 @@
                                                     <div class="form-group">
                                                          <div class="reg-inputs">
                                                             <!-- <label asp-for="Email" asp-postfix=":"></label> -->
+                                                            <span class="field-icon">
+                                                                <i aria-label="icon: user" class="anticon anticon-user" style="color: rgba(255, 255, 255, 0.5);"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="user" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M858.5 763.6a374 374 0 0 0-80.6-119.5 375.63 375.63 0 0 0-119.5-80.6c-.4-.2-.8-.3-1.2-.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1-.4.2-.8.3-1.2.5-44.8 18.9-85 46-119.5 80.6a375.63 375.63 0 0 0-80.6 119.5A371.7 371.7 0 0 0 136 901.8a8 8 0 0 0 8 8.2h60c4.4 0 7.9-3.5 8-7.8 2-77.2 33-149.5 87.8-204.3 56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c.1 4.4 3.6 7.8 8 7.8h60a8 8 0 0 0 8-8.2c-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534z"></path></svg></i>
+                                                            </span>
                                                             <input placeholder="Email * " asp-for="Email" />
                                                             <span asp-validation-for="Email"></span>
                                                         </div>
@@ -179,6 +148,9 @@
                                                             {
                                                                 <div class="reg-inputs">
                                                                     <!-- <label asp-for="ConfirmEmail" asp-postfix=":"></label> -->
+                                                                    <span class="field-icon">
+                                                                        <i aria-label="icon: user" class="anticon anticon-user" style="color: rgba(255, 255, 255, 0.5);"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="user" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M858.5 763.6a374 374 0 0 0-80.6-119.5 375.63 375.63 0 0 0-119.5-80.6c-.4-.2-.8-.3-1.2-.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1-.4.2-.8.3-1.2.5-44.8 18.9-85 46-119.5 80.6a375.63 375.63 0 0 0-80.6 119.5A371.7 371.7 0 0 0 136 901.8a8 8 0 0 0 8 8.2h60c4.4 0 7.9-3.5 8-7.8 2-77.2 33-149.5 87.8-204.3 56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c.1 4.4 3.6 7.8 8 7.8h60a8 8 0 0 0 8-8.2c-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534z"></path></svg></i>
+                                                                    </span>
                                                                     <input placeholder="Confirm Email * " asp-for="ConfirmEmail" />
                                                                     <span asp-validation-for="ConfirmEmail"></span>
                                                                 </div>
@@ -195,6 +167,9 @@
                                                             {
                                                                 <div class="reg-inputs">
                                                                     <!-- <label asp-for="Username" asp-postfix=":"></label> -->
+                                                                    <span class="field-icon">
+                                                                        <i aria-label="icon: user" class="anticon anticon-user" style="color: rgba(255, 255, 255, 0.5);"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="user" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M858.5 763.6a374 374 0 0 0-80.6-119.5 375.63 375.63 0 0 0-119.5-80.6c-.4-.2-.8-.3-1.2-.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1-.4.2-.8.3-1.2.5-44.8 18.9-85 46-119.5 80.6a375.63 375.63 0 0 0-80.6 119.5A371.7 371.7 0 0 0 136 901.8a8 8 0 0 0 8 8.2h60c4.4 0 7.9-3.5 8-7.8 2-77.2 33-149.5 87.8-204.3 56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c.1 4.4 3.6 7.8 8 7.8h60a8 8 0 0 0 8-8.2c-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534z"></path></svg></i>
+                                                                    </span>
                                                                     <input placeholder="Username * " asp-for="Username" />
                                                                     <span asp-validation-for="Username"></span>
                                                                     @if (Model.CheckUsernameAvailabilityEnabled)

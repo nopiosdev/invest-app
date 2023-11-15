@@ -27,85 +27,7 @@
 }
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-
-    .custom-dash-wrapper{
-        border-bottom: 1px solid #444;
-    }
-
-    .dash-button button{
-        height: 35px;
-        line-height: 35px;
-        font-size: 12px;
-        color: #fff;
-        background-color: #21ce99;
-        border-color: #21ce99;
-        border-radius: 2px;
-        line-height: 44px;
-        height: 44px;
-        text-transform: uppercase;
-        border: 1px solid #404040;
-        font-size: 12px;
-        padding: 0 25px;
-        font-weight: 600;
-        float:right;
-
-    }
-
-    .dash-header{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-direction: row;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-    }
-
-    .values{
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        flex-direction: row;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .dash-info{
-        margin-top:100px;
-    }
-
-    .info-box{
-        border:1px solid #444; 
-        padding:20px;
-        width:100%;
-        height: 100%;
-    }
-
-    .child-box{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .px-10{
-        padding-top:10px;
-        padding-bottom: 15px;
-    }
-    .page-body p {
-        font-size: 15px;
-        color: #aaa;
-        font-weight: 400;
-        margin: 0;
-    }
-    .green{
-        color:#21ce99;
-    }
-    @@media (max-width: 425px){
-        .info-box{
-            margin-top:20px;
-        }
-    }
-</style>
+ 
 
 <div class="page home-page">
     <div class="page-body">
@@ -113,9 +35,19 @@
             <div class="custom-dash-wrapper">
                 <div class="dash-header">
                     <h2 class="dash-heading">@T("Account.Dashboard")</h2>
-                    <div class="dash-button">
-                        <button>WITHDRAW FUNDS</button>
-                        <button style="margin-right: 20px;">ADD FUNDS</button>
+                    <div class="buttons">
+                        <a href="@Url.RouteUrl("Invest")" class="custom-btn btn-success">
+                            <span class="icon">
+                                <span class="fa fa-plus"></span>
+                            </span>
+                            <span class="text">@T("Account.AddFunds")</span>
+                        </a>
+                        <a href="@Url.RouteUrl("Withdraw")" class="custom-btn btn-danger">
+                            <span class="icon">
+                                <span class="fa fa-minus"></span>
+                            </span>
+                            <span class="text">@T("Account.WithDrawFunds")</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -136,11 +68,13 @@
                 </div>
             </div>
             <div class="row">
-                <div>
-                    <canvas id="line-Chart" class="line-graph"></canvas>
+                <div class="col-xl-12">
+                    <div class="line-chart-box w-100 p-3">
+                        <canvas id="line-Chart" class="line-graph"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="row dash-info">
+            <div class="row mt-5">
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 py-2 pb-3">
                     <div class="info-box">
                         <div class="child-box">

@@ -966,7 +966,7 @@ namespace Nop.Web.Controllers
                         await _customerService.InsertIdentityVerificationAsync(identityverification);
                         customer.IdentityVerificationId = identityverification.Id;
                     }
-                    catch (Exception ex){ await _logger.ErrorAsync($"Error on uploading files: {ex.Message}", ex); }
+                    catch (Exception ex) { await _logger.ErrorAsync($"Error on uploading files: {ex.Message}", ex); }
 
                     #endregion
 
@@ -2117,57 +2117,36 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> Invest(TransactionModel model)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            //var product = await _productService.GetProductByIdAsync(_customerSettings.TransactionProductId);
-            //if (product is null)
-            //{
-            //    ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.TransactionFailed"));
-            //    //return View(model);
-            //}
-            //var store = await _storeContext.GetCurrentStoreAsync();
-
-            //var warnings = await _shoppingCartService.AddToCartAsync(customer: customer,
-            //    product: product,
-            //    shoppingCartType: ShoppingCartType.ShoppingCart,
-            //    storeId: store.Id,
-            //    customerEnteredPrice: model.TransactionAmount,
-            //    addRequiredProducts: false
-            //    );
-            //foreach (var warning in warnings)
-            //{
-            //    ModelState.AddModelError("", warning);
-            //}
-
-            //if (ModelState.IsValid)
-            //{
-            //    return RedirectToRoute("CheckoutConfirm");
-
-            //    return RedirectToRoute("CheckoutPaymentMethod");
-            //}
-
-            try
+            var product = await _productService.GetProductByIdAsync(_customerSettings.TransactionProductId);
+            if (product is null)
             {
-                var transaction = new Transaction()
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.TransactionFailed"));
+            }
+            else
+            {
+                var store = await _storeContext.GetCurrentStoreAsync();
+
+                await _shoppingCartService.ClearShoppingCartAsync(customer: customer,
+                    storeId: store.Id);
+
+                var warnings = await _shoppingCartService.AddToCartAsync(customer: customer,
+                    product: product,
+                    shoppingCartType: ShoppingCartType.ShoppingCart,
+                    storeId: store.Id,
+                    customerEnteredPrice: model.TransactionAmount,
+                    addRequiredProducts: false
+                    );
+                foreach (var warning in warnings)
                 {
-                    CustomerId = customer.Id,
-                    TransactionAmount = model.TransactionAmount,
-                    TransactionType = TransactionType.Credit,
-                    Status = Status.Completed,
-                    TransactionNote = string.Empty,
-                    CreatedOnUtc = DateTime.UtcNow,
-                };
-
-                await _transactionService.InsertTransactionAsync(transaction);
-
-                _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));
-
-                model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer, model);
+                    ModelState.AddModelError("", warning);
+                }
             }
-            catch (Exception ex)
+            if (ModelState.IsValid)
             {
-                await _logger.ErrorAsync($"Error on invest: {ex.Message}", ex, customer);
-                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Unsuccessfull"));
+                return RedirectToRoute("CheckoutPaymentMethod");
             }
 
+            model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer, model);
             return View(model);
         }
 
@@ -2198,32 +2177,6 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> Withdraw(TransactionModel model)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            //var product = await _productService.GetProductByIdAsync(_customerSettings.TransactionProductId);
-            //if (product is null)
-            //{
-            //    ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.TransactionFailed"));
-            //    //return View(model);
-            //}
-            //var store = await _storeContext.GetCurrentStoreAsync();
-
-            //var warnings = await _shoppingCartService.AddToCartAsync(customer: customer,
-            //    product: product,
-            //    shoppingCartType: ShoppingCartType.ShoppingCart,
-            //    storeId: store.Id,
-            //    customerEnteredPrice: model.TransactionAmount,
-            //    addRequiredProducts: false
-            //    );
-            //foreach (var warning in warnings)
-            //{
-            //    ModelState.AddModelError("", warning);
-            //}
-
-            //if (ModelState.IsValid)
-            //{
-            //    return RedirectToRoute("CheckoutConfirm");
-
-            //    return RedirectToRoute("CheckoutPaymentMethod");
-            //}
 
             try
             {

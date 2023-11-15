@@ -14,7 +14,8 @@
         /// <summary>
         /// Gets the minor store version
         /// </summary>
-        public const string MINOR_VERSION = "0";
+        //public const string MINOR_VERSION = "0";
+        public const string MINOR_VERSION = "5";
 
         /// <summary>
         /// Gets the full store version

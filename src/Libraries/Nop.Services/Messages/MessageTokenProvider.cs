@@ -969,7 +969,7 @@ namespace Nop.Services.Messages
             //lambda expression for choosing correct order address
             async Task<Address> orderAddress(Order o) => await _addressService.GetAddressByIdAsync((o.PickupInStore ? o.PickupAddressId : o.ShippingAddressId) ?? 0);
 
-            var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+            var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId) ?? new Address();
             var (billingAddressLine, _) = await _addressService.FormatAddressAsync(billingAddress, languageId);
             var (shippingAddressLine, _) = await _addressService.FormatAddressAsync(await orderAddress(order), languageId);
 

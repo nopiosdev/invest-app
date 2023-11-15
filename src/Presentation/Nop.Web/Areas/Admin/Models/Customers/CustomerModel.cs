@@ -256,6 +256,12 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.Verified")]
         public bool Verified { get; set; }
+        [NopResourceDisplayName("Admin.Customers.Customers.Fields.FormId")]
+        public Guid FormId { get; set; }
+        [NopResourceDisplayName("Admin.Customers.Customers.Fields.ProofOfAddress")]
+        public Guid ProofOfAddress { get; set; }
+        [NopResourceDisplayName("Admin.Customers.Customers.Fields.OtherDocument")]
+        public Guid OtherDocument { get; set; }
 
         #endregion
 

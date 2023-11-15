@@ -9,6 +9,7 @@ using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Tax;
+using Nop.Core.Infrastructure;
 using Nop.Services.Affiliates;
 using Nop.Services.Attributes;
 using Nop.Services.Authentication.External;
@@ -81,6 +82,7 @@ namespace Nop.Web.Areas.Admin.Factories
         protected readonly MediaSettings _mediaSettings;
         protected readonly RewardPointsSettings _rewardPointsSettings;
         protected readonly TaxSettings _taxSettings;
+        protected readonly IDownloadService _downloadService;
 
         #endregion
 
@@ -167,6 +169,7 @@ namespace Nop.Web.Areas.Admin.Factories
             _mediaSettings = mediaSettings;
             _rewardPointsSettings = rewardPointsSettings;
             _taxSettings = taxSettings;
+            _downloadService = EngineContext.Current.Resolve<IDownloadService>();
         }
 
         #endregion
@@ -749,6 +752,14 @@ namespace Nop.Web.Areas.Admin.Factories
                 PrepareCustomerActivityLogSearchModel(model.CustomerActivityLogSearchModel, customer);
                 PrepareCustomerBackInStockSubscriptionSearchModel(model.CustomerBackInStockSubscriptionSearchModel, customer);
                 await PrepareCustomerAssociatedExternalAuthRecordsSearchModelAsync(model.CustomerAssociatedExternalAuthRecordsSearchModel, customer);
+
+                var identityVerificationRecord = await _customerService.GetIdentityVerificationById(customer.IdentityVerificationId);
+                if (identityVerificationRecord is not null)
+                {
+                    model.FormId = (await _downloadService.GetDownloadByIdAsync(identityVerificationRecord.FormId)).DownloadGuid;
+                    model.ProofOfAddress = (await _downloadService.GetDownloadByIdAsync(identityVerificationRecord.ProofOfAddress)).DownloadGuid;
+                    model.OtherDocument = (await _downloadService.GetDownloadByIdAsync(identityVerificationRecord.Document)).DownloadGuid;
+                }
             }
             else
             {

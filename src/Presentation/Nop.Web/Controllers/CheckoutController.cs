@@ -8,6 +8,7 @@ using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Http.Extensions;
 using Nop.Services.Attributes;
 using Nop.Services.Catalog;
@@ -15,10 +16,12 @@ using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
+using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
 using Nop.Services.Shipping;
 using Nop.Services.Tax;
+using Nop.Services.Transactions;
 using Nop.Web.Extensions;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Controllers;
@@ -62,6 +65,8 @@ namespace Nop.Web.Controllers
         protected readonly RewardPointsSettings _rewardPointsSettings;
         protected readonly ShippingSettings _shippingSettings;
         protected readonly TaxSettings _taxSettings;
+        protected readonly ITransactionService _transactionService;
+        protected readonly INotificationService _notificationService;
 
         #endregion
 
@@ -94,7 +99,9 @@ namespace Nop.Web.Controllers
             PaymentSettings paymentSettings,
             RewardPointsSettings rewardPointsSettings,
             ShippingSettings shippingSettings,
-            TaxSettings taxSettings)
+            TaxSettings taxSettings,
+            ITransactionService transactionService,
+            INotificationService notificationService)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -124,6 +131,8 @@ namespace Nop.Web.Controllers
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
             _taxSettings = taxSettings;
+            _transactionService = transactionService;
+            _notificationService = notificationService;
         }
 
         #endregion
@@ -1322,6 +1331,35 @@ namespace Nop.Web.Controllers
                     {
                         //redirection or POST has been done in PostProcessPayment
                         return Content(await _localizationService.GetResourceAsync("Checkout.RedirectMessage"));
+                    }
+
+                    //if transaction is made then process the transaction and redirect to the invest page
+                    var orderItems = await _orderService.GetOrderItemsAsync(orderId: placeOrderResult.PlacedOrder.Id);
+                    if (orderItems.Any(x => x.ProductId.Equals(_customerSettings.TransactionProductId)))
+                    {
+                        try
+                        {
+                            await _transactionService.InsertTransactionAsync(new Transaction()
+                            {
+                                CustomerId = customer.Id,
+                                TransactionAmount = placeOrderResult.PlacedOrder.OrderSubtotalExclTax,
+                                TransactionType = TransactionType.Credit,
+                                Status = Status.Completed,
+                                TransactionNote = string.Empty,
+                                OrderId = placeOrderResult.PlacedOrder.Id,
+                                CreatedOnUtc = DateTime.UtcNow,
+                                UpdatedOnUtc = DateTime.UtcNow,
+                            });
+
+                            _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));
+                        }
+                        catch (Exception ex)
+                        {
+                            await _logger.ErrorAsync($"Error on invest: {ex.Message}", ex, customer);
+                            _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Unsuccessfull"));
+                        }
+
+                        return RedirectToRoute("Invest");
                     }
 
                     return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });

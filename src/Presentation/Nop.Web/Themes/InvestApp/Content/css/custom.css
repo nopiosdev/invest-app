@@ -12,6 +12,21 @@ h1, h2, h3, h4, h5, h6 {   line-height: 1;  margin-top: 0;  margin-bottom: 0.5em
 ::-webkit-scrollbar-thumb{background:#37393E; border-radius: 3px;}
 ::-webkit-scrollbar { width: 10px; }
 
+/* notification css start */
+.bar-notification-container .bar-notification{display: flex;width: 100%;background-color: #fff;justify-content: space-between;align-items: center; padding: 10px 15px;}
+.bar-notification-container .bar-notification .content{ margin:0px;font-size: 17px; }
+.bar-notification-container .bar-notification .close{ color: #000;position: relative;transform: rotateX(35deg);cursor: pointer; } 
+.bar-notification-container .bar-notification .close:after{ content: "x";font-size: 30px; }
+
+.bar-notification-container .bar-notification.success{ background-color: #21ce99; }
+.bar-notification-container .bar-notification.success .content,
+.bar-notification-container .bar-notification.success .close{ color: #fff; }
+
+.bar-notification-container .bar-notification.danger{ background-color: #ff4d4f; }
+.bar-notification-container .bar-notification.danger .content,
+.bar-notification-container .bar-notification.danger .close{ color: #fff; }
+
+
 
 .buttons .custom-btn{ border-radius: 2px;line-height: 44px;height: 44px;display: inline-block;text-decoration: none; text-transform: uppercase; border: 1px solid #404040;font-size: 12px;padding: 0 25px;font-weight: 600;text-shadow: 0 -1px 0 rgba(0,0,0,.12);-webkit-box-shadow: 0 2px 0 rgba(0,0,0,.045);box-shadow: 0 2px 0 rgba(0,0,0,.045); }
 .buttons .btn-success{ color: #fff;background-color: #21ce99;border-color: #21ce99; }
@@ -239,4 +254,16 @@ h2.tabs-heading{ font-size: 1.5em; }
 .withdraw-page  .withdraw-amount-btn{ cursor: pointer; } 
 
 .withdraw-cards-group .withdraw-card{ border-color: #424242 !important;background-color: #282b31; }
+
+
+/* datatable css start */
+.datatable-grid{position: relative;overflow: auto;display: block;width: 100%;}
+.datatable{}
+.datatable thead{}
+.datatable tr{  }
+.datatable th,
+.datatable td{ padding: 12px 17px; color: #fff;border:0px; border-bottom: 1px solid #000; }
+
+.datatable-grid .dataTables_paginate { margin-bottom: 15px !important; }
+.datatable-grid .dataTables_paginate .paginate_button a{ background-color: #282b31;border: none;color: #fff; }
 

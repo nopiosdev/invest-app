@@ -59,6 +59,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     @NopHtml.GenerateHeadCustom()
     @*This is used so that themes can inject content into the header*@
+    
+    @*<link href="~/Themes/InvestApp/Content/tas_datatable/scroller.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Themes/InvestApp/Content/tas_datatable/rowGroup.dataTables.css.css" rel="stylesheet" />
+    <link href="~/Themes/InvestApp/Content/tas_datatable/dataTables.bootstrap5.min.css" rel="stylesheet" />*@
+
+    
     @await Html.PartialAsync("Head")
 
     @NopHtml.GenerateCssFiles()

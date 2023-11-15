@@ -8,6 +8,7 @@
     //page class
     NopHtml.AppendPageCssClassParts("html-login-page");
 }
+@*
 <form method="post">
     <nop-antiforgery-token />
     <div asp-validation-summary="ModelOnly" class="message-error"></div>
@@ -21,3 +22,68 @@
     <span>@item.CreateOnUtc.ToShortDateString()</span>
     <span>@item.TransactionAmount</span>
 }
+
+*@
+
+<div class="page withdraw-page">
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-12 page-title-header pb-1 mb-4">
+                    <h2 class="page-title">@T("Account.Stock.withdraw")</h2>
+                </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col-xl-4">
+                    <form class="withdraw-form mb-5" method="post">
+                        <label class="mb-2">@T("Account.Stock.amount")</label>
+                        <nop-antiforgery-token />
+                        <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                        <nop-editor asp-for="TransactionAmount" />
+                        <div class="d-flex flex-wrap align-items-center justify-content-between w-100 mb-5">
+                            <span class="text-primary withdraw-amount-btn p-1 px-2" data-text="1000">$1000</span>
+                            <span class="text-primary withdraw-amount-btn p-1 px-2" data-text="2000">$2000</span>
+                            <span class="text-primary withdraw-amount-btn p-1 px-2" data-text="2500">$2500</span>
+                            <span class="text-primary withdraw-amount-btn p-1 px-2" data-text="5000">$5000</span>
+                            <span class="text-primary withdraw-amount-btn p-1 px-2" data-text="10000">$10000</span>
+                        </div>
+                        <div class="buttons">
+                            <label class="mb-2">@T("Account.Founding.Source")
+                                <span class="float-end">@T("Account.MyBank")</span>
+                            </label>
+                            <button type="submit" class="custom-btn btn-success w-100">@T("Customer.Withdraw.Continue")</button>
+                        </div>
+                    </form>
+
+                    <div class="withdraw-cards-group d-flex flex-wrap gap-2 w-100 mt-3">
+                        <div class="withdraw-card border w-100 p-3">
+                            <div class="withdraw-wrapper">
+                                <span class="card-title d-block h5 mb-4">@T("Customer.RecentTransactions")</span>
+                                @foreach(var item in Model.RecentTransactions)
+                                {
+                                    <div class="d-flex align-items-center justify-content-between w-100 mb-3">
+                                        <span class="d-flex flex-wrap w-100">
+                                            <span class="h6">@item.TransactionNote</span>
+                                            <span>@item.CreateOnUtc.ToShortDateString()</span>
+                                        </span>
+                                        <span>@item.TransactionAmount</span>
+                                    </div>    
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).on("click",".withdraw-amount-btn",function(){
+        var that = $(this); 
+        $("#TransactionAmount").val(that.attr("data-text"));
+    });
+</script>

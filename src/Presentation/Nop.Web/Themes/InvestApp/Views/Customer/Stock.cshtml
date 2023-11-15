@@ -9,43 +9,47 @@
 <div class="page customer-stock-page">
     <div class="custom-tabs-wrapper">
         <div class="tabs-header">
-            <h2 class="tabs-heading">@T("Account.Stock.Picks")</h2>
+            <h2 class="tabs-heading">@T("Account.Transactions")</h2>
             <div class="tabs-navigation">
                 <ul>
                     <li class="active">
-                        <a href="javascript:void(0)" data-id="breakthroughTradesTab">@T("Account.BreakthroughTrades")</a>
+                        <a href="javascript:void(0)" data-id="WithdrawTab">@T("Account.Withdraw")</a>
                     </li>
                     <li>
-                        <a href="javascript:void(0)" data-id="longtermTradesTab">@T("Account.LongtermTrades")</a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" data-id="quickProfitTab">@T("Account.Quickprofit")</a>
-                    </li> 
+                        <a href="javascript:void(0)" data-id="DepositTab">@T("Account.Deposit")</a>
+                    </li>  
                 </ul>
             </div>
         </div>
         <div class="tabs-content">
 
-            <div id="breakthroughTradesTab" class="tab active">
-                <table id="breakthroughTradesTable" class="stock-datatable" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Company</th>
-                            <th>Innovation</th>
-                            <th>Grade</th>
-                            <th>Buy Date</th>
-                            <th>Buy Price</th>
-                            <th>Current Return</th>
-                            <th>Buy Below</th>
-                        </tr>
-                    </thead>
-                </table>
+            <div id="WithdrawTab" class="tab active">
+                <div class="datatable-grid ">
+                    <table id="WithdrawTable" class="table datatable stock-datatable" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Withdrawl Method</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th> 
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
-            <div id="longtermTradesTab" class="tab">
-
-            </div>
-            <div id="quickProfitTab" class="tab">
-            
+            <div id="DepositTab" class="tab">
+                <div class="datatable-grid ">
+                    <table id="DepositTable" class="table datatable stock-datatable" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Withdrawl Method</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th> 
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
 
         </div>
@@ -53,81 +57,131 @@
 </div>
 
 
-<script asp-location="Footer">
+<script asp-location="Footer"> 
+    
+    function WithdrawTable(){
+        var table = $('#WithdrawTable').DataTable({
+            "ajax": {
+                "url": "@Url.RouteUrl("GetTransactionData", new {transactionType="debit"})",
+                "dataType": "json",
+                "contentType": "application/json; charset=utf-8",
+                "dataSrc": function (resp) {
+                    return resp;
 
-    var stockData = {
-        "data":[
-            {
-                "Company" : "Company",
-                "Innovation" : "Innovation",
-                "Grade" : "Grade",
-                "BuyDate" : "Buy Date",
-                "BuyPrice" : "Buy Price",
-                "CurrentReturn" : "Current Return",
-                "CurrentPrice" : "Current Price",
-                "BuyBelow" : "Buy Below"
+                },
+                error: function () {
+                    alert("Something went wrong!");
+                }
             },
-            {
-                "Company" : "Company",
-                "Innovation" : "Innovation",
-                "Grade" : "Grade",
-                "BuyDate" : "Buy Date",
-                "BuyPrice" : "Buy Price",
-                "CurrentReturn" : "Current Return",
-                "CurrentPrice" : "Current Price",
-                "BuyBelow" : "Buy Below"
+            "searching": true,
+            "language": {
+                "searchPlaceholder": "Search by TAS Project Number"
             },
-            {
-                "Company" : "Company",
-                "Innovation" : "Innovation",
-                "Grade" : "Grade",
-                "BuyDate" : "Buy Date",
-                "BuyPrice" : "Buy Price",
-                "CurrentReturn" : "Current Return",
-                "CurrentPrice" : "Current Price",
-                "BuyBelow" : "Buy Below"
+            "paging": true,
+            "info": false,
+            "initComplete": function (settings, json) {
+                colorNegativeValue("#billingTransGrid");
             },
-            {
-                "Company" : "Company",
-                "Innovation" : "Innovation",
-                "Grade" : "Grade",
-                "BuyDate" : "Buy Date",
-                "BuyPrice" : "Buy Price",
-                "CurrentReturn" : "Current Return",
-                "CurrentPrice" : "Current Price",
-                "BuyBelow" : "Buy Below"
-            },
-            {
-                "Company" : "Company",
-                "Innovation" : "Innovation",
-                "Grade" : "Grade",
-                "BuyDate" : "Buy Date",
-                "BuyPrice" : "Buy Price",
-                "CurrentReturn" : "Current Return",
-                "CurrentPrice" : "Current Price",
-                "BuyBelow" : "Buy Below"
+            "order": [],
+            "aoColumns": [
+                {
+                    "mData": "WithdrawlMethod",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data != "" ? data:"-";
+                    }
+                },
+                {
+                    "mData": "Amount",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                }, 
+                {
+                    "mData": "Status",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+                {
+                    "mData": "Date",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+            ],
+            initComplete: function () {
+                
             }
-        ]
-    };
+        });
+    }
 
-    function breakthroughTrades(){
-        var breakthroughTrades_Table = new DataTable('#breakthroughTradesTable', {
-            ajax: stockData,
-            columns: [
-                { data: 'Company' },
-                { data: 'Innovation' },
-                { data: 'Grade' },
-                { data: 'BuyDate' },
-                { data: 'BuyPrice' },
-                { data: 'CurrentReturn' },
-                { data: 'CurrentPrice' },
-                { data: 'BuyBelow' }
-            ]
+    function DepositTable(){
+        var table = $('#DepositTable').DataTable({
+            "ajax": {
+                "url": "@Url.RouteUrl("GetTransactionData", new {transactionType="credit"})",
+                "dataType": "json",
+                "contentType": "application/json; charset=utf-8",
+                "dataSrc": function (resp) {
+                    return resp;
+
+                },
+                error: function () {
+                    alert("Something went wrong!");
+                }
+            },
+            "searching": true,
+            "language": {
+                "searchPlaceholder": "Search by TAS Project Number"
+            },
+            "paging": true,
+            "info": false,
+            "initComplete": function (settings, json) {
+                colorNegativeValue("#billingTransGrid");
+            },
+            "order": [],
+            "aoColumns": [
+                {
+                    "mData": "WithdrawlMethod",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data != "" ? data:"-";
+                    }
+                },
+                {
+                    "mData": "Amount",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                }, 
+                {
+                    "mData": "Status",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+                {
+                    "mData": "Date",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+            ],
+            initComplete: function () {
+                
+            }
         });
     }
 
     $(document).ready(function(){
-        breakthroughTrades();
+        WithdrawTable();
+        DepositTable();
     });
 
 </script>

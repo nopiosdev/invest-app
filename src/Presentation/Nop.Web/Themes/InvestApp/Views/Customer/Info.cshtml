@@ -147,10 +147,11 @@
                                 <div class="inputs">
                                     <label>@T("Account.Security")</label>
                                     <span>
-                                        <label class="custom-switch">
+                                        @* <label class="custom-switch">
                                             <input type="checkbox" name="TwoFactorAuthentication" />
                                             <span class="custom-slider round"></span>
-                                        </label>
+                                        </label> *@
+                                        <a href="@Url.RouteUrl("MultiFactorAuthenticationSettings")">@T("account.TwoFactorAuthentication")</a>
                                     </span>
                                 </div>
                             </div>

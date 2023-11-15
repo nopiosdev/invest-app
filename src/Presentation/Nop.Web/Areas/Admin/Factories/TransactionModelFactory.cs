@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using DocumentFormat.OpenXml.EMMA;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Transaction;
 using Nop.Services.Customers;
 using Nop.Services.Helpers;
@@ -44,7 +45,7 @@ namespace Nop.Web.Areas.Admin.Factories
 
         #region Methods
 
-        public virtual Task<TransactionSearchModel> PrepareTransactionSearchModelAsync(TransactionSearchModel searchModel)
+        public virtual async Task<TransactionSearchModel> PrepareTransactionSearchModelAsync(TransactionSearchModel searchModel)
         {
             if (searchModel == null)
                 throw new ArgumentNullException(nameof(searchModel));
@@ -52,7 +53,24 @@ namespace Nop.Web.Areas.Admin.Factories
             //prepare page parameters
             searchModel.SetGridPageSize();
 
-            return Task.FromResult(searchModel);
+            searchModel.AvailableStatus = new List<SelectListItem>()
+            {
+               new SelectListItem(){Text="--Select", Value="0" },
+               new SelectListItem(){Text=await _localizationService.GetLocalizedEnumAsync(Status.Completed),Value=$"{(int)Status.Completed}" },
+               new SelectListItem(){Text=await _localizationService.GetLocalizedEnumAsync(Status.Pending),Value=$"{(int)Status.Pending}"},
+               new SelectListItem(){Text=await _localizationService.GetLocalizedEnumAsync(Status.Removed),Value=$"{(int)Status.Removed}"},
+               new SelectListItem(){Text=await _localizationService.GetLocalizedEnumAsync(Status.Declined),Value=$"{(int)Status.Declined}"},
+            };
+
+            searchModel.AvailableTransactionType = new List<SelectListItem>()
+            {
+               new SelectListItem(){Text="--Select", Value="0" },
+               new SelectListItem(){Text=await _localizationService.GetLocalizedEnumAsync(TransactionType.Debit),Value=$"{(int)TransactionType.Debit}" },
+               new SelectListItem(){Text=await _localizationService.GetLocalizedEnumAsync(TransactionType.Credit),Value=$"{(int)TransactionType.Credit}"},
+               new SelectListItem(){Text=await _localizationService.GetLocalizedEnumAsync(TransactionType.Voided),Value=$"{(int)TransactionType.Voided}"},
+            };
+
+            return searchModel;
         }
         public virtual async Task<TransactionListModel> PrepareTransactionListModelAsync(TransactionSearchModel searchModel)
         {

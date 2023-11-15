@@ -28,10 +28,10 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #region Ctor
 
-        public TransactionController(IPermissionService permissionService, 
+        public TransactionController(IPermissionService permissionService,
             ITransactionModelFactory transactionModelFactory,
             ITransactionService transactionService,
-            ICustomerActivityService customerActivityService, 
+            ICustomerActivityService customerActivityService,
             ILocalizationService localizationService,
             INotificationService notificationService)
         {
@@ -148,9 +148,10 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                transaction = model.ToEntity(transaction);
-                transaction.UpdatedOnUtc = DateTime.UtcNow;
-                await _transactionService.UpdateTransactionAsync(transaction);
+                var transactionUpdated = model.ToEntity<Transaction>();
+                transactionUpdated.CustomerId = transaction.CustomerId;
+                transactionUpdated.UpdatedOnUtc = DateTime.UtcNow;
+                await _transactionService.UpdateTransactionAsync(transactionUpdated);
 
                 _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Transactions.Updated"));
 

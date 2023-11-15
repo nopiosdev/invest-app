@@ -13,6 +13,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Events;
+using Nop.Core.Infrastructure;
 using Nop.Services.Affiliates;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
@@ -83,6 +84,7 @@ namespace Nop.Services.Orders
         protected readonly RewardPointsSettings _rewardPointsSettings;
         protected readonly ShippingSettings _shippingSettings;
         protected readonly TaxSettings _taxSettings;
+        protected readonly CustomerSettings _customerSettings;
 
         #endregion
 
@@ -179,6 +181,7 @@ namespace Nop.Services.Orders
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
             _taxSettings = taxSettings;
+            _customerSettings = EngineContext.Current.Resolve<CustomerSettings>();
         }
 
         #endregion
@@ -274,7 +277,10 @@ namespace Nop.Services.Orders
             var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
             await PrepareAndValidateCustomerAsync(details, processPaymentRequest, currentCurrency);
             await PrepareAndValidateShoppingCartAndCheckoutAttributesAsync(details, processPaymentRequest, currentCurrency);
-            await PrepareAndValidateBillingAddressAsync(details);
+            if (!details.Cart.Any(x => x.ProductId.Equals(_customerSettings.TransactionProductId)))
+            {
+                await PrepareAndValidateBillingAddressAsync(details);
+            }
             await PrepareAndValidateShippingInfoAsync(details, processPaymentRequest);
             await PrepareAndValidateTotalsAsync(details, processPaymentRequest);
 
@@ -753,11 +759,14 @@ namespace Nop.Services.Orders
                 CustomOrderNumber = string.Empty
             };
 
-            if (details.BillingAddress is null)
-                throw new NopException("Billing address is not provided");
+            if (!details.Cart.Any(x => x.ProductId.Equals(_customerSettings.TransactionProductId)))
+            {
+                if (details.BillingAddress is null)
+                    throw new NopException("Billing address is not provided");
 
-            await _addressService.InsertAddressAsync(details.BillingAddress);
-            order.BillingAddressId = details.BillingAddress.Id;
+                await _addressService.InsertAddressAsync(details.BillingAddress);
+                order.BillingAddressId = details.BillingAddress.Id;
+            }
 
             if (details.PickupAddress != null)
             {
@@ -1557,8 +1566,9 @@ namespace Nop.Services.Orders
                     if (details.IsRecurringShoppingCart)
                         await CreateFirstRecurringPaymentAsync(processPaymentRequest, order);
 
-                    //notifications
-                    await SendNotificationsAndSaveNotesAsync(order);
+                    if (!details.Cart.Any(x => x.ProductId.Equals(_customerSettings.TransactionProductId)))
+                        //notifications
+                        await SendNotificationsAndSaveNotesAsync(order);
 
                     //reset checkout data
                     await _customerService.ResetCheckoutDataAsync(details.Customer, processPaymentRequest.StoreId, clearCouponCodes: true, clearCheckoutAttributes: true);

@@ -109,6 +109,9 @@ namespace Nop.Web.Infrastructure
 
             //helpers classes
             services.AddScoped<ITinyMceHelper, TinyMceHelper>();
+
+            //NCT back-end dev
+            services.AddScoped<ITransactionModelFactory, TransactionModelFactory>();
         }
 
         /// <summary>

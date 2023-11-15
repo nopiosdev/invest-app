@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Runtime.InteropServices;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
@@ -836,6 +837,37 @@ namespace Nop.Web.Controllers
                 ValidateRequiredConsents(consents, form);
             }
 
+            var allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".webp", ".doc", ".docx", ".pdf" };
+            var formIdExtension = _fileProvider.GetFileExtension(model.FormId?.FileName ?? string.Empty).ToLower();
+            var proofOfAddressExtension = _fileProvider.GetFileExtension(model.ProofOfAddress?.FileName ?? string.Empty).ToLower();
+            var documentExtension = _fileProvider.GetFileExtension(model.Document?.FileName ?? string.Empty).ToLower();
+            if (model.FormId is not null)
+            {
+                ModelState.AddModelError("FormId", await _localizationService.GetResourceAsync("Customer.Register.FormFile.Required"));
+            }
+            else if (allowedExtensions.Contains(formIdExtension))
+            {
+                ModelState.AddModelError("FormId", await _localizationService.GetResourceAsync("Customer.Register.FormFile.FileTypeNotAllowed"));
+            }
+
+            if (model.ProofOfAddress is not null)
+            {
+                ModelState.AddModelError("ProofOfAddress", await _localizationService.GetResourceAsync("Customer.Register.FormFile.Required"));
+            }
+            else if (allowedExtensions.Contains(proofOfAddressExtension))
+            {
+                ModelState.AddModelError("ProofOfAddress", await _localizationService.GetResourceAsync("Customer.Register.FormFile.FileTypeNotAllowed"));
+            }
+
+            if (model.Document is not null)
+            {
+                ModelState.AddModelError("FormId", await _localizationService.GetResourceAsync("Customer.Register.FormFile.Required"));
+            }
+            else if (allowedExtensions.Contains(documentExtension))
+            {
+                ModelState.AddModelError("FormId", await _localizationService.GetResourceAsync("Customer.Register.FormFile.FileTypeNotAllowed"));
+            }
+
             if (ModelState.IsValid)
             {
                 var customerUserName = model.Username;
@@ -900,6 +932,44 @@ namespace Nop.Web.Controllers
 
                     //save customer attributes
                     customer.CustomCustomerAttributesXML = customerAttributesXml;
+
+                    #region Identity Verification
+
+                    async Task<Download> InsertFormFiles(IFormFile file)
+                    {
+                        var download = new Download
+                        {
+                            DownloadGuid = Guid.NewGuid(),
+                            UseDownloadUrl = false,
+                            DownloadUrl = string.Empty,
+                            DownloadBinary = await _downloadService.GetDownloadBitsAsync(file),
+                            ContentType = file.ContentType,
+                            Filename = _fileProvider.GetFileNameWithoutExtension(file.FileName),
+                            Extension = _fileProvider.GetFileExtension(file.FileName),
+                            IsNew = true
+                        };
+
+                        await _downloadService.InsertDownloadAsync(download);
+
+                        return download;
+                    }
+
+                    try
+                    {
+                        var identityverification = new IdentityVerification
+                        {
+                            FormId = (await InsertFormFiles(model.FormId)).Id,
+                            ProofOfAddress = (await InsertFormFiles(model.ProofOfAddress)).Id,
+                            Document = (await InsertFormFiles(model.Document)).Id
+                        };
+
+                        await _customerService.InsertIdentityVerificationAsync(identityverification);
+                        customer.IdentityVerificationId = identityverification.Id;
+                    }
+                    catch (Exception ex){ await _logger.ErrorAsync($"Error on uploading files: {ex.Message}", ex); }
+
+                    #endregion
+
                     await _customerService.UpdateCustomerAsync(customer);
 
                     //newsletter
@@ -1022,6 +1092,7 @@ namespace Nop.Web.Controllers
 
                         await _customerService.UpdateCustomerAsync(customer);
                     }
+
 
                     //notifications
                     if (_customerSettings.NotifyNewCustomerRegistration)

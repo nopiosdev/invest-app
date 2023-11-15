@@ -1,0 +1,61 @@
+@model TransactionModel
+
+<div class="card-body">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <nop-label asp-for="CreateOnUtc" />
+        </div>
+        <div class="col-md-9">
+            <div class="form-text-row">@Model.CreateOnUtc</div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-3">
+            <nop-label asp-for="CustomerId" />
+        </div>
+        <div class="col-md-9">
+            <a asp-controller="Customer" asp-action="Edit" asp-route-id="@Model.CustomerId">@Model.CustomerInfo</a>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-3">
+            <nop-label asp-for="TransactionAmount" />
+        </div>
+        <div class="col-md-9">
+            <nop-editor asp-for="TransactionAmount" />
+            <span asp-validation-for="TransactionAmount"></span>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-3">
+            <nop-label asp-for="TransactionNote" />
+        </div>
+        <div class="col-md-9">
+            <nop-textarea asp-for="TransactionNote" />
+            <span asp-validation-for="TransactionNote"></span>
+        </div>
+    </div>
+
+    <div class="form-group row advanced-setting">
+        <div class="col-md-3">
+            <nop-label asp-for="StatusId" />
+        </div>
+        <div class="col-md-9">
+            <nop-select asp-for="StatusId" asp-items="Model.AvaialableStatus" />
+            <span asp-validation-for="StatusId"></span>
+        </div>
+    </div>
+
+    <div class="form-group row advanced-setting">
+        <div class="col-md-3">
+            <nop-label asp-for="TransactionTypeId" />
+        </div>
+        <div class="col-md-9">
+            <nop-select asp-for="TransactionTypeId" asp-items="Model.AvaialableTransactionType" />
+            <span asp-validation-for="TransactionTypeId"></span>
+        </div>
+    </div>
+</div>

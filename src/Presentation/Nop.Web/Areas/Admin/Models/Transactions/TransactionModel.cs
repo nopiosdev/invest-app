@@ -22,6 +22,9 @@ namespace Nop.Web.Areas.Admin.Models.Transactions
         public int StatusId { get; set; }
         public IList<SelectListItem> AvaialableStatus { get; set; }
         public IList<SelectListItem> AvaialableTransactionType { get; set; }
+        public string CustomerInfo { get; set; }
+        public bool UserCanDelete { get; set; }
+
         public TransactionType TransactionType
         {
             get => (TransactionType)this.TransactionTypeId;

@@ -11,6 +11,7 @@
 @inject MediaSettings mediaSettings
 @inject OrderSettings orderSettings
 
+
 <div class="order-summary-content">
     @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore, additionalData = Model })
     @await Html.PartialAsync("_OrderReviewData", Model.OrderReviewData)
@@ -29,6 +30,7 @@
         }
         @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
         <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
+            @*
             <div class="table-wrapper">
                 <table class="cart">
                     <colgroup>
@@ -246,6 +248,7 @@
                     </tbody>
                 </table>
             </div>
+            *@
             @if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
             {
                 var inclTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
@@ -271,6 +274,7 @@
                 }
                 @await Component.InvokeAsync(typeof(SelectedCheckoutAttributesViewComponent))
             </div>
+            @*
             <div class="cart-footer">
                 @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter, additionalData = Model })
                 @if (Model.IsEditable)
@@ -283,94 +287,95 @@
                         </div>
                     </div>
                 }
-            <div class="totals">
-                @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.OrderSummaryTotals, additionalData = Model })
-                @await Component.InvokeAsync(typeof(OrderTotalsViewComponent), new { isEditable = Model.IsEditable })
-                @if (Model.IsEditable)
-                {
-                    if (!string.IsNullOrEmpty(Model.MinOrderSubtotalWarning))
+                <div class="totals">
+                    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.OrderSummaryTotals, additionalData = Model })
+                    @await Component.InvokeAsync(typeof(OrderTotalsViewComponent), new { isEditable = Model.IsEditable })
+                    @if (Model.IsEditable)
                     {
-                        <div class="min-amount-warning">
-                            @Model.MinOrderSubtotalWarning
-                        </div>
+                        if (!string.IsNullOrEmpty(Model.MinOrderSubtotalWarning))
+                        {
+                            <div class="min-amount-warning">
+                                @Model.MinOrderSubtotalWarning
+                            </div>
+                        }
                     }
-                }
-                @if (Model.IsEditable)
-                {
-                    if (Model.TermsOfServiceOnShoppingCartPage)
+                    @if (Model.IsEditable)
                     {
-                        <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display: none;">
-                            <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
-                        </div>
-                        <div class="terms-of-service">
-                            <input id="termsofservice" type="checkbox" name="termsofservice" />
-                            <label for="termsofservice">@T("Checkout.TermsOfService.IAccept")</label>
-                            @if (Model.TermsOfServicePopup)
+                        if (Model.TermsOfServiceOnShoppingCartPage)
+                        {
+                            <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display: none;">
+                                <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
+                            </div>
+                            <div class="terms-of-service">
+                                <input id="termsofservice" type="checkbox" name="termsofservice" />
+                                <label for="termsofservice">@T("Checkout.TermsOfService.IAccept")</label>
+                                @if (Model.TermsOfServicePopup)
+                                {
+                                    <a class="read" id="read-terms">@T("Checkout.TermsOfService.Read")</a>
+                                    <script asp-location="Footer">
+                                            $(document).ready(function() {
+                                                $('#read-terms').on('click',
+                                                    function(e) {
+                                                        e.preventDefault();
+                                                        displayPopupContentFromUrl(
+                                                            '@Url.RouteUrl("TopicPopup", new {SystemName = "conditionsofuse"})',
+                                                            '@T("Checkout.TermsOfService")');
+                                                    });
+                                            });
+                                    </script>
+                                }
+                                else
+                                {
+                                    <a class="read" id="read-terms" href="@Url.RouteTopicUrl("conditionsofuse")">@T("Checkout.TermsOfService.Read")</a>
+                                }
+                            </div>
+                        }
+                        <div class="checkout-buttons">
+                            @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
                             {
-                                <a class="read" id="read-terms">@T("Checkout.TermsOfService.Read")</a>
                                 <script asp-location="Footer">
-                                        $(document).ready(function() {
-                                            $('#read-terms').on('click',
-                                                function(e) {
-                                                    e.preventDefault();
-                                                    displayPopupContentFromUrl(
-                                                        '@Url.RouteUrl("TopicPopup", new {SystemName = "conditionsofuse"})',
-                                                        '@T("Checkout.TermsOfService")');
-                                                });
+                                    $(document).ready(function () {
+                                        $('#checkout').on('click', function () {
+                                            //terms of service
+                                            var termOfServiceOk = true;
+                                            if ($('#termsofservice').length > 0) {
+                                                //terms of service element exists
+                                                if (!$('#termsofservice').is(':checked')) {
+                                                    $("#terms-of-service-warning-box").dialog();
+                                                    termOfServiceOk = false;
+                                                } else {
+                                                    termOfServiceOk = true;
+                                                }
+                                            }
+                                            return termOfServiceOk;
                                         });
+                                    });
                                 </script>
+                                if (orderSettings.CheckoutDisabled)
+                                {
+                                    <div class="checkout-disabled">
+                                        @T("Checkout.Disabled")
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button type="submit" id="checkout" name="checkout" value="checkout" class="button-1 checkout-button">
+                                        @T("Checkout.Button")
+                                    </button>
+                                }
                             }
-                            else
+                        </div>
+                        <div class="addon-buttons">
+                            <!-- Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express) -->
+                            @foreach (var pm in Model.ButtonPaymentMethodViewComponents)
                             {
-                                <a class="read" id="read-terms" href="@Url.RouteTopicUrl("conditionsofuse")">@T("Checkout.TermsOfService.Read")</a>
+                                @await Component.InvokeAsync(pm)
                             }
                         </div>
                     }
-                    <div class="checkout-buttons">
-                        @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
-                        {
-                            <script asp-location="Footer">
-                                $(document).ready(function () {
-                                    $('#checkout').on('click', function () {
-                                        //terms of service
-                                        var termOfServiceOk = true;
-                                        if ($('#termsofservice').length > 0) {
-                                            //terms of service element exists
-                                            if (!$('#termsofservice').is(':checked')) {
-                                                $("#terms-of-service-warning-box").dialog();
-                                                termOfServiceOk = false;
-                                            } else {
-                                                termOfServiceOk = true;
-                                            }
-                                        }
-                                        return termOfServiceOk;
-                                    });
-                                });
-                            </script>
-                            if (orderSettings.CheckoutDisabled)
-                            {
-                                <div class="checkout-disabled">
-                                    @T("Checkout.Disabled")
-                                </div>
-                            }
-                            else
-                            {
-                                <button type="submit" id="checkout" name="checkout" value="checkout" class="button-1 checkout-button">
-                                    @T("Checkout.Button")
-                                </button>
-                            }
-                        }
-                    </div>
-                    <div class="addon-buttons">
-                        @*Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express)*@
-                        @foreach (var pm in Model.ButtonPaymentMethodViewComponents)
-                        {
-                            @await Component.InvokeAsync(pm)
-                        }
-                    </div>
-                }
+                </div>
             </div>
-            </div>
+            *@
             @if (Model.IsEditable)
             {
                 @await Component.InvokeAsync(typeof(CrossSellProductsViewComponent))

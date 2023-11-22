@@ -25,6 +25,8 @@ namespace Nop.Web.Areas.Admin.Models.Transactions
         public string CustomerInfo { get; set; }
         public bool UserCanDelete { get; set; }
 
+        public string TransactionTypeString { get; set; }
+        public string StatusString { get; set; }
         public TransactionType TransactionType
         {
             get => (TransactionType)this.TransactionTypeId;

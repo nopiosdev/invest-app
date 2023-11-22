@@ -92,6 +92,8 @@ namespace Nop.Web.Areas.Admin.Factories
                 {
                     var transactionModel = transaction.ToModel<TransactionModel>();
                     transactionModel.CreateOnUtc = await _dateTimeHelper.ConvertToUserTimeAsync(transaction.CreatedOnUtc, DateTimeKind.Utc);
+                    transactionModel.TransactionTypeString = await _localizationService.GetLocalizedEnumAsync(transactionModel.TransactionType);
+                    transactionModel.StatusString = await _localizationService.GetLocalizedEnumAsync(transactionModel.Status);
 
                     return transactionModel;
                 });

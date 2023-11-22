@@ -39,6 +39,7 @@
                         <label class="mb-2">@T("Account.Stock.amount")</label>
                         <nop-antiforgery-token />
                         <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                        <input type="hidden" asp-for="MaxWithdrawAmount" />
                         <nop-editor asp-for="TransactionAmount" />
                         <div class="d-flex flex-wrap align-items-center justify-content-between w-100 mb-5">
                             <span class="text-primary withdraw-amount-btn p-1 px-2" data-text="1000">$1000</span>
@@ -85,5 +86,14 @@
     $(document).on("click",".withdraw-amount-btn",function(){
         var that = $(this); 
         $("#TransactionAmount").val(that.attr("data-text"));
+    });
+    $('form').submit(function () {
+        let maxAmount = $('form #MaxWithdrawAmount').val();
+        let withdrawAmount = $('form #TransactionAmount').val();
+        if (withdrawAmount > maxAmount) {
+            if (!confirm('@T("Customer.Withdraw.Transaction.WithdrawInvestedAmount")')) {
+                return false;
+            }
+        }
     });
 </script>

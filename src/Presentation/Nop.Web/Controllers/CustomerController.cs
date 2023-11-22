@@ -4,6 +4,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
+using Microsoft.VisualBasic;
 using Nop.Core;
 using Nop.Core.Domain;
 using Nop.Core.Domain.Catalog;
@@ -107,6 +108,7 @@ namespace Nop.Web.Controllers
         protected readonly INopFileProvider _fileProvider;
         protected readonly ITransactionService _transactionService;
         protected readonly IShoppingCartService _shoppingCartService;
+        protected readonly TransactionSettings _transactionSettings;
 
         #endregion
 
@@ -160,7 +162,8 @@ namespace Nop.Web.Controllers
             TaxSettings taxSettings,
             INopFileProvider fileProvider,
             ITransactionService transactionService,
-            IShoppingCartService shoppingCartService)
+            IShoppingCartService shoppingCartService,
+            TransactionSettings transactionSettings)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -211,6 +214,7 @@ namespace Nop.Web.Controllers
             _fileProvider = fileProvider;
             _transactionService = transactionService;
             _shoppingCartService = shoppingCartService;
+            _transactionSettings = transactionSettings;
         }
 
         #endregion
@@ -2102,7 +2106,7 @@ namespace Nop.Web.Controllers
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
             if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
-                return Content(await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
+                return Challenge();
 
             var model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer);
 
@@ -2117,33 +2121,39 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> Invest(TransactionModel model)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            var product = await _productService.GetProductByIdAsync(_customerSettings.TransactionProductId);
-            if (product is null)
-            {
-                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.TransactionFailed"));
-            }
-            else
-            {
-                var store = await _storeContext.GetCurrentStoreAsync();
+            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
 
-                await _shoppingCartService.ClearShoppingCartAsync(customer: customer,
-                    storeId: store.Id);
-
-                var warnings = await _shoppingCartService.AddToCartAsync(customer: customer,
-                    product: product,
-                    shoppingCartType: ShoppingCartType.ShoppingCart,
-                    storeId: store.Id,
-                    customerEnteredPrice: model.TransactionAmount,
-                    addRequiredProducts: false
-                    );
-                foreach (var warning in warnings)
-                {
-                    ModelState.AddModelError("", warning);
-                }
-            }
             if (ModelState.IsValid)
             {
-                return RedirectToRoute("CheckoutPaymentMethod");
+                var product = await _productService.GetProductByIdAsync(_customerSettings.TransactionProductId);
+                if (product is null)
+                {
+                    ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.TransactionFailed"));
+                }
+                else
+                {
+                    var store = await _storeContext.GetCurrentStoreAsync();
+
+                    await _shoppingCartService.ClearShoppingCartAsync(customer: customer,
+                        storeId: store.Id);
+
+                    var warnings = await _shoppingCartService.AddToCartAsync(customer: customer,
+                        product: product,
+                        shoppingCartType: ShoppingCartType.ShoppingCart,
+                        storeId: store.Id,
+                        customerEnteredPrice: model.TransactionAmount,
+                        addRequiredProducts: false
+                        );
+                    foreach (var warning in warnings)
+                    {
+                        ModelState.AddModelError("", warning);
+                    }
+                }
+                if (ModelState.IsValid)
+                {
+                    return RedirectToRoute("CheckoutPaymentMethod");
+                }
             }
 
             model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer, model);
@@ -2162,7 +2172,7 @@ namespace Nop.Web.Controllers
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
             if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
-                return Content(await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
+                return Challenge();
 
             var model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer);
 
@@ -2177,34 +2187,43 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> Withdraw(TransactionModel model)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
+            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
 
-            try
+            var currentBalance = await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id,
+                    dateTime: DateTime.Now);
+            if(model.TransactionAmount>currentBalance)
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.NotEnoughBalance"));
+
+            if (ModelState.IsValid)
             {
-                var transaction = new Transaction()
+                try
                 {
-                    CustomerId = customer.Id,
-                    TransactionAmount = model.TransactionAmount,
-                    TransactionType = TransactionType.Debit,
-                    Status = Status.Pending,
-                    TransactionNote = string.Empty,
-                    CreatedOnUtc = DateTime.UtcNow,
-                };
+                    var transaction = new Transaction()
+                    {
+                        CustomerId = customer.Id,
+                        TransactionAmount = -model.TransactionAmount,
+                        TransactionType = TransactionType.Debit,
+                        Status = Status.Pending,
+                        TransactionNote = string.Empty,
+                    };
 
-                await _transactionService.InsertTransactionAsync(transaction);
+                    await _transactionService.InsertTransactionAsync(transaction);
 
-                await _workflowMessageService.SendTransactionDebitRequestAsync(transactionAmount: model.TransactionAmount,
-                    languageId: (await _workContext.GetWorkingLanguageAsync()).Id,
-                    senderEmail: customer.Email,
-                    senderName: await _customerService.GetCustomerFullNameAsync(customer));
+                    await _workflowMessageService.SendTransactionDebitRequestAsync(transactionAmount: model.TransactionAmount,
+                        languageId: (await _workContext.GetWorkingLanguageAsync()).Id,
+                        senderEmail: customer.Email,
+                        senderName: await _customerService.GetCustomerFullNameAsync(customer));
 
-                _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.Successfull"));
+                    _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.Successfull"));
 
-                model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer, model);
-            }
-            catch (Exception ex)
-            {
-                await _logger.ErrorAsync($"Error on withdrawal: {ex.Message}", ex, customer);
-                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.Unsuccessfull"));
+                    model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer, model);
+                }
+                catch (Exception ex)
+                {
+                    await _logger.ErrorAsync($"Error on withdrawal: {ex.Message}", ex, customer);
+                    _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.Unsuccessfull"));
+                }
             }
 
 

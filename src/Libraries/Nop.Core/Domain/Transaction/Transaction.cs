@@ -20,7 +20,6 @@ namespace Nop.Core.Domain.Transaction
         public int StatusId { get; set; }
         public int? OrderId { get; set; }
 
-        
         public TransactionType TransactionType
         {
             get => (TransactionType)this.TransactionTypeId;

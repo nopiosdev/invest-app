@@ -10,7 +10,7 @@ namespace Nop.Core.Domain.Transaction
     {
         Debit = 10,
         Credit = 20,
-        Voided = 30
+        Voided = 30,
     }
     public enum Status
     {

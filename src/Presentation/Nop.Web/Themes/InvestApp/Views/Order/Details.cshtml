@@ -60,7 +60,7 @@
         </div>
         <div class="order-details-area">
             <div class="billing-info-wrap">
-                <div class="billing-info">
+                @* <div class="billing-info">
 	                <div class="title">
 	                    <strong>@T("Order.BillingAddress")</strong>
 	                </div>
@@ -112,7 +112,7 @@
                         }
                         @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.OrderDetailsBillingAddress, additionalData = Model })
                     </ul>
-                </div>
+                </div> *@
                 @if (!string.IsNullOrEmpty(Model.PaymentMethod))
                 {
                     <div class="payment-method-info">

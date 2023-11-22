@@ -96,8 +96,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var transaction = model.ToEntity<Transaction>();
-                transaction.CreatedOnUtc = DateTime.UtcNow;
-                transaction.UpdatedOnUtc = transaction.CreatedOnUtc;
                 await _transactionService.InsertTransactionAsync(transaction);
 
                 //activity log
@@ -150,7 +148,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 var transactionUpdated = model.ToEntity<Transaction>();
                 transactionUpdated.CustomerId = transaction.CustomerId;
-                transactionUpdated.UpdatedOnUtc = DateTime.UtcNow;
                 await _transactionService.UpdateTransactionAsync(transactionUpdated);
 
                 _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Transactions.Updated"));

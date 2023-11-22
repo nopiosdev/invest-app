@@ -145,7 +145,6 @@ namespace Nop.Services.Transactions
                 else
                     query = query.Where(x => x.CreatedOnUtc <= new DateTime(DateTime.Now.Year, DateTime.Now.Month, _transactionSettings.InvestmentDateEnd, 23, 59, 59));
 
-
                 return query;
             });
         }
@@ -157,7 +156,7 @@ namespace Nop.Services.Transactions
         public virtual async Task<decimal> InvestCustomerTransactionsAsync(int customerId)
         {
             var random = new Random();
-            return random.Next(10) / 100;
+            return Convert.ToDecimal(random.Next(0, 10) / 100);
         }
 
         #endregion

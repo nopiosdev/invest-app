@@ -239,14 +239,15 @@ namespace Nop.Core.Domain.Customers
         public int? ShippingAddressId { get; set; }
 
         //NCT Back-end dev
-        
+
         //Investment fields
         public int GoalId { get; set; }
         public int TimelineId { get; set; }
         public int ExperienceId { get; set; }
         public int RiskToleranceId { get; set; }
         public int InvestmentApproachId { get; set; }
-        
+        public bool DontInvestAmount { get; set; }
+
         //Security fields
         public bool Verified { get; set; }
 
@@ -256,6 +257,10 @@ namespace Nop.Core.Domain.Customers
 
         //Identity Verification
         public int IdentityVerificationId { get; set; }
+
+        //Transaction
+        public bool IsInvested { get; set; }
+        public decimal CommissionToHouse { get; set; }
 
         #region Custom properties
 

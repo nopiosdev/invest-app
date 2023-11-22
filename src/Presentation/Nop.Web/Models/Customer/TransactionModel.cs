@@ -21,6 +21,7 @@ namespace Nop.Web.Models.Customer
         public decimal TransactionAmount { get; set; }
         public decimal UpdateBalance { get; set; }
         public int StatusId { get; set; }
+        public decimal MaxWithdrawAmount { get; set; }
         public IList<TransactionModel> RecentTransactions { get; set; }
 
         public TransactionType TransactionType

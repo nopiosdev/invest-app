@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
@@ -1136,6 +1137,11 @@ namespace Nop.Web.Factories
                 TransactionAmount = x.TransactionAmount,
                 CreateOnUtc = x.CreatedOnUtc,
             }).ToList();
+
+            var currentBalance = await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id,
+                    dateTime: DateTime.Now);
+            var investedAmount = await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id);
+            model.MaxWithdrawAmount = currentBalance - investedAmount;
 
             return model;
         }

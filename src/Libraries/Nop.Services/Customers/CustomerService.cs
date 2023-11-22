@@ -12,10 +12,12 @@ using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Polls;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Infrastructure;
 using Nop.Data;
 using Nop.Services.Common;
 using Nop.Services.Localization;
+using Nop.Services.Transactions;
 
 namespace Nop.Services.Customers
 {
@@ -32,7 +34,6 @@ namespace Nop.Services.Customers
         protected readonly IRepository<Address> _customerAddressRepository;
         protected readonly IRepository<BlogComment> _blogCommentRepository;
         protected readonly IRepository<Customer> _customerRepository;
-        protected readonly IRepository<IdentityVerification> _identityVerificationRepository;
         protected readonly IRepository<CustomerAddressMapping> _customerAddressMappingRepository;
         protected readonly IRepository<CustomerCustomerRoleMapping> _customerCustomerRoleMappingRepository;
         protected readonly IRepository<CustomerPassword> _customerPasswordRepository;
@@ -50,6 +51,7 @@ namespace Nop.Services.Customers
         protected readonly IStoreContext _storeContext;
         protected readonly ShoppingCartSettings _shoppingCartSettings;
         protected readonly TaxSettings _taxSettings;
+        protected readonly IRepository<IdentityVerification> _identityVerificationRepository;
 
         #endregion
 
@@ -77,8 +79,7 @@ namespace Nop.Services.Customers
             IStaticCacheManager staticCacheManager,
             IStoreContext storeContext,
             ShoppingCartSettings shoppingCartSettings,
-            TaxSettings taxSettings,
-            IRepository<IdentityVerification> identityVerificationRepository)
+            TaxSettings taxSettings)
         {
             _customerSettings = customerSettings;
             _genericAttributeService = genericAttributeService;
@@ -103,7 +104,7 @@ namespace Nop.Services.Customers
             _storeContext = storeContext;
             _shoppingCartSettings = shoppingCartSettings;
             _taxSettings = taxSettings;
-            _identityVerificationRepository = identityVerificationRepository;
+            _identityVerificationRepository = EngineContext.Current.Resolve<IRepository<IdentityVerification>>();
         }
 
         #endregion
@@ -145,7 +146,8 @@ namespace Nop.Services.Customers
             string email = null, string username = null, string firstName = null, string lastName = null,
             int dayOfBirth = 0, int monthOfBirth = 0,
             string company = null, string phone = null, string zipPostalCode = null, string ipAddress = null,
-            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
+            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false,
+            bool? dontInvestAmount = default, bool? isInvested = default)
         {
             var customers = await _customerRepository.GetAllPagedAsync(query =>
             {
@@ -161,6 +163,12 @@ namespace Nop.Services.Customers
                     query = query.Where(c => affiliateId == c.AffiliateId);
                 if (vendorId > 0)
                     query = query.Where(c => vendorId == c.VendorId);
+
+                if (dontInvestAmount.HasValue)
+                    query = query.Where(c => c.DontInvestAmount.Equals(dontInvestAmount.Value));
+
+                if (isInvested.HasValue)
+                    query = query.Where(c => c.IsInvested.Equals(isInvested.Value));
 
                 query = query.Where(c => !c.Deleted);
 
@@ -1747,6 +1755,5 @@ namespace Nop.Services.Customers
         #endregion
 
         #endregion
-
     }
 }

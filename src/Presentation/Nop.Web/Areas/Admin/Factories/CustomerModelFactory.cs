@@ -26,6 +26,7 @@ using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Stores;
 using Nop.Services.Tax;
+using Nop.Services.Transactions;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Areas.Admin.Models.Customers;
@@ -83,6 +84,7 @@ namespace Nop.Web.Areas.Admin.Factories
         protected readonly RewardPointsSettings _rewardPointsSettings;
         protected readonly TaxSettings _taxSettings;
         protected readonly IDownloadService _downloadService;
+        protected readonly ITransactionService _transactionService;
 
         #endregion
 
@@ -170,6 +172,7 @@ namespace Nop.Web.Areas.Admin.Factories
             _rewardPointsSettings = rewardPointsSettings;
             _taxSettings = taxSettings;
             _downloadService = EngineContext.Current.Resolve<IDownloadService>();
+            _transactionService = EngineContext.Current.Resolve<ITransactionService>();
         }
 
         #endregion
@@ -1302,6 +1305,66 @@ namespace Nop.Web.Areas.Admin.Factories
                     return requestModel;
                 });
             });
+
+            return model;
+        }
+
+        public virtual async Task<CustomerCommissionSearchModel> PrepareCustomerCommissionSearchModelAsync(CustomerCommissionSearchModel searchModel)
+        {
+            if (searchModel == null)
+                throw new ArgumentNullException(nameof(searchModel));
+
+            var commissions = await _transactionService.GetAllCommissionsAsync();
+            var transactions = await _transactionService.GetTransactionsByIdsAsync(commissions.Select(x => x.TransactionId).ToArray());
+
+            searchModel.AvailableCustomer = await transactions
+                //.Select(x=>x.CustomerId)
+                .DistinctBy(x => x.CustomerId)
+                .SelectAwait(async x =>
+                {
+                    var customer = await _customerService.GetCustomerByIdAsync(x.CustomerId);
+                    return new SelectListItem()
+                    {
+                        Text = _customerSettings.UsernamesEnabled ? customer.Username : customer.Email,
+                        Value = customer.Id.ToString()
+                    };
+                }).ToListAsync();
+
+            searchModel.AvailableCustomer.Insert(0, new SelectListItem() { Text = "--Select", Value = "0" });
+
+            //prepare page parameters
+            searchModel.SetGridPageSize();
+
+            return searchModel;
+        }
+
+        public virtual async Task<CustomerCommissionListModel> PrepareCustomerCommissionListModelAsync(CustomerCommissionSearchModel searchModel)
+        {
+            if (searchModel == null)
+                throw new ArgumentNullException(nameof(searchModel));
+
+            //get commissions
+            var commissions = await _transactionService.GetAllCommissionsAsync(customerId: searchModel.SelectCustomer,
+                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
+
+            //prepare list model
+            var model = await new CustomerCommissionListModel().PrepareToGridAsync(searchModel, commissions, () =>
+            {
+                return commissions.SelectAwait(async commission =>
+                {
+                    var transaction = await _transactionService.GetTransactionByIdAsync(commission.TransactionId);
+                    var customer = await _customerService.GetCustomerByIdAsync(transaction.CustomerId);
+                    //fill in model values from the entity
+                    return new CustomerCommissionModel()
+                    {
+                        CreatedOn = commission.CreatedOnUtc,
+                        PaidAmount = transaction.TransactionAmount,
+                        PaidCustomer = _customerSettings.UsernamesEnabled ? customer.Username : customer.Email
+                    };
+                });
+            });
+
+            model.TotalPaidAmount = model.Data.Sum(x => x.PaidAmount);
 
             return model;
         }

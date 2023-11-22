@@ -1755,5 +1755,32 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         #endregion
+
+        #region Commission
+
+        public virtual async Task<IActionResult> Commission()
+        {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageCustomers))
+                return AccessDeniedView();
+
+            //prepare model
+            var model = await _customerModelFactory.PrepareCustomerCommissionSearchModelAsync(new CustomerCommissionSearchModel());
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public virtual async Task<IActionResult> CustomerCommissionList(CustomerCommissionSearchModel searchModel)
+        {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageCustomers))
+                return await AccessDeniedDataTablesJson();
+
+            //prepare model
+            var model = await _customerModelFactory.PrepareCustomerCommissionListModelAsync(searchModel);
+
+            return Json(model);
+        }
+
+        #endregion
     }
 }

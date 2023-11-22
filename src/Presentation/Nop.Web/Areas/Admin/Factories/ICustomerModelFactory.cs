@@ -162,5 +162,10 @@ namespace Nop.Web.Areas.Admin.Factories
         /// The task result contains the gDPR request list model
         /// </returns>
         Task<GdprLogListModel> PrepareGdprLogListModelAsync(GdprLogSearchModel searchModel);
+
+        Task<CustomerCommissionSearchModel> PrepareCustomerCommissionSearchModelAsync(CustomerCommissionSearchModel searchModel);
+        Task<CustomerCommissionListModel> PrepareCustomerCommissionListModelAsync(CustomerCommissionSearchModel searchModel);
+
+
     }
 }

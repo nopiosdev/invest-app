@@ -1343,6 +1343,7 @@ namespace Nop.Web.Controllers
                             {
                                 CustomerId = customer.Id,
                                 TransactionAmount = placeOrderResult.PlacedOrder.OrderSubtotalExclTax,
+                                UpdateBalance = placeOrderResult.PlacedOrder.OrderSubtotalExclTax,
                                 TransactionType = TransactionType.Credit,
                                 Status = Status.Completed,
                                 TransactionNote = string.Empty,

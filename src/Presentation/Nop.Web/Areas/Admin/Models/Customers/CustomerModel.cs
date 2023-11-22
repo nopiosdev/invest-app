@@ -263,6 +263,9 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.OtherDocument")]
         public Guid OtherDocument { get; set; }
 
+        [NopResourceDisplayName("Admin.Customers.Customers.Fields.CommissionToHouse")]
+        public decimal CommissionToHouse { get; set; }
+
         #endregion
 
         #region Nested classes

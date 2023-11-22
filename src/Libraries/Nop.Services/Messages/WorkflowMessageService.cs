@@ -202,7 +202,7 @@ namespace Nop.Services.Messages
                 : customer.Email;
 
             var replyToName = await _customerService.IsGuestAsync(customer)
-                ? string.Empty 
+                ? string.Empty
                 : await _customerService.GetCustomerFullNameAsync(customer);
 
             return (replyToEmail, replyToName);
@@ -520,7 +520,7 @@ namespace Nop.Services.Messages
             var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.OrderPlacedStoreOwnerNotification, store.Id);
             if (!messageTemplates.Any())
                 return new List<int>();
-            
+
             //tokens
             var commonTokens = new List<Token>();
             await _messageTokenProvider.AddOrderTokensAsync(commonTokens, order, languageId);
@@ -828,8 +828,14 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
-
+                var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId) ??
+                    new Address()
+                    {
+                        Email = customer.Email,
+                        FirstName = customer.FirstName,
+                        LastName = customer.LastName,
+                    };
                 var toEmail = billingAddress.Email;
                 var toName = $"{billingAddress.FirstName} {billingAddress.LastName}";
 
@@ -1992,7 +1998,7 @@ namespace Nop.Services.Messages
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
 
                 var vendorAddress = await _addressService.GetAddressByIdAsync(vendor.AddressId);
-                var replyToEmail = messageTemplate.AllowDirectReply ?  vendorAddress.Email : "";
+                var replyToEmail = messageTemplate.AllowDirectReply ? vendorAddress.Email : "";
                 var replyToName = messageTemplate.AllowDirectReply ? $"{vendorAddress.FirstName} {vendorAddress.LastName}" : "";
 
                 return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
@@ -2413,7 +2419,7 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);       
+                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
                 var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, customer);
 
                 return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
@@ -2748,8 +2754,8 @@ namespace Nop.Services.Messages
                 //email account
                 var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
 
-                   string fromEmail = senderEmail,
-                    fromName = senderName;
+                string fromEmail = senderEmail,
+                 fromName = senderName;
 
                 var tokens = new List<Token>(commonTokens);
                 await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);

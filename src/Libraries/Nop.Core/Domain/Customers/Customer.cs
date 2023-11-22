@@ -248,7 +248,6 @@ namespace Nop.Core.Domain.Customers
         public int InvestmentApproachId { get; set; }
         
         //Security fields
-        public bool TwoFactorAuthentication { get; set; }
         public bool Verified { get; set; }
 
         //Alert fields

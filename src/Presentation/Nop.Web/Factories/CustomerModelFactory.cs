@@ -422,7 +422,7 @@ namespace Nop.Web.Factories
             model.ExperienceId = customer.ExperienceId;
             model.RiskToleranceId = customer.RiskToleranceId;
             model.InvestmentApproachId = customer.InvestmentApproachId;
-            model.TwoFactorAuthentication = customer.TwoFactorAuthentication;
+            //model.TwoFactorAuthentication = customer.TwoFactorAuthentication;
             model.EmailAlert = customer.EmailAlert;
             model.TextAlert = customer.TextAlert;
 

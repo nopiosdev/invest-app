@@ -147,7 +147,7 @@ namespace Nop.Services.Customers
             int dayOfBirth = 0, int monthOfBirth = 0,
             string company = null, string phone = null, string zipPostalCode = null, string ipAddress = null,
             int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false,
-            bool? dontInvestAmount = default, bool? isInvested = default)
+            bool? dontInvestAmount = default, bool isInvested = default)
         {
             var customers = await _customerRepository.GetAllPagedAsync(query =>
             {
@@ -167,8 +167,8 @@ namespace Nop.Services.Customers
                 if (dontInvestAmount.HasValue)
                     query = query.Where(c => c.DontInvestAmount.Equals(dontInvestAmount.Value));
 
-                if (isInvested.HasValue)
-                    query = query.Where(c => c.IsInvested.Equals(isInvested.Value));
+                if (isInvested)
+                    query = query.Where(c => !c.InvestedAmount.Equals(default(decimal)));
 
                 query = query.Where(c => !c.Deleted);
 

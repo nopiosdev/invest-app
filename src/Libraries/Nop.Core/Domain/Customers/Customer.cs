@@ -259,7 +259,8 @@ namespace Nop.Core.Domain.Customers
         public int IdentityVerificationId { get; set; }
 
         //Transaction
-        public bool IsInvested { get; set; }
+        public decimal InvestedAmount { get; set; }
+        public decimal CurrentBalance { get; set; }
         public decimal CommissionToHouse { get; set; }
 
         #region Custom properties

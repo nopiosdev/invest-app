@@ -4,7 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Presentation;
 using Nop.Core;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Transaction;
 using Nop.Services.Configuration;
 using Nop.Services.Customers;
@@ -60,14 +62,13 @@ namespace Nop.Services.Transactions
                 {
                     try
                     {
-                        //come from external API 
-                        var returnPercentage = await _transactionService.InvestCustomerTransactionsAsync(customerId: customer.Id);
+                        //percentage on return come from external API 
+                        var returnPercentage = await _transactionService.InvestCustomerTransactionsAsync(customerId: customer.Id,
+                            investAmount:customer.InvestedAmount);
 
-                        var investedAmount = await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id);
-                        if (investedAmount <= 0)
-                            continue;
-
-                        var returnOnInvestedAmount = investedAmount * returnPercentage;
+                        //calculate return amount on the invest amount
+                       var returnOnInvestedAmount = customer.InvestedAmount * returnPercentage;
+                        //calculate commission on the return amount
                         var commissionOnReturnAmount = returnOnInvestedAmount * (customer.CommissionToHouse / 100);
 
                         var transation = new Transaction()
@@ -87,8 +88,11 @@ namespace Nop.Services.Transactions
                             TransactionId = transation.Id,
                         });
 
-                        customer.IsInvested = false;
-                        await _customerService.UpdateCustomerAsync(customer);
+                        //get the return amount and invested balance to the current balance 
+                        var updatedCustomer = await _customerService.GetCustomerByIdAsync(customer.Id);
+                        updatedCustomer.CurrentBalance += updatedCustomer.InvestedAmount;
+                        updatedCustomer.InvestedAmount = default;
+                        await _customerService.UpdateCustomerAsync(updatedCustomer);
                     }
                     catch (Exception ex)
                     {

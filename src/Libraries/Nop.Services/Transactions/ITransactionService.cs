@@ -36,7 +36,7 @@ namespace Nop.Services.Transactions
 
         #region API
 
-        Task<decimal> InvestCustomerTransactionsAsync(int customerId);
+        Task<decimal> InvestCustomerTransactionsAsync(int customerId, decimal investAmount);
 
         #endregion
 

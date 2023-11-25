@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Office2021.Excel.RichDataWebImage;
 using Nop.Core;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Transaction;
 using Nop.Services.Configuration;
 using Nop.Services.Customers;
@@ -59,12 +60,16 @@ namespace Nop.Services.Transactions
 
                 foreach (var customer in customers)
                 {
-                    totalInvestAmount += await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id);
-
-                    if (totalInvestAmount <= 0)
+                    //if any customer has not invested any amount then zero amount will not be invested.
+                    if (customer.CurrentBalance <= 0)
                         continue;
+                    
+                    //totalInvestAmount += await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id);
 
-                    customer.IsInvested = true;
+                    totalInvestAmount += customer.CurrentBalance;
+
+                    customer.InvestedAmount = customer.CurrentBalance;
+                    customer.CurrentBalance = default;
                     await _customerService.UpdateCustomerAsync(customer);
                 }
 

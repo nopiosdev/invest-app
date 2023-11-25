@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using System.Runtime.InteropServices;
 using System.Text.Encodings.Web;
+using AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using Microsoft.VisualBasic;
@@ -50,6 +52,7 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Validators;
 using Nop.Web.Models.Customer;
+using Org.BouncyCastle.Asn1.Cms;
 using ILogger = Nop.Services.Logging.ILogger;
 
 namespace Nop.Web.Controllers
@@ -2094,6 +2097,39 @@ namespace Nop.Web.Controllers
             return Ok(transactionModel);
         }
 
+        public virtual async Task<ObjectResult> GetInvestedAndCurrentBalance()
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (customer is null ||
+                !await _customerService.IsRegisteredAsync(customer))
+                return Unauthorized("");
+
+            return Ok(new
+            {
+                InvestedBalance = new
+                {
+                    Balance = customer.InvestedAmount,
+                    Message = await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.InvestedAmountExceed")
+                },
+                CurrentBalance = customer.CurrentBalance
+            });
+        }
+
+        public virtual async Task<ObjectResult> GetCustomerNotification()
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (customer is null ||
+                !await _customerService.IsRegisteredAsync(customer))
+                return Unauthorized("");
+
+            var notification = await _customerActivityService.GetAllActivitiesAsync(customerId: customer.Id);
+
+            return Ok(new
+            {
+                notificationList = notification.Select(x => x.Comment).ToList()
+            });
+        }
+
         #endregion
 
         #region Invest
@@ -2121,7 +2157,10 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> Invest(TransactionModel model)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+            if (customer is null ||
+                !await _customerService.IsRegisteredAsync(customer) ||
+                !(await _workContext.GetCurrentCustomerAsync()).Id.Equals(customer?.Id ?? 0) ||
+                !customer.Verified)
                 ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
 
             if (ModelState.IsValid)
@@ -2171,7 +2210,10 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> Withdraw()
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+            if (customer is null ||
+                !await _customerService.IsRegisteredAsync(customer) ||
+                !(await _workContext.GetCurrentCustomerAsync()).Id.Equals(customer?.Id ?? 0)
+                || !customer.Verified)
                 return Challenge();
 
             var model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer);
@@ -2187,13 +2229,20 @@ namespace Nop.Web.Controllers
         public virtual async Task<IActionResult> Withdraw(TransactionModel model)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+            if (customer is null ||
+                !await _customerService.IsRegisteredAsync(customer) ||
+                !(await _workContext.GetCurrentCustomerAsync()).Id.Equals(customer?.Id ?? 0) ||
+                !customer.Verified)
                 ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
 
-            var currentBalance = await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id,
-                    dateTime: DateTime.Now);
-            if(model.TransactionAmount>currentBalance)
+            if (model.TransactionAmount.Equals(default(decimal)))
+            {
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.CannotWithdrawZeroAmount"));
+            }
+            else if (model.TransactionAmount > (customer.CurrentBalance + customer.InvestedAmount))
+            {
                 ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.NotEnoughBalance"));
+            }
 
             if (ModelState.IsValid)
             {

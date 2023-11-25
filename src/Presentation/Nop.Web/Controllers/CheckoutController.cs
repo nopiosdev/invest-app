@@ -1343,13 +1343,10 @@ namespace Nop.Web.Controllers
                             {
                                 CustomerId = customer.Id,
                                 TransactionAmount = placeOrderResult.PlacedOrder.OrderSubtotalExclTax,
-                                UpdateBalance = placeOrderResult.PlacedOrder.OrderSubtotalExclTax,
                                 TransactionType = TransactionType.Credit,
                                 Status = Status.Completed,
                                 TransactionNote = string.Empty,
                                 OrderId = placeOrderResult.PlacedOrder.Id,
-                                CreatedOnUtc = DateTime.UtcNow,
-                                UpdatedOnUtc = DateTime.UtcNow,
                             });
 
                             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));

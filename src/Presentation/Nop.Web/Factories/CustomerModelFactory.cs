@@ -1138,11 +1138,6 @@ namespace Nop.Web.Factories
                 CreateOnUtc = x.CreatedOnUtc,
             }).ToList();
 
-            var currentBalance = await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id,
-                    dateTime: DateTime.Now);
-            var investedAmount = await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id);
-            model.MaxWithdrawAmount = currentBalance - investedAmount;
-
             return model;
         }
 

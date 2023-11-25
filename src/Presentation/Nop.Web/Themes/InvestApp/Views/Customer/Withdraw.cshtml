@@ -8,22 +8,6 @@
     //page class
     NopHtml.AppendPageCssClassParts("html-login-page");
 }
-@*
-<form method="post">
-    <nop-antiforgery-token />
-    <div asp-validation-summary="ModelOnly" class="message-error"></div>
-    <nop-editor asp-for="TransactionAmount" />
-    <button type="submit">@T("Customer.Withdraw.MakeTransaction")</button>
-</form>
-
-@foreach (var item in Model.RecentTransactions)
-{
-    <span>@item.TransactionNote</span>
-    <span>@item.CreateOnUtc.ToShortDateString()</span>
-    <span>@item.TransactionAmount</span>
-}
-
-*@
 
 <div class="page withdraw-page">
     <div class="page-body">
@@ -39,7 +23,6 @@
                         <label class="mb-2">@T("Account.Stock.amount")</label>
                         <nop-antiforgery-token />
                         <div asp-validation-summary="ModelOnly" class="message-error"></div>
-                        <input type="hidden" asp-for="MaxWithdrawAmount" />
                         <nop-editor asp-for="TransactionAmount" />
                         <div class="d-flex flex-wrap align-items-center justify-content-between w-100 mb-5">
                             <span class="text-primary withdraw-amount-btn p-1 px-2" data-text="1000">$1000</span>
@@ -49,7 +32,8 @@
                             <span class="text-primary withdraw-amount-btn p-1 px-2" data-text="10000">$10000</span>
                         </div>
                         <div class="buttons">
-                            <label class="mb-2">@T("Account.Founding.Source")
+                            <label class="mb-2">
+                                @T("Account.Founding.Source")
                                 <span class="float-end">@T("Account.MyBank")</span>
                             </label>
                             <button type="submit" class="custom-btn btn-success w-100">@T("Customer.Withdraw.Continue")</button>
@@ -60,7 +44,7 @@
                         <div class="withdraw-card border w-100 p-3">
                             <div class="withdraw-wrapper">
                                 <span class="card-title d-block h5 mb-4">@T("Customer.RecentTransactions")</span>
-                                @foreach(var item in Model.RecentTransactions)
+                                @foreach (var item in Model.RecentTransactions)
                                 {
                                     <div class="d-flex align-items-center justify-content-between w-100 mb-3">
                                         <span class="d-flex flex-wrap w-100">
@@ -68,7 +52,7 @@
                                             <span>@item.CreateOnUtc.ToShortDateString()</span>
                                         </span>
                                         <span>@item.TransactionAmount</span>
-                                    </div>    
+                                    </div>
                                 }
                             </div>
                         </div>
@@ -83,17 +67,38 @@
 
 
 <script>
-    $(document).on("click",".withdraw-amount-btn",function(){
-        var that = $(this); 
+    $(document).on("click", ".withdraw-amount-btn", function () {
+        var that = $(this);
         $("#TransactionAmount").val(that.attr("data-text"));
     });
     $('form').submit(function () {
-        let maxAmount = $('form #MaxWithdrawAmount').val();
-        let withdrawAmount = $('form #TransactionAmount').val();
-        if (withdrawAmount > maxAmount) {
-            if (!confirm('@T("Customer.Withdraw.Transaction.WithdrawInvestedAmount")')) {
-                return false;
+        var transactionAmount = $('#TransactionAmount').val();
+        $.ajax({
+            url: "@Url.Action("GetInvestedAndCurrentBalance")", // Make sure this URL is correct
+            method: "GET",
+            dataType: "json",
+            //data: $('#product-details-form').serializeArray(), // Serialize the form data
+            success: function (data) {
+                console.log(data); // Log the response data
+
+                if (transactionAmount > (data.InvestedBalance.Balance + data.CurrentBalance)) {
+                    alert('@T("Customer.Withdraw.Transaction.NotEnoughBalance")');
+                }
+                else if ((transactionAmount - data.CurrentBalance) > 0 && data.InvestedBalance.Balance > 0) {
+                    if(confirm(data.InvestedBalance.Message)){
+                        return true;
+                    }
+                }
+                else {
+                    return true;
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle errors here, if any
+                console.error(status, error);
             }
-        }
+        });
+
+        return false;
     });
 </script>

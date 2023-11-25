@@ -13,6 +13,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Transaction;
 using Nop.Data;
 using Nop.Services.Customers;
+using Nop.Services.Localization;
 
 namespace Nop.Services.Transactions
 {
@@ -24,6 +25,7 @@ namespace Nop.Services.Transactions
         private readonly ICustomerService _customerService;
         private readonly IRepository<Commission> _commissionRepository;
         private readonly TransactionSettings _transactionSettings;
+        private readonly ILocalizationService _localizationService;
 
         #endregion
 
@@ -32,17 +34,65 @@ namespace Nop.Services.Transactions
         public TransactionService(IRepository<Transaction> transactionRepository,
             ICustomerService customerService,
             IRepository<Commission> commissionRepository,
-            TransactionSettings transactionSettings)
+            TransactionSettings transactionSettings,
+            ILocalizationService localizationService)
         {
             _transactionRepository = transactionRepository;
             _customerService = customerService;
             _commissionRepository = commissionRepository;
             _transactionSettings = transactionSettings;
+            _localizationService = localizationService;
         }
 
         #endregion
 
         #region Methods
+
+        #region Utilities
+
+        private async Task UpdateCustomerWalletAsync(Transaction transaction, Customer customer = null)
+        {
+            customer ??= await _customerService.GetCustomerByIdAsync(transaction.CustomerId);
+
+            switch (transaction.TransactionType)
+            {
+                case TransactionType.Debit:
+                    {
+                        //remove transaction amount from current balance at all conditions, either if current balance goes in minus then remove it from invested amount,
+                        //transaction amount should not be exceeded from the total balance in wallet
+
+                        if (transaction.TransactionAmount > (customer.CurrentBalance + customer.InvestedAmount))
+                        {
+                            throw new Exception(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.NotEnoughBalance"));
+                        }
+
+                        customer.CurrentBalance -= transaction.TransactionAmount;
+
+                        if (customer.CurrentBalance < 0)
+                        {
+                            customer.InvestedAmount += customer.CurrentBalance;
+                            customer.CurrentBalance = default;
+                        }
+                        await _customerService.UpdateCustomerAsync(customer);
+                    }
+                    break;
+                case TransactionType.Credit:
+                    {
+                        if (transaction.Status.Equals(Status.Completed))
+                        {
+                            customer.CurrentBalance += transaction.TransactionAmount;
+                            await _customerService.UpdateCustomerAsync(customer);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        #endregion
+
+        #region Transaction
 
         public virtual async Task<IPagedList<Transaction>> GetAllTransactionsAsync(DateTime? startOnUtc = default,
             DateTime? endOnUtc = default,
@@ -97,10 +147,8 @@ namespace Nop.Services.Transactions
                 if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
                     throw new UnauthorizedAccessException();
 
-                var lastInvestmentTransction = await GetCustomerLastInvestedBalanceAsync(customerId: customer.Id,
-                    dateTime: DateTime.Now);
-                transaction.UpdateBalance = lastInvestmentTransction + transaction.TransactionAmount;
-                transaction.Balance = lastInvestmentTransction;
+                await UpdateCustomerWalletAsync(transaction, customer);
+
                 transaction.CreatedOnUtc = DateTime.UtcNow;
                 transaction.UpdatedOnUtc = transaction.CreatedOnUtc;
             }
@@ -119,6 +167,7 @@ namespace Nop.Services.Transactions
             await _transactionRepository.DeleteAsync(transaction);
         }
 
+        #endregion
 
         #region Vault
 
@@ -153,7 +202,7 @@ namespace Nop.Services.Transactions
 
         #region API
 
-        public virtual async Task<decimal> InvestCustomerTransactionsAsync(int customerId)
+        public virtual async Task<decimal> InvestCustomerTransactionsAsync(int customerId, decimal investAmount)
         {
             var random = new Random();
             return Convert.ToDecimal(random.Next(0, 10) / 100);

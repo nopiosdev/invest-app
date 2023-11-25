@@ -8,8 +8,9 @@
 @{
     await Html.RenderPartialAsync("_JavaScriptDisabledWarning");
 }
-@* @await Component.InvokeAsync(typeof(AdminHeaderLinksViewComponent))
+@* 
     @{ await Html.RenderPartialAsync("_Header"); }*@
+    @await Component.InvokeAsync(typeof(AdminHeaderLinksViewComponent))
 <script asp-location="Footer">
     var localized_data = {
         AjaxCartFailure: "@T("AjaxCart.Failure")"

@@ -13,6 +13,9 @@ h1, h2, h3, h4, h5, h6 {   line-height: 1;  margin-top: 0;  margin-bottom: 0.5em
 ::-webkit-scrollbar-thumb{background:#37393E; border-radius: 3px;}
 ::-webkit-scrollbar { width: 10px; }
 
+
+.master-wrapper-content{ position: relative; }
+
 /* notification css start */
 .bar-notification-container{ position: absolute;width: 100%;bottom:0px;z-index: 1000; }
 .bar-notification-container .bar-notification{ display: flex;width: 100%;background-color: #fff;justify-content: space-between;align-items: center; padding: 7px 15px;}
@@ -61,6 +64,12 @@ h1, h2, h3, h4, h5, h6 {   line-height: 1;  margin-top: 0;  margin-bottom: 0.5em
 .custom-slider.round:before { border-radius: 50% }
 .custom-switch input+.custom-slider:after { content:"Off";color: #fff;font-size: 12px;position: absolute;right: 7px;top: 2px; }
 .custom-switch input:checked+.custom-slider:after { content:"On";right: auto;left: 7px; }
+
+
+/* admin header css start */
+.admin-header-links{ display: flex;flex-wrap: wrap;width: 100%;min-height: 40px;align-items: center;justify-content: center;color: #333;background-color: #f7f7f7; } 
+.admin-header-links a{ text-decoration: none;font-weight: 500; }
+
 
 /* drawer-wrapper css start */
 .drawer-wrapper{ display: flex; width: 100%; }
@@ -115,13 +124,29 @@ h2.tabs-heading{ font-size: 1.5em; }
 .account-dropdown .account-wrapper{ display: flex;align-items: center; background-color: #090d16; width: 100%;padding: 15px;gap: 0px; }
 .account-dropdown .account-profile{ min-width: 38px;max-width: 38px;opacity: 0.8; }
 .account-dropdown .account-text{ color: #fff;font-size: 14px;padding-left: 20px; }
-.account-dropdown .account-text span{ white-space: nowrap;opacity: 0.8;cursor: pointer;user-select: none; }
+.account-dropdown .account-text .account-info{ white-space: nowrap;opacity: 0.8;cursor: pointer;user-select: none; }
 .account-dropdown .account-text .name{ font-size: 12px;font-weight: 700; }
 .account-dropdown.open .dropdown-list{ top: 70px;transform: rotateX(0deg);opacity: 1; }
 .account-dropdown .dropdown-list{ position: absolute;background-color: #30333a; -webkit-box-shadow: 0 2px 8px rgba(0,0,0,0.5);box-shadow: 0 2px 8px rgba(0,0,0,0.5);transition: 0.3s; width: 100%;padding:0px;transform: rotateX(90deg);top: -10px;z-index: 1000;opacity: 0; }
 .account-dropdown .dropdown-list li{ display: block; padding: 0px;margin: 0px; }
 .account-dropdown .dropdown-list li a{ display: block;text-decoration: none; margin: 0;padding: 5px 12px;color: #fff;font-weight: 400;font-size: 14px;line-height: 22px;white-space: nowrap;cursor: pointer;transition: 0.3s;cursor: pointer; }
 .account-dropdown .dropdown-list li a:hover{ background-color: #37393c; }
+
+.account-text{ display: flex;gap: 3px; }
+.account-text .account-info,
+.account-text .balance-info{ display: flex; flex-wrap: wrap; }
+.account-text .balance-info{ padding: 0px 0px 0px 6px; }
+.account-text .balance-info span{ display: flex; font-size: 15px;width:100%;justify-content: space-between; }
+.account-text .balance-info .txt{ color: #f0f0f0;font-size: 13px;opacity: 0.8; }
+.account-text .balance-info .num{ color: #fff; display: inline-block;text-align: end;} 
+
+/* notification-dropdown */
+.notification-dropdown .account-wrapper{ min-height: 70px;min-width: 50px;padding: 5px;display: flex;align-items: center;justify-content: center;font-size: 23px;}
+.notification-dropdown .dropdown-list{ right: 0px; min-width: 400px; max-height: 400px;overflow: hidden;overflow-y: auto; background-color: #30333a; }
+.notification-dropdown .dropdown-list .notification-item{ display: block;width: 100%; padding: 7px 5px;border-bottom: 1px solid #777;cursor: pointer;}
+.notification-dropdown .dropdown-list .notification-item:last-child{ border-bottom-color: transparent; }
+.notification-dropdown .dropdown-list .notification-item span{ font-size: 15px;cursor: pointer; }
+
 
 /* custom-tabs-wrapper css start */
 .custom-tabs-wrapper{ overflow: hidden; }

@@ -2,6 +2,16 @@
 @using Nop.Core.Domain.Customers
 @inject Nop.Core.IWebHelper webHelper
 
+@if(Model.IsAuthenticated){
+    <div class="account-dropdown notification-dropdown">
+        <div class="account-wrapper">
+        <i class="fa-regular fa-bell"></i>
+        </div>
+        <div id="notificationList" class="dropdown-list"> </div>
+    </div>
+}
+
+
 <div class="account-dropdown">
     @if (Model.IsAuthenticated){
         
@@ -10,8 +20,20 @@
                     <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAACrAAAAqwHUTZKrAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAS9QTFRF////M5mZdrHERqKudLnFSp+vksPSR6Ctfb7NSKGwSKGvSKGvgMHNSKCvfsHNfcDNn8PQhMPQSKGvSKGvisjUm7bCkszYSKGvbrfElM3ams/cgpelMDAuNEVGNzUxN1NWODUxOTYyOlVXO2NpPDw7PEpIPEpJQTs1QYGLRU5LR56sSKGvSUY/SaGvS0I6S2RoS3FzTqWyWG1xWG5xXa27Xl1TX668aKm0a6u2bKq1dl9Md7K9eGBNeKqzg77JhmlSipyqjcnVj3BXkrrGlcvXlsPQls3Zls7al8/bm9HdodPfqcvSq8vTrsDMtdXhuItouMnVvo9rw49sxJ6Ex5ZvzZlx0Zxz05103OLk4eLj4efs4phz4qN54qmD661+7Kd77a1+7q9/8bGB8rGA9LOCBUomggAAABx0Uk5TAAUNFiwwREtman+AkLK8vb/H0Obr7/n6/P39/qc5B0IAAAE5SURBVBgZBcFBbtNAAADA2V3bOGkNSdSqSk8c+ER/zwe4F4kLEmoUKYpEbJrU9nqZCYBUpdQYc54zEEBY3z8ATv21QIC62wPg0E9IWG2eKE3px7bOQVeWmUC9e8B1BM0Kp/MkCV+ekK9AriPr8SZa72ECkQn2KzHdgxn115c7M+hS+PQNjM+bpovy7z81+FUlYPO4gbTr30GKCRgykAcgxQYYjsBxAJoI8HYp12u5vAHEETC/TlU1vc6AMWaA8xDCcAbIMQO0YZ5DC5ATa8T15902hVCaVsFpSMWG1XZ7N6Rq6fvHrllmjmMyz13zWLP824VD06hWt3zoRaU/1RFtuVxKi1if+iKxLB97xOZy6xL8vHyQMM/nZ8SqWnIu8cffGwKI3UtAeO/S8n1YIACqtk51COP0PgL/AVz5hcnxNQwZAAAAAElFTkSuQmCC" />
                 </span>
                 <span class="account-text">
-                    <span class="email">Welcome</span>
-                    <span class="name">@Model.CustomerName</span>
+                    <span class="account-info">                    
+                        <span class="email">Welcome</span>
+                        <span class="name">@Model.CustomerName</span>
+                    </span>
+                    <span class="balance-info">
+                        <span class="current-balance">
+                            <span class="txt">Current</span>
+                            <span id="currentBalanceTxt" class="num">0</span>
+                        </span>
+                        <span class="investment-balance">
+                            <span class="txt">Investement</span>
+                            <span id="investmentTxt" class="num">0</span>
+                        </span>
+                    </span>
                 </span>
             </span>
             <ul class="dropdown-list">
@@ -42,7 +64,12 @@
                 </li>
 
             </ul>
-        
+        <script asp-location="Footer">
+            $(function(){
+                getAccountBalance();
+                getAccountNotifications();
+            });
+        </script>
     }
     else{
         var returnUrl = Context.Request.Query.TryGetValue("returnUrl", out var url) && !StringValues.IsNullOrEmpty(url)
@@ -143,3 +170,39 @@
 
 *@
 
+<script>
+
+    function getAccountBalance(){
+        $.ajax({
+            url: "@Url.Action("GetInvestedAndCurrentBalance","Customer")",
+            type: 'GET',
+            beforeSend: function () { },
+            success: function (resp) {
+                //console.log("GetInvestedAndCurrentBalance resp ", resp);
+                $("#currentBalanceTxt").html(resp.CurrentBalance);
+                $("#investmentTxt").html(resp.InvestedBalance.Balance);
+            }
+        });
+    }
+
+    function getAccountNotifications(){
+        var html = '';
+        $.ajax({
+            url: "@Url.Action("GetCustomerNotification","Customer")",
+            type: 'GET',
+            beforeSend: function () { },
+            success: function (resp) {
+                //console.log("GetCustomerNotification resp ", resp);
+                if(resp.notificationList.length > 0){
+                    resp.notificationList.forEach((item) => {
+                        html += `<div class="notification-item">
+                            <span>${item}</span>
+                        </div>`;
+                    });
+                    $("#notificationList").html(html);
+                }
+            }
+        });
+    }
+
+</script>

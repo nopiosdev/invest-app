@@ -1355,7 +1355,7 @@ namespace Nop.Web.Controllers
                             await _transactionService.InsertTransactionAsync(transaction);
 
                             await _customerActivityService.InsertActivityAsync("TransactionLog",
-                                string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Invest.Transaction.Successfull"), transaction));
+                                string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Invest.Transaction.Successfull"), transaction.TransactionAmount), transaction);
 
                             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));
                         }

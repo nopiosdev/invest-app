@@ -36,7 +36,7 @@
                                 @T("Account.Founding.Source")
                                 <span class="float-end">@T("Account.MyBank")</span>
                             </label>
-                            <button type="submit" class="custom-btn btn-success w-100">@T("Customer.Withdraw.Continue")</button>
+                            <button type="button" class="custom-btn btn-success w-100 withdraw-btn">@T("Customer.Withdraw.Continue")</button>
                         </div>
                     </form>
 
@@ -71,7 +71,8 @@
         var that = $(this);
         $("#TransactionAmount").val(that.attr("data-text"));
     });
-    $('form').submit(function () {
+    $(document).on("click", "form .withdraw-btn", function () {
+        var submitForm = true;
         var transactionAmount = $('#TransactionAmount').val();
         $.ajax({
             url: "@Url.Action("GetInvestedAndCurrentBalance")", // Make sure this URL is correct
@@ -83,22 +84,21 @@
 
                 if (transactionAmount > (data.InvestedBalance.Balance + data.CurrentBalance)) {
                     alert('@T("Customer.Withdraw.Transaction.NotEnoughBalance")');
+                    console.log('a');
+                    submitForm = false;
+
                 }
                 else if ((transactionAmount - data.CurrentBalance) > 0 && data.InvestedBalance.Balance > 0) {
-                    if(confirm(data.InvestedBalance.Message)){
-                        return true;
+                    if(!confirm(data.InvestedBalance.Message)){
+                        submitForm = false;
                     }
+                    console.log('b');
                 }
-                else {
-                    return true;
+
+                if (submitForm) {
+                    $("form.withdraw-form").submit();
                 }
-            },
-            error: function (xhr, status, error) {
-                // Handle errors here, if any
-                console.error(status, error);
             }
         });
-
-        return false;
     });
 </script>

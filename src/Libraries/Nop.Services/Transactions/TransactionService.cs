@@ -66,7 +66,7 @@ namespace Nop.Services.Transactions
                             throw new Exception(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.NotEnoughBalance"));
                         }
 
-                        customer.CurrentBalance -= transaction.TransactionAmount;
+                        customer.CurrentBalance += transaction.TransactionAmount;
 
                         if (customer.CurrentBalance < 0)
                         {

@@ -2261,7 +2261,7 @@ namespace Nop.Web.Controllers
                     await _transactionService.InsertTransactionAsync(transaction);
 
                     await _customerActivityService.InsertActivityAsync("TransactionLog",
-                        string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Withdraw.Transaction.Successfull"), transaction));
+                        string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Withdraw.Transaction.Successfull"), transaction.TransactionAmount), transaction);
 
                     await _workflowMessageService.SendTransactionDebitRequestAsync(transactionAmount: model.TransactionAmount,
                         languageId: (await _workContext.GetWorkingLanguageAsync()).Id,

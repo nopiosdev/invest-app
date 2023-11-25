@@ -199,8 +199,14 @@
                             <span>${item}</span>
                         </div>`;
                     });
-                    $("#notificationList").html(html);
+                    
                 }
+                else{
+                    html = `<div class="notification-item">
+                        <span>Notification Empty!</span>
+                    </div>`;
+                }
+                $("#notificationList").html(html);
             }
         });
     }

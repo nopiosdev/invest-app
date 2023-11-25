@@ -142,7 +142,7 @@ h2.tabs-heading{ font-size: 1.5em; }
 
 /* notification-dropdown */
 .notification-dropdown .account-wrapper{ min-height: 70px;min-width: 50px;padding: 5px;display: flex;align-items: center;justify-content: center;font-size: 23px;}
-.notification-dropdown .dropdown-list{ right: 0px; min-width: 400px; max-height: 400px;overflow: hidden;overflow-y: auto; background-color: #30333a; }
+.notification-dropdown .dropdown-list{ right: 0px; min-width: 400px; min-height: 200px; max-height: 400px;overflow: hidden;overflow-y: auto; background-color: #30333a; }
 .notification-dropdown .dropdown-list .notification-item{ display: block;width: 100%; padding: 7px 5px;border-bottom: 1px solid #777;cursor: pointer;}
 .notification-dropdown .dropdown-list .notification-item:last-child{ border-bottom-color: transparent; }
 .notification-dropdown .dropdown-list .notification-item span{ font-size: 15px;cursor: pointer; }

@@ -2121,7 +2121,9 @@ namespace Nop.Web.Controllers
                 !await _customerService.IsRegisteredAsync(customer))
                 return Unauthorized("");
 
-            var notification = await _customerActivityService.GetAllActivitiesAsync(customerId: customer.Id);
+            var activityLogType = (await _customerActivityService.GetAllActivityTypesAsync()).FirstOrDefault(type => type.SystemKeyword.Equals("TransactionLog"));
+
+            var notification = await _customerActivityService.GetAllActivitiesAsync(activityLogTypeId: activityLogType?.Id ?? null, customerId: customer.Id);
 
             return Ok(new
             {
@@ -2257,6 +2259,9 @@ namespace Nop.Web.Controllers
                     };
 
                     await _transactionService.InsertTransactionAsync(transaction);
+
+                    await _customerActivityService.InsertActivityAsync("TransactionLog",
+                        string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Withdraw.Transaction.Successfull"), transaction));
 
                     await _workflowMessageService.SendTransactionDebitRequestAsync(transactionAmount: model.TransactionAmount,
                         languageId: (await _workContext.GetWorkingLanguageAsync()).Id,

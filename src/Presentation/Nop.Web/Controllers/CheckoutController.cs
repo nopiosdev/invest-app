@@ -16,6 +16,7 @@ using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
+using Nop.Services.Logging;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
@@ -67,6 +68,7 @@ namespace Nop.Web.Controllers
         protected readonly TaxSettings _taxSettings;
         protected readonly ITransactionService _transactionService;
         protected readonly INotificationService _notificationService;
+        protected readonly ICustomerActivityService _customerActivityService;
 
         #endregion
 
@@ -101,7 +103,8 @@ namespace Nop.Web.Controllers
             ShippingSettings shippingSettings,
             TaxSettings taxSettings,
             ITransactionService transactionService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            ICustomerActivityService customerActivityService)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -133,6 +136,7 @@ namespace Nop.Web.Controllers
             _taxSettings = taxSettings;
             _transactionService = transactionService;
             _notificationService = notificationService;
+            _customerActivityService = customerActivityService;
         }
 
         #endregion
@@ -1339,7 +1343,7 @@ namespace Nop.Web.Controllers
                     {
                         try
                         {
-                            await _transactionService.InsertTransactionAsync(new Transaction()
+                            var transaction = new Transaction()
                             {
                                 CustomerId = customer.Id,
                                 TransactionAmount = placeOrderResult.PlacedOrder.OrderSubtotalExclTax,
@@ -1347,7 +1351,11 @@ namespace Nop.Web.Controllers
                                 Status = Status.Completed,
                                 TransactionNote = string.Empty,
                                 OrderId = placeOrderResult.PlacedOrder.Id,
-                            });
+                            };
+                            await _transactionService.InsertTransactionAsync(transaction);
+
+                            await _customerActivityService.InsertActivityAsync("TransactionLog",
+                                string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Invest.Transaction.Successfull"), transaction));
 
                             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));
                         }

@@ -36,7 +36,7 @@ namespace Nop.Services.Transactions
 
         #region API
 
-        Task<CommissionApiResponse> GetReturnPercentageOfCustomerTransactionsAsync(decimal customerCommission);
+        Task<CommissionApiResponse> GetReturnPercentageOfCustomerTransactionsAsync(decimal customerCommission, bool getCurrentPercentage = false);
 
         #endregion
 

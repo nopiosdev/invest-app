@@ -222,13 +222,20 @@ namespace Nop.Services.Transactions
 
         #region API
 
-        public virtual async Task<CommissionApiResponse> GetReturnPercentageOfCustomerTransactionsAsync(decimal customerCommission)
+        public virtual async Task<CommissionApiResponse> GetReturnPercentageOfCustomerTransactionsAsync(decimal customerCommission, bool getCurrentPercentage = false)
         {
             //since this method will be called from task that will run on the 1st day of month
             DateTime currentDateTime = DateTime.Now,
                 previousDateTime = currentDateTime.AddMonths(-1),
                 startDate = new DateTime(previousDateTime.Year, previousDateTime.Month, _transactionSettings.InvestmentDateEnd + 1),
                 endDate = new DateTime(previousDateTime.Year, previousDateTime.Month, new DateTime(currentDateTime.Year, currentDateTime.Month, 1).AddDays(-1).Day);
+
+            //if request is coming to get the return of uptill now
+            if (getCurrentPercentage)
+            {
+                startDate = new DateTime(currentDateTime.Year, currentDateTime.Month, 1);
+                endDate = currentDateTime;
+            }
 
             var client = new HttpClient();
             var request = new HttpRequestMessage(HttpMethod.Get, $"https://interest-generator-api.azurewebsites.net/interest/?" +

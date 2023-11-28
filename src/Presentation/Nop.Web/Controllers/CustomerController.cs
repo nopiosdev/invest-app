@@ -2103,7 +2103,8 @@ namespace Nop.Web.Controllers
                 !await _customerService.IsRegisteredAsync(customer))
                 return Unauthorized("");
 
-            var apiResponse = await _transactionService.GetReturnPercentageOfCustomerTransactionsAsync(customerCommission: customer.CommissionToHouse);
+            var apiResponse = await _transactionService.GetReturnPercentageOfCustomerTransactionsAsync(customerCommission: customer.CommissionToHouse,
+                getCurrentPercentage: true);
 
             return Ok(new
             {

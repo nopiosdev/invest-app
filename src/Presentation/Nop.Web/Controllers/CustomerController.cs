@@ -2114,8 +2114,25 @@ namespace Nop.Web.Controllers
                     Message = await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.InvestedAmountExceed")
                 },
                 CurrentBalance = customer.CurrentBalance,
-                CommissionAmount = customer.InvestedAmount * (apiResponse.investorInterestPercentage / 100),
-                CommissionPercentage = $"{apiResponse.investorInterestPercentage} %"
+                ReturnAmount = customer.InvestedAmount * (apiResponse.investorInterestPercentage / 100),
+                ReturnPercentage = $"{apiResponse.investorInterestPercentage} %"
+            });
+        }
+
+        public virtual async Task<ObjectResult> GetStatisticsValues()
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (customer is null ||
+                !await _customerService.IsRegisteredAsync(customer))
+                return Unauthorized("");
+
+            var apiResponse = await _transactionService.GetReturnPercentageOfCustomerTransactionsAsync(customerCommission: customer.CommissionToHouse,
+                getCurrentPercentage: true);
+
+            return Ok(new
+            {
+                NetContribution = customer.InvestedAmount,
+                NetReturn = customer.InvestedAmount * (apiResponse.investorInterestPercentage / 100)
             });
         }
 

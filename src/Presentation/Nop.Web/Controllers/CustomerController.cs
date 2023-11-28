@@ -2103,6 +2103,8 @@ namespace Nop.Web.Controllers
                 !await _customerService.IsRegisteredAsync(customer))
                 return Unauthorized("");
 
+            var apiResponse = await _transactionService.GetReturnPercentageOfCustomerTransactionsAsync(customerCommission: customer.CommissionToHouse);
+
             return Ok(new
             {
                 InvestedBalance = new
@@ -2110,7 +2112,9 @@ namespace Nop.Web.Controllers
                     Balance = customer.InvestedAmount,
                     Message = await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.InvestedAmountExceed")
                 },
-                CurrentBalance = customer.CurrentBalance
+                CurrentBalance = customer.CurrentBalance,
+                CommissionAmount = customer.InvestedAmount * (apiResponse.investorInterestPercentage / 100),
+                CommissionPercentage = $"{apiResponse.investorInterestPercentage} %"
             });
         }
 

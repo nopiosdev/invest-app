@@ -21,5 +21,7 @@ namespace Nop.Core.Domain.Transaction
         /// </summary>
         public int InvestmentDateEnd { get; set; }
         public int AdminCommissionAccount { get; set; }
+        public string ApiSession { get; set; }
+        public string ApiPoolId { get; set; }
     }
 }

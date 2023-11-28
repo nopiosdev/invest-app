@@ -48,8 +48,8 @@ namespace Nop.Services.Transactions
 
         public async Task ExecuteAsync()
         {
-            var nextDateTime = DateTime.Now.AddDays(1);
-            if (nextDateTime.Day.Equals(_transactionSettings.InvestmentDateStart) ||
+            //runs on the 1st day of the month (_transactionSettings.InvestmentDateStart)
+            if (DateTime.Now.Day.Equals(_transactionSettings.InvestmentDateStart) ||
                 _transactionSettings.SendProfitDevMode)
             {
                 _transactionSettings.SendProfitDevMode = false;
@@ -63,13 +63,13 @@ namespace Nop.Services.Transactions
                     try
                     {
                         //percentage on return come from external API 
-                        var returnPercentage = await _transactionService.InvestCustomerTransactionsAsync(customerId: customer.Id,
-                            investAmount:customer.InvestedAmount);
+                        var apiResponse = await _transactionService.GetReturnPercentageOfCustomerTransactionsAsync(customerCommission: customer.CommissionToHouse);
+                        var returnPercentage = apiResponse.investorInterestPercentage / 100;
 
                         //calculate return amount on the invest amount
-                       var returnOnInvestedAmount = customer.InvestedAmount * returnPercentage;
-                        //calculate commission on the return amount
-                        var commissionOnReturnAmount = returnOnInvestedAmount * (customer.CommissionToHouse / 100);
+                        var returnOnInvestedAmount = customer.InvestedAmount * returnPercentage;
+                        //calculate commission on the invest amount
+                        var commissionOnReturnAmount = customer.InvestedAmount * ((apiResponse.totalGeneratedPercentage - apiResponse.investorInterestPercentage) / 100);
 
                         var transation = new Transaction()
                         {

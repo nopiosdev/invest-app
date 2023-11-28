@@ -47,6 +47,7 @@ namespace Nop.Services.Transactions
 
         public async Task ExecuteAsync()
         {
+            //runs on the 6th day of the month that is the next day of the ending day (_transactionSettings.InvestmentDateEnd)
             var previousDateTime = DateTime.Now.AddDays(-1);
             if (previousDateTime.Day.Equals(_transactionSettings.InvestmentDateEnd) ||
                 _transactionSettings.InvestAmountDevMode)
@@ -64,8 +65,6 @@ namespace Nop.Services.Transactions
                     if (customer.CurrentBalance <= 0)
                         continue;
                     
-                    //totalInvestAmount += await _transactionService.GetCustomerLastInvestedBalanceAsync(customerId: customer.Id);
-
                     totalInvestAmount += customer.CurrentBalance;
 
                     customer.InvestedAmount = customer.CurrentBalance;

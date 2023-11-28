@@ -34,6 +34,16 @@
                             <span id="investmentTxt" class="num">0</span>
                         </span>
                     </span>
+                    <span class="balance-info">
+                        <span class="current-balance">
+                            <span class="txt" style="min-width: 110px;">Return Amount</span>
+                            <span id="ReturnAmount" class="num">0</span>
+                        </span>
+                        <span class="investment-balance">
+                            <span class="txt" style="min-width: 110px;">Return Percentage</span>
+                            <span id="ReturnPercentage" class="num">0</span>
+                        </span>
+                    </span>
                 </span>
             </span>
             <ul class="dropdown-list">
@@ -181,6 +191,9 @@
                 //console.log("GetInvestedAndCurrentBalance resp ", resp);
                 $("#currentBalanceTxt").html(resp.CurrentBalance);
                 $("#investmentTxt").html(resp.InvestedBalance.Balance);
+
+                $("#ReturnAmount").html(resp.ReturnAmount);
+                $("#ReturnPercentage").html(resp.ReturnPercentage);
             }
         });
     }

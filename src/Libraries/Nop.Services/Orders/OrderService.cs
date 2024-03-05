@@ -334,14 +334,18 @@ namespace Nop.Services.Orders
             if (!string.IsNullOrEmpty(orderNotes))
                 query = query.Where(o => _orderNoteRepository.Table.Any(oNote => oNote.OrderId == o.Id && oNote.Note.Contains(orderNotes)));
 
-            query = from o in query
-                    join oba in _addressRepository.Table on o.BillingAddressId equals oba.Id
-                    where
-                        (billingCountryId <= 0 || (oba.CountryId == billingCountryId)) &&
-                        (string.IsNullOrEmpty(billingPhone) || (!string.IsNullOrEmpty(oba.PhoneNumber) && oba.PhoneNumber.Contains(billingPhone))) &&
-                        (string.IsNullOrEmpty(billingEmail) || (!string.IsNullOrEmpty(oba.Email) && oba.Email.Contains(billingEmail))) &&
-                        (string.IsNullOrEmpty(billingLastName) || (!string.IsNullOrEmpty(oba.LastName) && oba.LastName.Contains(billingLastName)))
-                    select o;
+            if(billingCountryId>0||
+                !string.IsNullOrEmpty(billingPhone)||
+                !string.IsNullOrEmpty(billingEmail)||
+                !string.IsNullOrEmpty(billingLastName))
+                query = from o in query
+                        join oba in _addressRepository.Table on o.BillingAddressId equals oba.Id
+                        where
+                            (billingCountryId <= 0 || (oba.CountryId == billingCountryId)) &&
+                            (string.IsNullOrEmpty(billingPhone) || (!string.IsNullOrEmpty(oba.PhoneNumber) && oba.PhoneNumber.Contains(billingPhone))) &&
+                            (string.IsNullOrEmpty(billingEmail) || (!string.IsNullOrEmpty(oba.Email) && oba.Email.Contains(billingEmail))) &&
+                            (string.IsNullOrEmpty(billingLastName) || (!string.IsNullOrEmpty(oba.LastName) && oba.LastName.Contains(billingLastName)))
+                        select o;
 
             query = query.Where(o => !o.Deleted);
             query = query.OrderByDescending(o => o.CreatedOnUtc);

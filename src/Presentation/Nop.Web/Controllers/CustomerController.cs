@@ -1,8 +1,11 @@
 ﻿using System.Net;
 using System.Runtime.InteropServices;
 using System.Text.Encodings.Web;
+using DocumentFormat.OpenXml.Presentation;
+using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using Microsoft.VisualBasic;
@@ -52,6 +55,7 @@ using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Validators;
 using Nop.Web.Models.Customer;
 using Org.BouncyCastle.Asn1.Cms;
+using Org.BouncyCastle.Utilities.Net;
 using ILogger = Nop.Services.Logging.ILogger;
 
 namespace Nop.Web.Controllers
@@ -111,6 +115,7 @@ namespace Nop.Web.Controllers
         protected readonly ITransactionService _transactionService;
         protected readonly IShoppingCartService _shoppingCartService;
         protected readonly TransactionSettings _transactionSettings;
+        protected readonly IWithdrawService _withdrawService;
 
         #endregion
 
@@ -165,7 +170,8 @@ namespace Nop.Web.Controllers
             INopFileProvider fileProvider,
             ITransactionService transactionService,
             IShoppingCartService shoppingCartService,
-            TransactionSettings transactionSettings)
+            TransactionSettings transactionSettings,
+            IWithdrawService withdrawService)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -217,6 +223,7 @@ namespace Nop.Web.Controllers
             _transactionService = transactionService;
             _shoppingCartService = shoppingCartService;
             _transactionSettings = transactionSettings;
+            _withdrawService = withdrawService;
         }
 
         #endregion
@@ -454,6 +461,8 @@ namespace Nop.Web.Controllers
                 var fullName = await _customerService.GetCustomerFullNameAsync(customer);
                 var message = await _localizationService.GetResourceAsync("Account.Login.AlreadyLogin");
                 _notificationService.SuccessNotification(string.Format(message, _htmlEncoder.Encode(fullName)));
+
+                return RedirectToRoute("Homepage");
             }
 
             return View(model);
@@ -843,37 +852,6 @@ namespace Nop.Web.Controllers
                 ValidateRequiredConsents(consents, form);
             }
 
-            var allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".webp", ".doc", ".docx", ".pdf" };
-            var formIdExtension = _fileProvider.GetFileExtension(model.FormId?.FileName ?? string.Empty).ToLower();
-            var proofOfAddressExtension = _fileProvider.GetFileExtension(model.ProofOfAddress?.FileName ?? string.Empty).ToLower();
-            var documentExtension = _fileProvider.GetFileExtension(model.Document?.FileName ?? string.Empty).ToLower();
-            if (model.FormId is not null)
-            {
-                ModelState.AddModelError("FormId", await _localizationService.GetResourceAsync("Customer.Register.FormFile.Required"));
-            }
-            else if (allowedExtensions.Contains(formIdExtension))
-            {
-                ModelState.AddModelError("FormId", await _localizationService.GetResourceAsync("Customer.Register.FormFile.FileTypeNotAllowed"));
-            }
-
-            if (model.ProofOfAddress is not null)
-            {
-                ModelState.AddModelError("ProofOfAddress", await _localizationService.GetResourceAsync("Customer.Register.FormFile.Required"));
-            }
-            else if (allowedExtensions.Contains(proofOfAddressExtension))
-            {
-                ModelState.AddModelError("ProofOfAddress", await _localizationService.GetResourceAsync("Customer.Register.FormFile.FileTypeNotAllowed"));
-            }
-
-            if (model.Document is not null)
-            {
-                ModelState.AddModelError("FormId", await _localizationService.GetResourceAsync("Customer.Register.FormFile.Required"));
-            }
-            else if (allowedExtensions.Contains(documentExtension))
-            {
-                ModelState.AddModelError("FormId", await _localizationService.GetResourceAsync("Customer.Register.FormFile.FileTypeNotAllowed"));
-            }
-
             if (ModelState.IsValid)
             {
                 var customerUserName = model.Username;
@@ -938,43 +916,6 @@ namespace Nop.Web.Controllers
 
                     //save customer attributes
                     customer.CustomCustomerAttributesXML = customerAttributesXml;
-
-                    #region Identity Verification
-
-                    async Task<Download> InsertFormFiles(IFormFile file)
-                    {
-                        var download = new Download
-                        {
-                            DownloadGuid = Guid.NewGuid(),
-                            UseDownloadUrl = false,
-                            DownloadUrl = string.Empty,
-                            DownloadBinary = await _downloadService.GetDownloadBitsAsync(file),
-                            ContentType = file.ContentType,
-                            Filename = _fileProvider.GetFileNameWithoutExtension(file.FileName),
-                            Extension = _fileProvider.GetFileExtension(file.FileName),
-                            IsNew = true
-                        };
-
-                        await _downloadService.InsertDownloadAsync(download);
-
-                        return download;
-                    }
-
-                    try
-                    {
-                        var identityverification = new IdentityVerification
-                        {
-                            FormId = (await InsertFormFiles(model.FormId)).Id,
-                            ProofOfAddress = (await InsertFormFiles(model.ProofOfAddress)).Id,
-                            Document = (await InsertFormFiles(model.Document)).Id
-                        };
-
-                        await _customerService.InsertIdentityVerificationAsync(identityverification);
-                        customer.IdentityVerificationId = identityverification.Id;
-                    }
-                    catch (Exception ex) { await _logger.ErrorAsync($"Error on uploading files: {ex.Message}", ex); }
-
-                    #endregion
 
                     await _customerService.UpdateCustomerAsync(customer);
 
@@ -1731,7 +1672,7 @@ namespace Nop.Web.Controllers
         }
 
         [HttpPost]
-        public virtual async Task<IActionResult> ChangePassword(ChangePasswordModel model, string returnUrl)
+        public virtual async Task<IActionResult> ChangePassword(ChangePasswordModel ChangePasswordModel, string returnUrl)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
             if (!await _customerService.IsRegisteredAsync(customer))
@@ -1740,7 +1681,7 @@ namespace Nop.Web.Controllers
             if (ModelState.IsValid)
             {
                 var changePasswordRequest = new ChangePasswordRequest(customer.Email,
-                    true, _customerSettings.DefaultPasswordFormat, model.NewPassword, model.OldPassword);
+                    true, _customerSettings.DefaultPasswordFormat, ChangePasswordModel.NewPassword, ChangePasswordModel.OldPassword);
                 var changePasswordResult = await _customerRegistrationService.ChangePasswordAsync(changePasswordRequest);
                 if (changePasswordResult.Success)
                 {
@@ -1750,7 +1691,8 @@ namespace Nop.Web.Controllers
                     await _customerRegistrationService.SignInCustomerAsync(customer, null, true);
 
                     if (string.IsNullOrEmpty(returnUrl))
-                        return View(model);
+                        //return View(model);
+                        return RedirectToAction("Info");
 
                     //prevent open redirection attack
                     if (!Url.IsLocalUrl(returnUrl))
@@ -1761,11 +1703,31 @@ namespace Nop.Web.Controllers
 
                 //errors
                 foreach (var error in changePasswordResult.Errors)
-                    ModelState.AddModelError("", error);
+                    //ModelState.AddModelError("", error);
+                    _notificationService.ErrorNotification(error);
+            }
+
+            //errors
+            foreach (var modelState in ModelState)
+            {
+                if (modelState.Value.ValidationState.Equals(ModelValidationState.Invalid))
+                {
+                    _notificationService.ErrorNotification(string.Join('\n', modelState.Value.Errors.Select(x => x.ErrorMessage), false));
+                }
+            }
+
+            //errors
+            foreach (var modelState in ModelState)
+            {
+                if (modelState.Value.ValidationState.Equals(ModelValidationState.Invalid))
+                {
+                    _notificationService.ErrorNotification(string.Join('\n', modelState.Value.Errors.Select(x => x.ErrorMessage), false));
+                }
             }
 
             //If we got this far, something failed, redisplay form
-            return View(model);
+            //return View(model);
+            return RedirectToAction("Info");
         }
 
         #endregion
@@ -2081,17 +2043,19 @@ namespace Nop.Web.Controllers
                 return Unauthorized("");
 
             var transactions = await _transactionService.GetAllTransactionsAsync(customerId: customer.Id,
-                transactionTypeId: (int)transactionType);
+                transactionTypeId: (int)transactionType,
+                orderBy: 2);
 
             var transactionModel = await transactions
                 .Where(x => !x.Status.Equals(Status.Removed))
                 .SelectAwait(async x => new
                 {
-                    Date = x.CreatedOnUtc.ToShortDateString(),
+                    Date = DateHelper.ToFormattedDate(x.CreatedOnUtc),
                     WithdrawlMethod = x.TransactionNote,
-                    Amount = x.TransactionAmount,
+                    Amount = await _priceFormatter.FormatPriceInCurrencyAsync(x.TransactionAmount),
                     Status = await _localizationService.GetLocalizedEnumAsync(x.Status),
-                }).ToListAsync();
+                })
+                .ToListAsync();
 
             return Ok(transactionModel);
         }
@@ -2103,19 +2067,17 @@ namespace Nop.Web.Controllers
                 !await _customerService.IsRegisteredAsync(customer))
                 return Unauthorized("");
 
-            var apiResponse = await _transactionService.GetReturnPercentageOfCustomerTransactionsAsync(customerCommission: customer.CommissionToHouse,
-                getCurrentPercentage: true);
-
             return Ok(new
             {
                 InvestedBalance = new
                 {
-                    Balance = customer.InvestedAmount,
+                    Balance = await _priceFormatter.FormatPriceInCurrencyAsync(customer.InvestedAmount, false),
                     Message = await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.InvestedAmountExceed")
                 },
-                CurrentBalance = customer.CurrentBalance,
-                ReturnAmount = customer.InvestedAmount * (apiResponse.investorInterestPercentage / 100),
-                ReturnPercentage = $"{apiResponse.investorInterestPercentage} %"
+                CurrentBalance = customer.CurrentBalance, // -- net contribution
+                ReturnAmount = await _priceFormatter.FormatPriceInCurrencyAsync(Math.Round(customer.InvestedAmount * (customer.ReturnAmountPercentagePerday / 100), 2), false),
+                ReturnPercentage = $"{customer.ReturnAmountPercentagePerday} %",
+                currenySymbol = await _priceFormatter.GetCurrentSymbolAsync()
             });
         }
 
@@ -2126,13 +2088,27 @@ namespace Nop.Web.Controllers
                 !await _customerService.IsRegisteredAsync(customer))
                 return Unauthorized("");
 
-            var apiResponse = await _transactionService.GetReturnPercentageOfCustomerTransactionsAsync(customerCommission: customer.CommissionToHouse,
-                getCurrentPercentage: true);
+            var transactions = (await _transactionService.GetAllTransactionsAsync(startOnUtc: null,
+                customerId: customer.Id))
+                .Where(t => !t.Status.Equals(Status.Removed) ||
+                    t.Status.Equals(Status.Completed))
+                .ToList();
+
+            var chartValues = new Dictionary<string, string>();
+            decimal balance = default;
+            foreach (var transaction in transactions)
+            {
+                balance += transaction.TransactionAmount;
+                chartValues.Add(transaction.CreatedOnUtc.ToString(), await _priceFormatter.FormatPriceInCurrencyAsync(balance, false));
+            }
 
             return Ok(new
             {
-                NetContribution = customer.InvestedAmount,
-                NetReturn = customer.InvestedAmount * (apiResponse.investorInterestPercentage / 100)
+                //InvestedAmount = Math.Round(customer.InvestedAmount, 2),
+                //NetContribution = Math.Round(customer.CurrentBalance, 2),
+                //NetReturn = Math.Round(customer.InvestedAmount * (customer.ReturnAmountPercentagePerday / 100),2),
+                ChartValues = chartValues,
+                currenySymbol = await _priceFormatter.GetCurrentSymbolAsync()
             });
         }
 
@@ -2145,12 +2121,101 @@ namespace Nop.Web.Controllers
 
             var activityLogType = (await _customerActivityService.GetAllActivityTypesAsync()).FirstOrDefault(type => type.SystemKeyword.Equals("TransactionLog"));
 
-            var notification = await _customerActivityService.GetAllActivitiesAsync(activityLogTypeId: activityLogType?.Id ?? null, customerId: customer.Id);
+            var notification = await _customerActivityService.GetAllActivitiesAsync(activityLogTypeId: activityLogType?.Id ?? 0, customerId: customer.Id);
 
             return Ok(new
             {
-                notificationList = notification.Select(x => x.Comment).ToList()
+                notificationList = notification
+                    .OrderByDescending(x => x.CreatedOnUtc)
+                    .Select(x => $"{x.Comment} - {x.CreatedOnUtc.ToString()}")
+                    .ToList(),
+                newNotificationCount = notification
+                    .Where(x => !x.Viewed)
+                    .Count()
             });
+        }
+
+        public virtual async Task<JsonResult> SaveCustomerTheme(string themeClass)
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (await _customerService.IsRegisteredAsync(customer))
+            {
+                try
+                {
+                    await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CustomerThemeAttribute, themeClass);
+
+                    return Json(new { success = true });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, error = ex.Message });
+                }
+            }
+
+            return Json(new { success = false, error = "Customer not registered." });
+        }
+
+        [HttpPost]
+        public virtual async Task<ObjectResult> DeleteAccountRequest()
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (customer is null ||
+                !await _customerService.IsRegisteredAsync(customer))
+                return Unauthorized("");
+
+            try
+            {
+                await _workflowMessageService.SendDeleteAccountRequestAsync(customer: customer, languageId: (await _workContext.GetWorkingLanguageAsync()).Id);
+                customer.Active = false;
+                await _customerService.UpdateCustomerAsync(customer);
+
+                return Ok(new { });
+            }
+            catch (Exception ex)
+            {
+                await _logger.ErrorAsync(ex.Message, ex, customer);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        public virtual async Task<ObjectResult> SaveNotificationViewed()
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (await _customerService.IsRegisteredAsync(customer))
+            {
+                try
+                {
+                    var activityLogType = (await _customerActivityService.GetAllActivityTypesAsync()).FirstOrDefault(type => type.SystemKeyword.Equals("TransactionLog"));
+
+                    var notifications = await _customerActivityService.GetAllActivitiesAsync(activityLogTypeId: activityLogType?.Id ?? 0,
+                        customerId: customer.Id,
+                        viewed: false);
+
+                    foreach (var notification in notifications)
+                    {
+                        notification.Viewed = true;
+                        await _customerActivityService.UpdateActivityAsync(notification);
+                    }
+
+                    return Ok(new { success = true });
+                }
+                catch (Exception ex)
+                {
+                    return Ok(new { success = false, error = ex.Message });
+                }
+            }
+
+            return Ok("");
+        }
+
+        #endregion
+
+        #region Dashboard
+        
+        [AuthorizeCustomer]
+        public virtual IActionResult Dashboard()
+        {
+            return View();
         }
 
         #endregion
@@ -2161,11 +2226,17 @@ namespace Nop.Web.Controllers
         [CheckAccessClosedStore(ignore: true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(ignore: true)]
+        [AuthorizeCustomer]
         public virtual async Task<IActionResult> Invest()
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            if (!await _customerService.IsRegisteredAsync(customer) || !customer.Verified)
+            if (!await _customerService.IsRegisteredAsync(customer))
                 return Challenge();
+            else if (!customer.Verified)
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.NotVerified"));
+                return RedirectToRoute("Homepage");
+            }
 
             var model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer);
 
@@ -2177,14 +2248,32 @@ namespace Nop.Web.Controllers
         [CheckAccessClosedStore(ignore: true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(ignore: true)]
+        [AuthorizeCustomer]
         public virtual async Task<IActionResult> Invest(TransactionModel model)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            if (customer is null ||
-                !await _customerService.IsRegisteredAsync(customer) ||
-                !(await _workContext.GetCurrentCustomerAsync()).Id.Equals(customer?.Id ?? 0) ||
-                !customer.Verified)
+            var totalLiquidityValue = await _transactionService.GetCurrentLiquidityLimitAsync();
+
+            if (!await _customerService.IsRegisteredAsync(customer) ||
+                !(await _workContext.GetCurrentCustomerAsync()).Id.Equals(customer?.Id ?? 0))
                 ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
+            else if (!customer.Verified)
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.NotVerified"));
+                return RedirectToRoute("Homepage");
+            }
+            else if ((Convert.ToDecimal(await _priceFormatter.FormatPriceInCurrencyAsync(customer.InvestedAmount, false)) +
+                Convert.ToDecimal(await _priceFormatter.FormatPriceInCurrencyAsync(customer.CurrentBalance, false)) +
+                Convert.ToDecimal(await _priceFormatter.FormatPriceInCurrencyAsync(model.TransactionAmount, false))) 
+                > 
+                totalLiquidityValue)
+            {
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.MaxValueExceeded"));
+            }
+            else if (model.TransactionAmount.Equals(default(decimal)))
+            {
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Invest.Transaction.CannotInvestZeroAmount"));
+            }
 
             if (ModelState.IsValid)
             {
@@ -2230,16 +2319,19 @@ namespace Nop.Web.Controllers
         [CheckAccessClosedStore(ignore: true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(ignore: true)]
+        [AuthorizeCustomer]
         public virtual async Task<IActionResult> Withdraw()
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            if (customer is null ||
-                !await _customerService.IsRegisteredAsync(customer) ||
-                !(await _workContext.GetCurrentCustomerAsync()).Id.Equals(customer?.Id ?? 0)
-                || !customer.Verified)
+            if (!await _customerService.IsRegisteredAsync(customer))
                 return Challenge();
+            else if (!customer.Verified)
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.NotVerified"));
+                return RedirectToRoute("Homepage");
+            }
 
-            var model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer);
+            var model = await _customerModelFactory.PrepareWithdawModelModelAsync(customer: customer);
 
             return View(model);
         }
@@ -2249,39 +2341,41 @@ namespace Nop.Web.Controllers
         [CheckAccessClosedStore(ignore: true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(ignore: true)]
-        public virtual async Task<IActionResult> Withdraw(TransactionModel model)
+        [AuthorizeCustomer]
+        public virtual async Task<IActionResult> Withdraw(WithdrawModel model)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
-            if (customer is null ||
-                !await _customerService.IsRegisteredAsync(customer) ||
+            var withdrawalMethod = (await _withdrawService.GetAllWithdrawalMethodAsync(customerId: customer.Id,
+                isEnabled: true)).FirstOrDefault(x => x.Id.Equals(model.WithdrawalMethodId));
+
+            if (!await _customerService.IsRegisteredAsync(customer) ||
                 !(await _workContext.GetCurrentCustomerAsync()).Id.Equals(customer?.Id ?? 0) ||
                 !customer.Verified)
                 ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.NotAuthorized"));
-
-            if (model.TransactionAmount.Equals(default(decimal)))
+            else if (!customer.Verified)
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.NotVerified"));
+                return RedirectToRoute("Homepage");
+            }
+            else if (model.TransactionAmount.Equals(default(decimal)))
             {
                 ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.CannotWithdrawZeroAmount"));
             }
-            else if (model.TransactionAmount > (customer.CurrentBalance + customer.InvestedAmount))
+            else if (model.TransactionAmount > (Convert.ToDecimal(await _priceFormatter.FormatPriceInCurrencyAsync(customer.CurrentBalance, false)) +
+                Convert.ToDecimal(await _priceFormatter.FormatPriceInCurrencyAsync(customer.InvestedAmount, false))))
             {
                 ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.NotEnoughBalance"));
+            }
+            else if (withdrawalMethod is null)
+            {
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.NoWithdrawalMethodFound"));
             }
 
             if (ModelState.IsValid)
             {
-                try
+                var transaction = await _transactionService.MakeDebitTransaction(model.TransactionAmount, withdrawalMethod, customer);
+                if (transaction is not null)
                 {
-                    var transaction = new Transaction()
-                    {
-                        CustomerId = customer.Id,
-                        TransactionAmount = -model.TransactionAmount,
-                        TransactionType = TransactionType.Debit,
-                        Status = Status.Pending,
-                        TransactionNote = string.Empty,
-                    };
-
-                    await _transactionService.InsertTransactionAsync(transaction);
-
                     await _customerActivityService.InsertActivityAsync("TransactionLog",
                         string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Withdraw.Transaction.Successfull"), transaction.TransactionAmount), transaction);
 
@@ -2291,16 +2385,14 @@ namespace Nop.Web.Controllers
                         senderName: await _customerService.GetCustomerFullNameAsync(customer));
 
                     _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.Successfull"));
-
-                    model = await _customerModelFactory.PrepareTransactionModelAsync(customer: customer, model);
                 }
-                catch (Exception ex)
+                else
                 {
-                    await _logger.ErrorAsync($"Error on withdrawal: {ex.Message}", ex, customer);
                     _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Withdraw.Transaction.Unsuccessfull"));
                 }
             }
 
+            model = await _customerModelFactory.PrepareWithdawModelModelAsync(customer: customer, model);
 
             return View(model);
         }
@@ -2309,11 +2401,350 @@ namespace Nop.Web.Controllers
 
         #region Stock
 
-        public virtual IActionResult Stock()
+        //available even when a store is closed
+        [CheckAccessClosedStore(ignore: true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(ignore: true)]
+        [AuthorizeCustomer]
+        public virtual IActionResult Transaction()
         {
             return View();
         }
 
+        #endregion
+
+        #region Customer Settings
+
+        [HttpPost]
+        public virtual async Task<IActionResult> CustomerSettings(CustomerInfoModel model, IFormCollection form)
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (!await _customerService.IsRegisteredAsync(customer))
+                return Challenge();
+
+            //newsletter
+            if (_customerSettings.NewsletterEnabled)
+            {
+                //save newsletter value
+                var store = await _storeContext.GetCurrentStoreAsync();
+                var newsletter = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreIdAsync(customer.Email, store.Id);
+                if (newsletter != null)
+                {
+                    if (model.Newsletter)
+                    {
+                        newsletter.Active = true;
+                        await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(newsletter);
+                    }
+                    else
+                    {
+                        await _newsLetterSubscriptionService.DeleteNewsLetterSubscriptionAsync(newsletter);
+                    }
+                }
+                else
+                {
+                    if (model.Newsletter)
+                    {
+                        await _newsLetterSubscriptionService.InsertNewsLetterSubscriptionAsync(new NewsLetterSubscription
+                        {
+                            NewsLetterSubscriptionGuid = Guid.NewGuid(),
+                            Email = customer.Email,
+                            Active = true,
+                            StoreId = store.Id,
+                            CreatedOnUtc = DateTime.UtcNow
+                        });
+                    }
+                }
+            }
+
+            customer.PaymentTypeId = model.PaymentType;
+
+            foreach (WalletTypeEnum enumValues in Enum.GetValues(typeof(WalletTypeEnum)))
+            {
+                var withdrawalMethods = await _withdrawService.GetAllWithdrawalMethodAsync(typeId: (int)enumValues,
+                    isEnabled: true);
+                if (!withdrawalMethods.Any())
+                    continue;
+
+                foreach (var withdrawalMethod in withdrawalMethods)
+                {
+                    var withdrawalMethodFields = await _withdrawService.GetAllWithdrawalMethodFieldAsync(withdrawalMethodId: withdrawalMethod.Id,
+                        isEnabled: true);
+                    if (!withdrawalMethodFields.Any())
+                        continue;
+
+                    var customerWithdrawalMethods = new List<CustomerWithdrawalMethod>();
+                    foreach (var withdrawalMethodField in withdrawalMethodFields)
+                    {
+                        var value = form[$"{withdrawalMethodField.FieldName}.{withdrawalMethodField.WithdrawalMethodId}"].ToString();
+
+                        var existingRecord = (await _withdrawService.GetAllCustomerWithdrawalMethodAsync(customerId: customer.Id,
+                            withdrawalMethodFieldId: withdrawalMethodField.Id))
+                            .FirstOrDefault();
+                        //if existing record is found then update it otherwise add new one only if all the fields are present for individual withdrawal method
+                        if (existingRecord is null)
+                        {
+                            customerWithdrawalMethods.Add(new CustomerWithdrawalMethod()
+                            {
+                                CustomerId = customer.Id,
+                                WithdrawalMethodFieldId = withdrawalMethodField.Id,
+                                Value = value
+                            });
+                        }
+                        else
+                        {
+                            existingRecord.Value = value;
+                            customerWithdrawalMethods.Add(existingRecord);
+                        }
+                    }
+
+                    //all fields of a method is required
+                    if (customerWithdrawalMethods.Any(x => string.IsNullOrEmpty(x.Value)) &&
+                        customerWithdrawalMethods.Any(x => !string.IsNullOrEmpty(x.Value)))
+                    {
+                        //error
+                        _notificationService.ErrorNotification($"Method: {withdrawalMethod.Name} does not have all fields filled. ");
+                        return RedirectToAction("Info");
+                    }
+                    //delete this method data if all the fields are found empty with and the data is already addded in the database
+                    else if (customerWithdrawalMethods.All(x => string.IsNullOrEmpty(x.Value)))
+                    {
+                        if (customerWithdrawalMethods.All(x => !x.Id.Equals(0)))
+                        {
+                            customerWithdrawalMethods.ForEach(async x => await _withdrawService.DeleteCustomerWithdrawalMethodAsync(x));
+                        }
+                    }
+                    else
+                    {
+                        //if it comes up here, means all fields are ready to insert/update
+                        //insert/update all the data
+                        foreach (var customerWithdrawalMethod in customerWithdrawalMethods)
+                        {
+                            if (customerWithdrawalMethod.Id.Equals(0))
+                            {
+                                await _withdrawService.InsertCustomerWithdrawalMethodAsync(customerWithdrawalMethod);
+                            }
+                            else
+                            {
+                                await _withdrawService.UpdateCustomerWithdrawalMethodAsync(customerWithdrawalMethod);
+                            }
+
+                            //set selected default withdrawal method when that withdrawal method comes up in the looping
+                            //because any withdrawal method that does not have all fields filled will not be set as default
+                            if (withdrawalMethod.Id.Equals(model.DefaultWithdrawalMethodId))
+                                customer.DefaultWithdrawalMethodId = model.DefaultWithdrawalMethodId;
+                        }
+                    }
+                }
+            }
+
+            await _customerService.UpdateCustomerAsync(customer);
+            _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.WithdrawMethods.SuccessfullySaved"));
+
+            return RedirectToAction("Info");
+        }
+
+        #endregion
+
+        #region Customer Document
+
+        [HttpPost]
+        public virtual async Task<IActionResult> CustomerDocument(CustomerInfoModel model)
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (!await _customerService.IsRegisteredAsync(customer))
+                return Challenge();
+
+            var allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".webp", ".doc", ".docx", ".pdf" };
+            var formIdExtension = _fileProvider.GetFileExtension(model.FormId?.FileName ?? string.Empty).ToLower();
+            var proofOfAddressExtension = _fileProvider.GetFileExtension(model.ProofOfAddress?.FileName ?? string.Empty).ToLower();
+            var documentExtension = _fileProvider.GetFileExtension(model.Document?.FileName ?? string.Empty).ToLower();
+
+            var validateForm = true;
+            if (model.FormId is null)
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Register.FormFile.Required"));
+                validateForm = false;
+            }
+            else if (!allowedExtensions.Contains(formIdExtension))
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Register.FormFile.FileTypeNotAllowed"));
+                validateForm = false;
+            }
+
+            if (model.ProofOfAddress is null)
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Register.FormFile.Required"));
+                validateForm = false;
+            }
+            else if (!allowedExtensions.Contains(proofOfAddressExtension))
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Register.FormFile.FileTypeNotAllowed"));
+                validateForm = false;
+            }
+
+            if (model.Document is null)
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Register.FormFile.Required"));
+                validateForm = false;
+            }
+            else if (!allowedExtensions.Contains(documentExtension))
+            {
+                _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Register.FormFile.FileTypeNotAllowed"));
+                validateForm = false;
+            }
+
+            #region Identity Verification Method
+
+            async Task<Download> InsertFormFiles(IFormFile file)
+            {
+                var download = new Download
+                {
+                    DownloadGuid = Guid.NewGuid(),
+                    UseDownloadUrl = false,
+                    DownloadUrl = string.Empty,
+                    DownloadBinary = await _downloadService.GetDownloadBitsAsync(file),
+                    ContentType = file.ContentType,
+                    Filename = _fileProvider.GetFileNameWithoutExtension(file.FileName),
+                    Extension = _fileProvider.GetFileExtension(file.FileName),
+                    IsNew = true
+                };
+
+                await _downloadService.InsertDownloadAsync(download);
+
+                return download;
+            }
+
+            #endregion
+
+            if (validateForm)
+            {
+                try
+                {
+                    var identityverification = new IdentityVerification
+                    {
+                        FormId = (await InsertFormFiles(model.FormId)).Id,
+                        ProofOfAddress = (await InsertFormFiles(model.ProofOfAddress)).Id,
+                        Document = (await InsertFormFiles(model.Document)).Id
+                    };
+
+                    await _customerService.InsertIdentityVerificationAsync(identityverification);
+                    customer.IdentityVerificationId = identityverification.Id;
+                    await _customerService.UpdateCustomerAsync(customer);
+
+                    _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Documents.SuccessfullySaved"));
+                }
+                catch (Exception ex)
+                {
+                    await _logger.ErrorAsync($"Error on uploading files: {ex.Message}", ex);
+                    _notificationService.ErrorNotification(ex.Message);
+                }
+            }
+
+            return RedirectToAction("Info");
+        }
+
+        #endregion
+
+        #region Customer Address
+
+        [HttpPost]
+        public virtual async Task<IActionResult> CustomerAddressAddEdit(CustomerInfoModel model, IFormCollection form)
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (!await _customerService.IsRegisteredAsync(customer))
+                return Challenge();
+
+            //custom address attributes
+            var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+            var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
+            var validateForm = !customAttributeWarnings.Any();
+
+            if (validateForm)
+            {
+                try
+                {
+                    //find address (ensure that it belongs to the current customer)
+                    var address = await _customerService.GetCustomerAddressAsync(customer.Id, model.Address.Id);
+                    //create new one
+                    if (address == null)
+                    {
+                        var newAddress = model.Address.ToEntity();
+                        newAddress.FirstName = customer.FirstName;
+                        newAddress.LastName = customer.LastName;
+                        newAddress.Email = customer.Email;
+
+                        newAddress.CustomAttributes = customAttributes;
+                        newAddress.CreatedOnUtc = DateTime.UtcNow;
+                        //some validation
+                        if (newAddress.CountryId == 0)
+                            newAddress.CountryId = null;
+                        if (newAddress.StateProvinceId == 0)
+                            newAddress.StateProvinceId = null;
+
+                        await _addressService.InsertAddressAsync(newAddress);
+
+                        await _customerService.InsertCustomerAddressAsync(customer, newAddress);
+                    }
+                    //edit existing one
+                    else
+                    {
+                        address = model.Address.ToEntity();
+                        address.FirstName = customer.FirstName;
+                        address.LastName = customer.LastName;
+                        address.Email = customer.Email;
+
+                        address.CustomAttributes = customAttributes;
+                        await _addressService.UpdateAddressAsync(address);
+
+                        _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Account.CustomerAddresses.Updated"));
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    await _logger.ErrorAsync($"Error on uploading files: {ex.Message}", ex);
+                    _notificationService.ErrorNotification(ex.Message);
+                }
+            }
+            else
+            {
+                _notificationService.ErrorNotification(string.Join('\n', customAttributeWarnings, false));
+            }
+
+            return RedirectToAction("Info");
+
+
+        }
+
+        #endregion
+
+        #region Analytics
+
+        //available even when a store is closed
+        [CheckAccessClosedStore(ignore: true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(ignore: true)]
+        [AuthorizeCustomer]
+        public virtual async Task<IActionResult> Analytics()
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            var model = await _customerModelFactory.PrepareAnalyticsModelAsync(customer);
+
+            return View(model);
+        }
+
+        #endregion
+
+        #region Chat Bot AI
+        //available even when a store is closed
+        [CheckAccessClosedStore(ignore: true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(ignore: true)]
+        [AuthorizeCustomer]
+        public virtual IActionResult Chat()
+        {
+            return View();
+        }
         #endregion
 
         #endregion

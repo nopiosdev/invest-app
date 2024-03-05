@@ -81,12 +81,12 @@
                     @if (!Model.IsLoggedInAsVendor && canManageOrders)
                     {
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-12">
                                 @await Html.PartialAsync("_OrderAverageReport")
                             </div>
-                            <div class="col-md-4">
+                            @* <div class="col-md-4">
                                 @await Html.PartialAsync("_OrderIncompleteReport")
-                            </div>
+                            </div> *@
                         </div>
                     }
                     @await Component.InvokeAsync(typeof(AdminWidgetViewComponent), new { widgetZone = AdminWidgetZones.DashboardOrderreportsAfter, additionalData = Model })
@@ -95,20 +95,20 @@
                         <div class="row">
                             @if (canManageOrders)
                             {
-                                <div class="col-md-8">
+                                <div class="col-md-12">
                                     @await Html.PartialAsync("_LatestOrders")
                                 </div>
                             }
-                            <div class="col-md-4">
+                            @* <div class="col-md-4">
                                 @if (canManageProducts)
                                 {
                                     @await Html.PartialAsync("_PopularSearchTermsReport")
                                 }
-                            </div>
+                            </div> *@
                         </div>
                     }
                     @await Component.InvokeAsync(typeof(AdminWidgetViewComponent), new { widgetZone = AdminWidgetZones.DashboardLatestordersSearchtermsAfter, additionalData = Model })
-                    @if (canManageOrders)
+                    @* @if (canManageOrders)
                     {
                         <div class="row">
                             <div class="col-md-6">
@@ -119,7 +119,7 @@
                             </div>
                         </div>
                     }
-                    @await Component.InvokeAsync(typeof(AdminWidgetViewComponent), new { widgetZone = AdminWidgetZones.DashboardBottom, additionalData = Model })
+                    @await Component.InvokeAsync(typeof(AdminWidgetViewComponent), new { widgetZone = AdminWidgetZones.DashboardBottom, additionalData = Model }) *@
                 </div>
             </div>
         </div>

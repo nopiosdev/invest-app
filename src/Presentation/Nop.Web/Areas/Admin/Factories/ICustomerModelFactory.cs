@@ -165,7 +165,7 @@ namespace Nop.Web.Areas.Admin.Factories
 
         Task<CustomerCommissionSearchModel> PrepareCustomerCommissionSearchModelAsync(CustomerCommissionSearchModel searchModel);
         Task<CustomerCommissionListModel> PrepareCustomerCommissionListModelAsync(CustomerCommissionSearchModel searchModel);
-
+        Task<CustomerWithdrawalMethodListModel> PrepareCustomerWithdrawalMethodListModelAsync(CustomerWIthdrawalMethodSearchModel searchModel);
 
     }
 }

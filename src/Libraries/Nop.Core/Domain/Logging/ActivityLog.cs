@@ -39,5 +39,6 @@
         /// Gets or sets the IP address
         /// </summary>
         public virtual string IpAddress { get; set; }
+        public bool Viewed { get; set; }
     }
 }

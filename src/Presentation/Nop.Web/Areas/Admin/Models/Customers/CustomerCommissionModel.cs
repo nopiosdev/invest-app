@@ -12,6 +12,9 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         public string PaidCustomer { get; set; }
         [NopResourceDisplayName("Admin.Customers.CustomerCommission.List.PaidAmount")]
         public decimal PaidAmount { get; set; }
+        public int CustomerId { get; set; }
+        [NopResourceDisplayName("Admin.Customers.CustomerCommission.List.Percentage")]
+        public decimal Percentage { get; set; }
 
         #endregion
     }

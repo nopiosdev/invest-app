@@ -25,7 +25,7 @@ namespace Nop.Services.Orders
         /// A task that represents the asynchronous operation
         /// The task result contains the place order result
         /// </returns>
-        Task<PlaceOrderResult> PlaceOrderAsync(ProcessPaymentRequest processPaymentRequest);
+        Task<PlaceOrderResult> PlaceOrderAsync(ProcessPaymentRequest processPaymentRequest, bool byPassPaymentProcess = false);
 
         /// <summary>
         /// Update order totals
@@ -338,5 +338,6 @@ namespace Nop.Services.Orders
         /// <param name="recurringPayment">Recurring payment</param>
         /// <returns>A task that represents the asynchronous operation</returns>
         Task<int> GetCyclesRemainingAsync(RecurringPayment recurringPayment);
+        Task RollBackOrderAsync(Order order);
     }
 }

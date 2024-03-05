@@ -1337,38 +1337,55 @@ namespace Nop.Web.Controllers
                         return Content(await _localizationService.GetResourceAsync("Checkout.RedirectMessage"));
                     }
 
-                    //if transaction is made then process the transaction and redirect to the invest page
-                    var orderItems = await _orderService.GetOrderItemsAsync(orderId: placeOrderResult.PlacedOrder.Id);
-                    if (orderItems.Any(x => x.ProductId.Equals(_customerSettings.TransactionProductId)))
+                    //MOVED THIS WORKING TO A FUNCTION TO USE THAT SAME WORKING SOMEWHERE ELSE
+                    ////if transaction is made then process the transaction and redirect to the invest page
+                    //var orderItems = await _orderService.GetOrderItemsAsync(orderId: placeOrderResult.PlacedOrder.Id);
+                    //if (orderItems.Any(x => x.ProductId.Equals(_customerSettings.TransactionProductId)))
+                    //{
+                    //    try
+                    //    {
+                    //        //payment method
+                    //        var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(placeOrderResult.PlacedOrder.PaymentMethodSystemName);
+                    //        var paymentMethodStr = paymentMethod != null
+                    //            ? await _localizationService.GetLocalizedFriendlyNameAsync(paymentMethod, (await _workContext.GetWorkingLanguageAsync()).Id)
+                    //            : placeOrderResult.PlacedOrder.PaymentMethodSystemName;
+
+                    //        var transaction = new Transaction()
+                    //        {
+                    //            CustomerId = customer.Id,
+                    //            TransactionAmount = placeOrderResult.PlacedOrder.OrderSubtotalExclTax,
+                    //            TransactionType = TransactionType.Credit,
+                    //            Status = Status.Pending,
+                    //            TransactionNote = "Deposit: " + paymentMethodStr,
+                    //            OrderId = placeOrderResult.PlacedOrder.Id,
+                    //        };
+                    //        await _transactionService.InsertTransactionAsync(transaction);
+
+                    //        await _customerActivityService.InsertActivityAsync("TransactionLog",
+                    //            string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Invest.Transaction.Pending"), transaction.TransactionAmount), transaction);
+
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        await _logger.ErrorAsync($"Error on invest: {ex.Message}", ex, customer);
+                    //    }
+                    //}
+                    var transaction = await _transactionService.MakeTransactionAfterOrderCreation(placeOrderResult.PlacedOrder, customer);
+                    if (transaction is not null)
                     {
-                        try
-                        {
-                            var transaction = new Transaction()
-                            {
-                                CustomerId = customer.Id,
-                                TransactionAmount = placeOrderResult.PlacedOrder.OrderSubtotalExclTax,
-                                TransactionType = TransactionType.Credit,
-                                Status = Status.Completed,
-                                TransactionNote = string.Empty,
-                                OrderId = placeOrderResult.PlacedOrder.Id,
-                            };
-                            await _transactionService.InsertTransactionAsync(transaction);
+                        await _customerActivityService.InsertActivityAsync("TransactionLog",
+                            string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Invest.Transaction.Pending"), transaction.TransactionAmount), transaction);
 
-                            await _customerActivityService.InsertActivityAsync("TransactionLog",
-                                string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Invest.Transaction.Successfull"), transaction.TransactionAmount), transaction);
-
-                            _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));
-                        }
-                        catch (Exception ex)
-                        {
-                            await _logger.ErrorAsync($"Error on invest: {ex.Message}", ex, customer);
-                            _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Unsuccessfull"));
-                        }
-
-                        return RedirectToRoute("Invest");
+                        _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));
                     }
+                    else
+                    {
+                        _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Unsuccessfull"));
 
-                    return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
+                    }
+                    return RedirectToRoute("Invest");
+
+                    //return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
                 }
 
                 foreach (var error in placeOrderResult.Errors)

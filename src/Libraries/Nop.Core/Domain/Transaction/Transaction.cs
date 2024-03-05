@@ -19,6 +19,8 @@ namespace Nop.Core.Domain.Transaction
         public decimal UpdateBalance { get; set; }
         public int StatusId { get; set; }
         public int? OrderId { get; set; }
+        public int? WithdrawalMethodId { get; set; }
+        //public decimal? ReturnPercentage { get; set; }
 
         public TransactionType TransactionType
         {

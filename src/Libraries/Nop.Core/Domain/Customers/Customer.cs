@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Tax;
+using Nop.Core.Domain.Transaction;
 
 namespace Nop.Core.Domain.Customers
 {
@@ -261,7 +262,18 @@ namespace Nop.Core.Domain.Customers
         //Transaction
         public decimal InvestedAmount { get; set; }
         public decimal CurrentBalance { get; set; }
+        public decimal ReturnAmountPercentagePerday { get; set; }
         public decimal CommissionToHouse { get; set; }
+        public int PaymentTypeId { get; set; }
+        public PaymentTypeEnum PaymentType
+        {
+            get => (PaymentTypeEnum)this.PaymentTypeId;
+            set { this.PaymentTypeId = (int)value; }
+        }
+
+        public int DefaultWithdrawalMethodId { get; set; }
+        public DateTime? LastReturnDate { get; set; }
+
 
         #region Custom properties
 

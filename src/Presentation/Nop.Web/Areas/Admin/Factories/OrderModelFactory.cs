@@ -22,6 +22,7 @@ using Nop.Services.Directory;
 using Nop.Services.Discounts;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
+using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
@@ -93,6 +94,8 @@ namespace Nop.Web.Areas.Admin.Factories
         protected readonly ShippingSettings _shippingSettings;
         protected readonly IUrlRecordService _urlRecordService;
         protected readonly TaxSettings _taxSettings;
+        protected readonly Services.Logging.ILogger _logger;
+        protected readonly IPermissionService _permissionService;
 
         #endregion
 
@@ -142,7 +145,9 @@ namespace Nop.Web.Areas.Admin.Factories
             OrderSettings orderSettings,
             ShippingSettings shippingSettings,
             IUrlRecordService urlRecordService,
-            TaxSettings taxSettings)
+            TaxSettings taxSettings,
+            Services.Logging.ILogger logger,
+            IPermissionService permissionService)
         {
             _addressSettings = addressSettings;
             _catalogSettings = catalogSettings;
@@ -189,6 +194,8 @@ namespace Nop.Web.Areas.Admin.Factories
             _shippingSettings = shippingSettings;
             _urlRecordService = urlRecordService;
             _taxSettings = taxSettings;
+            _logger = logger;
+            _permissionService=permissionService;
         }
 
         #endregion
@@ -566,7 +573,8 @@ namespace Nop.Web.Areas.Admin.Factories
             if (order == null)
                 throw new ArgumentNullException(nameof(order));
 
-            var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+            var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
+                ?? new Address();
 
             //prepare billing address
             model.BillingAddress = billingAddress.ToModel(model.BillingAddress);
@@ -630,6 +638,9 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //recurring payment record
             model.RecurringPaymentId = (await _orderService.SearchRecurringPaymentsAsync(initialOrderId: order.Id, showHidden: true)).FirstOrDefault()?.Id ?? 0;
+
+            model.CanRollBack = !model.CanMarkOrderAsPaid &&
+                await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageRollBackOrder);
         }
 
         /// <summary>
@@ -1070,7 +1081,14 @@ namespace Nop.Web.Areas.Admin.Factories
                 //fill in model values from the entity
                 return orders.SelectAwait(async order =>
                 {
-                    var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+                    var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+                    var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
+                        ?? new Address()
+                        {
+                            Email = customer.Email,
+                            FirstName = customer.FirstName,
+                            LastName = customer.LastName
+                        };
 
                     //fill in model values from the entity
                     var orderModel = new OrderModel

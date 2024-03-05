@@ -37,17 +37,16 @@
             <div class="col-12 col-md-6 col-lg-5 col-xl-6 col-sm-12 col-md-6 col-lg-5 col-xl-6 p-0">
                 <div class="login-block">
                     <div>
-                        <img class="logo-full" src="https://stock-i-app.azurewebsites.net/static/media/logo-full.42727152.svg" alt="Logo">
+                        @* <img class="logo-full" src="https://stock-i-app.azurewebsites.net/static/media/logo-full.42727152.svg" alt="Logo"> *@
                     </div>
                     <div class="page-title">
-                        @* <h1>@T("Account.Login.Welcome")</h1> *@
-                        <h2 class="heading">Welcome to Intelligent Trades</h2>
+                        <h2 class="heading">@T("Account.Login.Welcome")</h2>
                     </div>
                     <div class="returning-wrapper fieldset">
                         <div class="form-horizontal">
                             <div class="form-group">
                                 <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
-                                    <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
+                                    <div asp-validation-summary="ModelOnly" class="message-error error-color d-flex">@T("Account.Login.Unsuccessful")</div>
                                     <div class="title">
                                         @* <strong>@T("Account.Login.ReturningCustomer")</strong> *@
                                     </div>
@@ -151,10 +150,19 @@
                         @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LoginBottom, additionalData = Model })
                     </div>
                 </div>
+                <div class="footer-links ">
+                    <a class="reg-btn" href="/about-us">About</a>|
+                    <a class="reg-btn" href="@Url.RouteUrl("ContactUs")">Contact</a>|
+                    <a class="reg-btn" href="#">Help</a>
+                    
+                </div>
+                <div class="copyright">
+                    <p>
+                        Copyright © 2024
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
 </div>
-
-

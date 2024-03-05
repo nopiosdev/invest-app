@@ -752,14 +752,19 @@ namespace Nop.Web.Infrastructure
             endpointRouteBuilder.MapFallbackToController("FallbackRedirect", "Common");
 
             //NCT Back-end dev
+            //Dashboard
+            endpointRouteBuilder.MapControllerRoute(name: "Dashboard",
+                pattern: $"{lang}/app/dashboard",
+                defaults: new { controller = "Customer", action = "Dashboard" });
+
             //invest
             endpointRouteBuilder.MapControllerRoute(name: "Invest",
-                pattern: $"{lang}/customertransaction/invest",
+                pattern: $"{lang}/app/invest",
                 defaults: new { controller = "Customer", action = "Invest" });
 
             //withdraw
             endpointRouteBuilder.MapControllerRoute(name: "Withdraw",
-                pattern: $"{lang}/customertransaction/withdraw",
+                pattern: $"{lang}/app/withdraw",
                 defaults: new { controller = "Customer", action = "Withdraw" });
 
             //Transaction Data
@@ -767,10 +772,20 @@ namespace Nop.Web.Infrastructure
                 pattern: $"{lang}/GetTransactionData/{{transactionType}}",
                 defaults: new { controller = "Customer", action = "GetTransactionData" });
 
-            //Stock
-            endpointRouteBuilder.MapControllerRoute(name: "StockPicks",
-                pattern: $"{lang}/customertransaction/stock",
-                defaults: new { controller = "Customer", action = "Stock" });
+            //Transaction
+            endpointRouteBuilder.MapControllerRoute(name: "Transactions",
+                pattern: $"{lang}/app/transactions",
+                defaults: new { controller = "Customer", action = "Transaction" });
+
+            //Analytics
+            endpointRouteBuilder.MapControllerRoute(name: "Analytics",
+                pattern: $"{lang}/app/analytics",
+                defaults: new { controller = "Customer", action = "Analytics" });
+
+            //Chat Bot
+            endpointRouteBuilder.MapControllerRoute(name: "ChatBot",
+                pattern: $"{lang}/app/chatbot",
+                defaults: new { controller = "Customer", action = "Chat" });
         }
 
         #endregion

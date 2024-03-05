@@ -1,3 +1,6 @@
+@media screen and ( max-width:1440px) {
+.contact-page .container {overflow: hidden;overflow-y: auto;height: 100vh;}
+}
 
 /*  laptop media css start  */
 @media screen and ( max-width:1024px) {
@@ -23,6 +26,8 @@
   /* register css start */
   .registration-page .textWrap {  padding: 50px; }
 
+  /* contact us page */
+  .html-contact-page .links a{font-size: 18px;}
 }
 
 /*  tablet media css start  */
@@ -32,20 +37,49 @@
   .registration-page .textWrap { width: 100%; padding: 50px; }
   .registration-page .registerWrapper { flex-direction: column; height: auto; overflow: unset; }
 
+ /* contact us page */
+  .contact-page .container{max-width: 100%;}
+  .contact-page .form-fields .inputs {margin-bottom: 12px;}
+}
+
+@media (max-width: 768px){
+  /* contact us page */
+  .contact-page .page-title{padding: 0;margin-bottom:10px ;}
+  .html-contact-page .links{margin-right:12px;}
+
+  .html-contact-page .links{display: none;}
+  .html-contact-page .account-dropdown{display: block;}
+  
 }
 
 /*  tablet small css start  */
 @media (max-width: 767px){
-
   /* login css start */
   .login-page .login-image {  display:none !important; }
-
-  
 }
 
 /*  mobile css start  */
 @media (max-width: 480px){
 
   .info-box{ margin-top:20px; }
+  .buttons .custom-btn{padding:0 15px;}
+  .home-page .values{gap: 15px 40px;justify-content:unset;}
+  .side-drawer-content .page{padding: 15px 18px;}
+  .home-page .buttons{flex-wrap: wrap;}
+
+  .contact-page .title h4 {font-size: 18px;}
+  
+}
+
+@media (max-width: 350px){
+  .buttons .custom-btn{font-size: 10px;
+    padding: 0px 10px;}
+    
+  /* recover-page */
+  .recover-layout .password-recovery-page {margin: 0;}
+}
+
+@media (max-width: 320px){
+  .contact-page .social a{padding: 0 16px 0 0;}
 
 }

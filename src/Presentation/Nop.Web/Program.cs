@@ -1,6 +1,7 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
+using Nop.Data;
 using Nop.Web.Framework.Infrastructure.Extensions;
 
 namespace Nop.Web
@@ -39,6 +40,8 @@ namespace Nop.Web
             //add services to the application and configure service provider
             builder.Services.ConfigureApplicationServices(builder);
 
+            //await RunDbScriptAsync(builder);
+
             var app = builder.Build();
 
             //configure the application HTTP request pipeline
@@ -46,6 +49,24 @@ namespace Nop.Web
             await app.StartEngineAsync();
 
             await app.RunAsync();
+        }
+
+        private static async Task RunDbScriptAsync(WebApplicationBuilder builder)
+        {
+            // Initialize the database provider and perform operations
+            using (var scope = builder.Services.BuildServiceProvider().CreateScope())
+            {
+                var _nopDataProvider = scope.ServiceProvider.GetRequiredService<INopDataProvider>();
+
+                var filePath = System.IO.Path.GetFullPath(@"wwwroot\db_scripts");
+                var files = Directory.GetFiles(filePath);
+                foreach (var file in files)
+                {
+                    var fileData = System.IO.File.ReadAllText(file);
+                    await _nopDataProvider.ExecuteNonQueryAsync(fileData);
+
+                }
+            }
         }
     }
 }

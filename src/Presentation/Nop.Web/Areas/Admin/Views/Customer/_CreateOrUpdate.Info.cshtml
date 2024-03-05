@@ -478,8 +478,17 @@
             <nop-label asp-for="CommissionToHouse" />
         </div>
         <div class="col-md-9">
-            <nop-textarea asp-for="CommissionToHouse" />
+            <nop-editor asp-for="CommissionToHouse" />
             <span asp-validation-for="CommissionToHouse"></span>
+        </div>
+    </div>
+    <div class="form-group row advanced-setting">
+        <div class="col-md-3">
+            <nop-label asp-for="DontInvestAmount" />
+        </div>
+        <div class="col-md-9">
+            <nop-editor asp-for="DontInvestAmount" />
+            <span asp-validation-for="DontInvestAmount"></span>
         </div>
     </div>
     @if (Model.DisplayRegisteredInStore)

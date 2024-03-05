@@ -16,7 +16,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Nop.Core;
 using Nop.Core.Configuration;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Seo;
+using Nop.Core.Infrastructure;
+using Nop.Services.Common;
+using Nop.Services.Customers;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Framework.WebOptimizer;
@@ -56,6 +60,10 @@ namespace Nop.Web.Framework.UI
         protected string _activeAdminMenuSystemName;
         protected string _editPageUrl;
 
+        protected readonly ICustomerService _customerService;
+        protected readonly IWorkContext _workContext;
+        protected readonly IGenericAttributeService _genericAttributeService;
+
         #endregion
 
         #region Ctor
@@ -68,7 +76,10 @@ namespace Nop.Web.Framework.UI
             IStoreContext storeContext,
             IUrlHelperFactory urlHelperFactory,
             IWebHostEnvironment webHostEnvironment,
-            SeoSettings seoSettings)
+            SeoSettings seoSettings,
+            ICustomerService customerService,
+            IWorkContext workContext,
+            IGenericAttributeService genericAttributeService)
         {
             _appSettings = appSettings;
             _htmlEncoder = htmlEncoder;
@@ -79,6 +90,9 @@ namespace Nop.Web.Framework.UI
             _urlHelperFactory = urlHelperFactory;
             _webHostEnvironment = webHostEnvironment;
             _seoSettings = seoSettings;
+            _customerService = customerService;
+            _workContext = workContext;
+            _genericAttributeService = genericAttributeService;
         }
 
         #endregion
@@ -565,7 +579,7 @@ namespace Nop.Web.Framework.UI
         /// </summary>
         /// <returns>Generated HTML string</returns>
         public virtual IHtmlContent GenerateCssFiles()
-        {            
+        {
             if (_cssParts.Count == 0)
                 return HtmlString.Empty;
 
@@ -824,6 +838,18 @@ namespace Nop.Web.Framework.UI
                 };
 
             return routeName;
+        }
+
+        public virtual async Task<string> GetCustomerThemeAsync()
+        {
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            if (await _customerService.IsRegisteredAsync(customer))
+            {
+                    
+                var themeClass = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.CustomerThemeAttribute);
+                return themeClass;
+            }
+            return "";
         }
 
         #endregion

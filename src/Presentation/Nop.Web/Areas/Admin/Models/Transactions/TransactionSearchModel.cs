@@ -11,6 +11,8 @@ namespace Nop.Web.Areas.Admin.Models.Transactions
         {
             AvailableStatus = new List<SelectListItem>();
             AvailableTransactionType = new List<SelectListItem>();
+
+            this.SetGridPageSize();
         }
 
         [NopResourceDisplayName("Admin.Customers.Transaction.Fields.CreatedOnFrom")]
@@ -26,5 +28,7 @@ namespace Nop.Web.Areas.Admin.Models.Transactions
 
         public int TransactionTypeId { get; set; }
         public IList<SelectListItem> AvailableTransactionType { get; set; }
+
+        public int CustomerId { get; set; }
     }
 }

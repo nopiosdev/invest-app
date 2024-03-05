@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
+using Nop.Web.Areas.Admin.Models.Transactions;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
@@ -36,6 +37,10 @@ namespace Nop.Web.Areas.Admin.Models.Customers
             CustomerActivityLogSearchModel = new CustomerActivityLogSearchModel();
             CustomerBackInStockSubscriptionSearchModel = new CustomerBackInStockSubscriptionSearchModel();
             CustomerAssociatedExternalAuthRecordsSearchModel = new CustomerAssociatedExternalAuthRecordsSearchModel();
+
+            TransactionSearchModel = new TransactionSearchModel();
+            CustomerCommissionSearchModel = new CustomerCommissionSearchModel();
+            CustomerWIthdrawalMethodSearchModel = new CustomerWIthdrawalMethodSearchModel();
         }
 
         #endregion
@@ -265,6 +270,12 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.CommissionToHouse")]
         public decimal CommissionToHouse { get; set; }
+        [NopResourceDisplayName("Admin.Customers.Customers.Fields.DontInvestAmount")]
+        public bool DontInvestAmount { get; set; }
+
+        public TransactionSearchModel TransactionSearchModel { get; set; }
+        public CustomerCommissionSearchModel CustomerCommissionSearchModel { get; set; }
+        public CustomerWIthdrawalMethodSearchModel CustomerWIthdrawalMethodSearchModel { get; set; }
 
         #endregion
 

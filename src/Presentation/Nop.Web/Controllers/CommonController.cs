@@ -182,7 +182,7 @@ namespace Nop.Web.Controllers
 
         //contact us page
         //available even when a store is closed
-        [CheckAccessClosedStore(ignore: true)]
+        //[CheckAccessClosedStore(ignore: true)]
         public virtual async Task<IActionResult> ContactUs()
         {
             var model = new ContactUsModel();
@@ -194,7 +194,7 @@ namespace Nop.Web.Controllers
         [HttpPost, ActionName("ContactUs")]
         [ValidateCaptcha]
         //available even when a store is closed
-        [CheckAccessClosedStore(ignore: true)]
+        //[CheckAccessClosedStore(ignore: true)]
         public virtual async Task<IActionResult> ContactUsSend(ContactUsModel model, bool captchaValid)
         {
             //validate CAPTCHA
@@ -211,7 +211,7 @@ namespace Nop.Web.Controllers
                 var body = _htmlFormatter.FormatText(model.Enquiry, false, true, false, false, false, false);
 
                 await _workflowMessageService.SendContactUsMessageAsync((await _workContext.GetWorkingLanguageAsync()).Id,
-                    model.Email, model.FullName, subject, body);
+                    model.Email, model.FullName, subject, body, model.PhoneNumber);
 
                 model.SuccessfullySent = true;
                 model.Result = await _localizationService.GetResourceAsync("ContactUs.YourEnquiryHasBeenSent");

@@ -8,5 +8,8 @@ namespace Nop.Web.Areas.Admin.Factories
         Task<TransactionSearchModel> PrepareTransactionSearchModelAsync(TransactionSearchModel searchModel);
         Task<TransactionListModel> PrepareTransactionListModelAsync(TransactionSearchModel searchModel);
         Task<TransactionModel> PrepareTransactionModelAsync(TransactionModel model, Transaction transaction);
+        
+        Task<ReturnTransactionSearchModel> PrepareReturnTransactionSearchModelAsync(ReturnTransactionSearchModel searchModel);
+        Task<ReturnTransactionListModel> PrepareReturnTransactionListModelAsync(ReturnTransactionSearchModel searchModel);
     }
 }

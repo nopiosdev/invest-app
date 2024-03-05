@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml.Office2021.Excel.RichDataWebImage;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Transaction;
+using Nop.Services.Authentication.External;
 using Nop.Services.Configuration;
 using Nop.Services.Customers;
 using Nop.Services.Logging;
@@ -23,6 +24,7 @@ namespace Nop.Services.Transactions
         private readonly ITransactionService _transactionService;
         private readonly ICustomerService _customerService;
         private readonly ISettingService _settingService;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -32,13 +34,15 @@ namespace Nop.Services.Transactions
             TransactionSettings transactionSettings,
             ITransactionService transactionService,
             ICustomerService customerService,
-            ISettingService settingService)
+            ISettingService settingService,
+            IWorkContext workContext)
         {
             _logger = logger;
             _transactionSettings = transactionSettings;
             _transactionService = transactionService;
             _customerService = customerService;
             _settingService = settingService;
+            _workContext = workContext;
         }
 
         #endregion
@@ -50,21 +54,17 @@ namespace Nop.Services.Transactions
             //runs on the 6th day of the month that is the next day of the ending day (_transactionSettings.InvestmentDateEnd)
             var previousDateTime = DateTime.Now.AddDays(-1);
             if (previousDateTime.Day.Equals(_transactionSettings.InvestmentDateEnd) ||
-                _transactionSettings.InvestAmountDevMode)
+                await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             {
-                _transactionSettings.InvestAmountDevMode = false;
-                await _settingService.SaveSettingAsync(_transactionSettings, x => x.InvestAmountDevMode);
-
-                var customers = await (await _customerService.GetAllCustomersAsync(dontInvestAmount: false,
-                    isInvested: false)).WhereAwait(async c => await _customerService.IsRegisteredAsync(c)).ToListAsync();
+                var customers = await (await _customerService.GetAllCustomersAsync(dontInvestAmount: false)).WhereAwait(async c => await _customerService.IsRegisteredAsync(c)&&
+                    //if any customer has not invested any amount then zero amount will not be invested.
+                    c.CurrentBalance>0&&
+                    //don't invest any customer if it is forced to ask to not invest his amount
+                    !c.DontInvestAmount).ToListAsync();
                 decimal totalInvestAmount = default;
 
                 foreach (var customer in customers)
                 {
-                    //if any customer has not invested any amount then zero amount will not be invested.
-                    if (customer.CurrentBalance <= 0)
-                        continue;
-                    
                     totalInvestAmount += customer.CurrentBalance;
 
                     customer.InvestedAmount = customer.CurrentBalance;
@@ -72,7 +72,7 @@ namespace Nop.Services.Transactions
                     await _customerService.UpdateCustomerAsync(customer);
                 }
 
-                //send investment amount to API
+                await _transactionService.GenerateReturnAmountAsync();
             }
         }
 

@@ -11,218 +11,842 @@
     NopHtml.AppendPageCssClassParts("html-customer-info-page");
 }
 
+<style>
+
+    input.input-validation-error {
+        border-color: red !important;
+    }
+
+        input.input-validation-error:focus {
+            box-shadow: 0 0 1px 1px #ff000070 !important;
+        }
+
+    .field-validation-error {
+        display: block;
+        width: 100%;
+        color: red;
+    }
+
+    @* .sticky-parent{ transition: 0.1s; } *@
+
+</style>
+
 @*
 @section left
 {
     @await Component.InvokeAsync(typeof(CustomerNavigationViewComponent), new { selectedTabId = CustomerNavigationEnum.Info })
 }
 *@
+<style>
+    .transaction-checkbox {
+        margin-right: 10px;
+    }
+</style>
 
 <div class="page account-page customer-info-page">
 
     <div class="custom-tabs-wrapper">
         <div class="tabs-header">
-            <h2 class="tabs-heading">@T("Account.Setting")</h2>
+            <h2 class="tabs-heading">@T("Account.Settings.Title")</h2>
             <div class="tabs-navigation">
                 <ul>
-                    <li class="active">
-                        <a href="javascript:void(0)" data-id="accountTab">Account</a>
+                    <li class="">
+                        <a href="javascript:void(0)" data-id="accountTab" id="accountSection">@T("Account.AccountDetails")</a>
                     </li>
                     <li>
-                        <a href="javascript:void(0)" data-id="settignsTab">Settings</a>
+                        <a href="javascript:void(0)" data-id="addressTab">@T("Account.Address")</a>
                     </li>
                     <li>
-                        <a href="javascript:void(0)" data-id="helpcenterTab">Help Center</a>
+                        <a href="javascript:void(0)" data-id="changePasswordTab" id="passwordSection">@T("Account.ChangePassword")</a>
                     </li>
                     <li>
-                        <a href="javascript:void(0)" data-id="disclosureTab">Disclosure</a>
+                        <a href="javascript:void(0)" data-id="settignsTab" id="settingsSection">@T("Account.Settings")</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" data-id="documentTab">@T("Account.SubmittedDocuments")</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" data-id="disclosureTab" id="disclosureSection">@T("Account.Disclosure")</a>
                     </li>
                 </ul>
             </div>
         </div>
         <div class="tabs-content">
-            <div id="accountTab" class="tab from-left-animation active">
+            <div id="accountTab" class="tab from-left-animation">
 
                 <div class="col-xl-10">
                     <div class="custom-tab-container">
-                        <div id="investmentSection" class="title my-25">
-                            <h2>@T("Account.Account")</h2>
-                        </div>
 
-                        <div class="form-block">
-                            <div class="inputs">
-                                <label>@T("Account.firstname")</label>
-                                <span>
-                                    <input placeholder="First Name" name="name" type="text" />
-                                </span>
-                            </div>
-                            <div class="inputs">
-                                <label>@T("Account.lastname")</label>
-                                <span>
-                                    <input placeholder="Last Name" name="name" type="text" />
-                                </span>
-                            </div>
-                            <div class="inputs">
-                                <label>@T("Account.emailaddress")</label>
-                                <span>
-                                    <input placeholder="Email address" name="name" type="text" />
-                                </span>
-                            </div>
-                            <div class="inputs">
-                                <label>@T("Account.phonenumber")</label>
-                                <span>
-                                    <input placeholder="Phone Number" name="name" type="number" />
-                                </span>
-                            </div>
-                            <div class="buttons">
-                                <button type="button" class="custom-btn btn-success save-customer-info-button">@T("Account.UpdateAccount")</button>
-                            </div>
-                        </div>
+                        <div class="page-body">
+                            @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.CustomerInfoTop, additionalData = Model })
+                            <form asp-route="CustomerInfo" method="post">
+                                <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                                <div class="fieldset">
+                                    <div class="title my-25">
+                                        <h2>@T("Account.YourContactInformation")</h2>
+                                    </div>
+                                    <div class="form-block">
+                                        @if (Model.GenderEnabled)
+                                        {
+                                                <div class="inputs">
+                                                    <label>@T("Account.Fields.Gender"):</label>
+                                                    <div class="gender">
+                                                        <span class="male">
+                                                            <input type="radio" asp-for="Gender" value="M" checked="@(Model.Gender == "M")" id="gender-male" />
+                                                            <label class="forcheckbox" for="gender-male">@T("Account.Fields.Gender.Male")</label>
+                                                        </span>
+                                                        <span class="female">
+                                                            <input type="radio" asp-for="Gender" value="F" checked="@(Model.Gender == "F")" id="gender-female" />
+                                                            <label class="forcheckbox" for="gender-female">@T("Account.Fields.Gender.Female")</label>
+                                                        </span>
+                                                    @if (Model.NeutralGenderEnabled)
+                                                    {
+                                                                <span class="Neutral">
+                                                                    <input type="radio" asp-for="Gender" value="N" checked="@(Model.Gender == "N")" id="gender-neutral" />
+                                                                    <label class="forcheckbox" for="gender-neutral">@T("Account.Fields.Gender.Neutral")</label>
+                                                                </span>
+                                                    }
+                                                    </div>
+                                                </div>
+                                        }
+                                        @if (Model.FirstNameEnabled)
+                                        {
+                                                <div class="inputs">
+                                                    <label asp-for="FirstName" asp-postfix=":"></label>
+                                                    <input asp-for="FirstName" />
+                                                </div>
+                                        }
+                                        @if (Model.LastNameEnabled)
+                                        {
+                                                <div class="inputs">
+                                                    <label asp-for="LastName" asp-postfix=":"></label>
+                                                    <input asp-for="LastName" />
+                                                </div>
+                                        }
+                                        @if (Model.DateOfBirthEnabled)
+                                        {
+                                                <div class="inputs date-of-birth">
+                                                    <label>@T("Account.Fields.DateOfBirth"):</label>
+                                                    <nop-date-picker asp-day-name="@Html.NameFor(x => x.DateOfBirthDay)"
+                                                                     asp-month-name="@Html.NameFor(x => x.DateOfBirthMonth)"
+                                                                     asp-year-name="@Html.NameFor(x => x.DateOfBirthYear)"
+                                                                     asp-begin-year="@(DateTime.Now.AddYears(-110))"
+                                                                     asp-end-year="@(DateTime.UtcNow)"
+                                                                     asp-selected-date="@Model.ParseDateOfBirth()" />
+                                                </div>
+                                        }
+                                        <div class="inputs">
+                                            <label asp-for="Email" asp-postfix=":"></label>
+                                            <input asp-for="Email" />
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.EmailToRevalidate))
+                                        {
+                                                <div class="inputs">
+                                                    <label asp-for="EmailToRevalidate"></label>
+                                                    <span class="email-to-revalidate">@Model.EmailToRevalidate</span>
+                                                    <span class="email-to-revalidate-note">
+                                                        <em>@T("Account.Fields.EmailToRevalidate.Note")</em>
+                                                    </span>
+                                                </div>
+                                        }
+                                        @if (Model.UsernamesEnabled)
+                                        {
+                                            if (Model.AllowUsersToChangeUsernames)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="Username" asp-postfix=":"></label>
+                                                            <input asp-for="Username" />
+                                                        </div>
+                                            }
+                                            else
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="Username" asp-postfix=":"></label>
+                                                            <span class="readonly-username">@Model.Username</span>
+                                                        </div>
+                                            }
+                                        }
+                                        @if (Model.PhoneEnabled || Model.FaxEnabled)
+                                        {
+                                                    
+                                                @if (Model.PhoneEnabled)
+                                                {
+                                                            <div class="inputs">
+                                                                <label asp-for="Phone" asp-postfix=":"></label>
+                                                                <input asp-for="Phone" />
+                                                            </div>
+                                                }
+                                                @if (Model.FaxEnabled)
+                                                {
+                                                            <div class="inputs">
+                                                                <label asp-for="Fax" asp-postfix=":"></label>
+                                                                <input asp-for="Fax" />
+                                                            </div>
+                                                }                                                    
+                                        }
+                                    </div>
+                                </div>
+                                @if (Model.CompanyEnabled || Model.DisplayVatNumber)
+                                {
+                                        <div class="fieldset">
+                                            <div class="title my-25">
+                                                <h2>@T("Account.CompanyDetails")</h2>
+                                            </div>
+                                            <div class="form-block">
+                                            @if (Model.CompanyEnabled)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="Company" asp-postfix=":"></label>
+                                                            <input asp-for="Company" />
+                                                        </div>
+                                            }
+                                            @if (Model.DisplayVatNumber)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="VatNumber" asp-postfix=":"></label>
+                                                            <input asp-for="VatNumber" />
+                                                            <span class="vat-status">@Model.VatNumberStatusNote</span>
+                                                            <span class="vat-note">
+                                                                <em>@T("Account.Fields.VatNumber.Note")</em>
+                                                            </span>
+                                                        </div>
+                                            }
+                                            </div>
+                                        </div>
+                                }
+                                @if (Model.StreetAddressEnabled ||
+                                Model.StreetAddress2Enabled ||
+                                Model.ZipPostalCodeEnabled ||
+                                Model.CityEnabled ||
+                                Model.CountyEnabled ||
+                                Model.CountryEnabled)
+                                {
+                                        <div class="fieldset">
+                                            <div class="title my-25">
+                                                <h2>@T("Account.YourAddress")</h2>
+                                            </div>
+                                            <div class="form-block">
+                                            @if (Model.StreetAddressEnabled)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="StreetAddress" asp-postfix=":"></label>
+                                                            <input asp-for="StreetAddress" />
+                                                        </div>
+                                            }
+                                            @if (Model.StreetAddress2Enabled)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="StreetAddress2" asp-postfix=":"></label>
+                                                            <input asp-for="StreetAddress2" />
+                                                        </div>
+                                            }
+                                            @if (Model.ZipPostalCodeEnabled)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="ZipPostalCode" asp-postfix=":"></label>
+                                                            <input asp-for="ZipPostalCode" />
+                                                        </div>
+                                            }
+                                            @if (Model.CityEnabled)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="City" asp-postfix=":"></label>
+                                                            <input asp-for="City" />
+                                                        </div>
+                                            }
+                                            @if (Model.CountyEnabled)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="County" asp-postfix=":"></label>
+                                                            <input asp-for="County" />
+                                                        </div>
+                                            }
+                                            @if (Model.CountryEnabled)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="CountryId" asp-postfix=":"></label>
+                                                            <select asp-for="CountryId" asp-items="Model.AvailableCountries"
+                                                                    data-trigger="country-select"
+                                                                    data-url="@(Url.RouteUrl("GetStatesByCountryId"))"
+                                                                    data-stateprovince="#@Html.IdFor(model => model.StateProvinceId)"
+                                                                    data-loading="#states-loading-progress"></select>
+                                                        </div>
+                                            }
+                                            @if (Model.CountryEnabled && Model.StateProvinceEnabled)
+                                            {
+                                                        <div class="inputs">
+                                                            <label asp-for="StateProvinceId" asp-postfix=":"></label>
+                                                            <select asp-for="StateProvinceId" asp-items="Model.AvailableStates"></select>
+                                                            <span id="states-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait")</span>
+                                                        </div>
+                                            }
+                                            </div>
+                                        </div>
+                                }
+                                @if (@* Model.NewsletterEnabled || *@ Model.CustomerAttributes.Count > 0)
+                                {
+                                        <div class="fieldset">
+                                            <div class="title my-25">
+                                                <h2>@T("Account.Options")</h2>
+                                            </div>
+                                            <div class="form-block">
+                                            @* @if (Model.NewsletterEnabled)
+                                            {
+                                                <div class="inputs">
+                                                    <label asp-for="Newsletter" asp-postfix=":"></label>
+                                                    <input asp-for="Newsletter" />
+                                                </div>
+                                            } *@
+                                            @if (Model.CustomerAttributes.Count > 0)
+                                            {
+                                                @await Html.PartialAsync("_CustomerAttributes", Model.CustomerAttributes)
+                                            }
+                                            </div>
+                                        </div>
+                                }                                
+                                @if (Model.NumberOfExternalAuthenticationProviders > 0)
+                                {
+                                        <div class="fieldset">
+                                            <div class="title">
+                                                <strong>@T("Account.AssociatedExternalAuth")</strong>
+                                            </div>
+                                        @if (Model.AssociatedExternalAuthRecords.Count > 0)
+                                        {
+                                        //existing associated external records
+                                                    <div class="table-wrapper">
+                                                        <table class="data-table">
+                                                            <colgroup>
+                                                                <col />
+                                                                <col />
+                                                                <col />
+                                                            </colgroup>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="auth-method-name">
+                                                                @T("Account.AssociatedExternalAuth.AuthMethodName")
+                                                                    </th>
+                                                                    <th class="email">
+                                                                @T("Account.AssociatedExternalAuth.Email")
+                                                                    </th>
+                                                                    <th class="external-id">
+                                                                @T("Account.AssociatedExternalAuth.ExternalIdentifier")
+                                                                    </th>
+                                                            @if (Model.AllowCustomersToRemoveAssociations)
+                                                            {
+                                                                            <th class="remove">
+                                                                    @T("Account.AssociatedExternalAuth.Remove")
+                                                                            </th>
+                                                            }
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                        @foreach (var item in Model.AssociatedExternalAuthRecords)
+                                                        {
+                                                                        <tr>
+                                                                            <td class="auth-method-name">
+                                                                    @item.AuthMethodName
+                                                                            </td>
+                                                                            <td class="email">
+                                                                    @item.Email
+                                                                            </td>
+                                                                            <td class="external-id">
+                                                                    @CommonHelper.EnsureMaximumLength(item.ExternalIdentifier, 40, "...")
+                                                                            </td>
+                                                                @if (Model.AllowCustomersToRemoveAssociations)
+                                                                {
+                                                                                    <td class="remove">
+                                                                                        <a href="#" onclick="return removeexternalassociation(@item.Id)">@T("Account.AssociatedExternalAuth.Remove")</a>
+                                                                                    </td>
+                                                                }
+                                                                        </tr>
+                                                        }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                        }
+                                        @if (Model.NumberOfExternalAuthenticationProviders > Model.AssociatedExternalAuthRecords.Count)
+                                        {
+                                            //we can add more external records
+                                            var loginUrl = Url.RouteUrl("Login", null, webHelper.GetCurrentRequestProtocol());
+                                                    <div class="form-fields add-more-external-records">
+                                                @T("Account.AssociatedExternalAuth.AddMoreRecords")
+                                                        <a href="@loginUrl">@loginUrl</a>
+                                                    </div>
+                                        }
+                                        </div>
+                                }
 
-
-                        <div class="title mt-50">
-                            <h2>@T("Account.DeleteAccount")</h2>
+                                @if (Model.GdprConsents.Count > 0)
+                                {
+                                        <div class="fieldset">
+                                            <div class="title">
+                                                <strong>@T("Account.UserAgreement")</strong>
+                                            </div>
+                                            <div class="form-block">
+                                            @foreach (var consent in Model.GdprConsents)
+                                            {
+                                                if (consent.IsRequired)
+                                                {
+                                                                <script asp-location="Footer">
+                                                                    $(document).ready(function () {
+                                                                        $('#save-info-button').on('click', function () {
+                                                                            if ($('#consent@(consent.Id)').is(':checked')) {
+                                                                                //do some stuff
+                                                                                return true;
+                                                                            } else {
+                                                                                //just show validation errors, don't post
+                                                                                alert('@Html.Raw(JavaScriptEncoder.Default.Encode(consent.RequiredMessage))');
+                                                                                return false;
+                                                                            }
+                                                                        });
+                                                                    });
+                                                                </script>
+                                                }
+                                                        <div class="inputs accept-consent">
+                                                            <input id="consent@(consent.Id)" type="checkbox" name="consent@(consent.Id)" checked="@consent.Accepted" />
+                                                            <label for="consent@(consent.Id)">@consent.Message</label>
+                                                        </div>
+                                            }
+                                            </div>
+                                        </div>
+                                }
+                                <div class="buttons">
+                                    <button type="submit" id="save-info-button" name="save-info-button" class="custom-btn btn-success save-customer-info-button">@T("Common.Save")</button>
+                                </div>
+                                <div class="form-block">
+                                    <div class="inputs">
+                                        <label>@T("Account.DeleteUserAccount")</label>
+                                        <span class="buttons">
+                                            <button type="button" id="delete-account" class="custom-btn btn-danger delete-customer-info-button">@T("Account.DeleteAccount")</button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                            @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.CustomerInfoBottom, additionalData = Model })
                         </div>
-                        <div class="form-block">
-                            <div class="inputs">
-                                <label>@T("Account.DeleteUserAccount")</label>
-                                <span class="buttons">
-                                    <button type="button" class="custom-btn btn-danger delete-customer-info-button">@T("Account.UpdateAccount")</button>
-                                </span>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
-
             </div>
+
+            <div id="addressTab" class="tab from-left-animation">
+                <div class="col-xl-10">
+                    <div class="custom-tab-container">
+                        <div class="page-body">
+                            <form asp-action="CustomerAddressAddEdit" method="post">
+                                <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                                @{
+                                    var dataDictAddress = new ViewDataDictionary(ViewData);
+                                    dataDictAddress.TemplateInfo.HtmlFieldPrefix = "Address";
+                                    @await Html.PartialAsync("_CreateOrUpdateAddress", Model.Address, dataDictAddress)
+                                }
+                                <div class="buttons">
+                                    <button type="submit" class="button-1 custom-btn btn-success  save-address-button">@T("Common.Save")</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="changePasswordTab" class="tab from-left-animation">
+                <form asp-route="CustomerChangePassword" method="post" autocomplete="off">
+                    <div class="col-xl-10">
+                        <div class="custom-tab-container">
+                            <div class="page-body">
+                                <div class="fieldset">
+                                    <div class="title my-25"><h2>Change Password</h2></div>
+                                    <div class="form-block">
+                                        <div class="inputs">
+                                            <label asp-for="ChangePasswordModel.OldPassword" asp-postfix=":"></label>
+                                            <span>
+                                                <input asp-for="ChangePasswordModel.OldPassword" />
+                                                <nop-required />
+                                                <br />
+                                                <span asp-validation-for="ChangePasswordModel.OldPassword"></span>
+                                            </span>
+                                        </div>
+                                        <div class="inputs">
+                                            <label asp-for="ChangePasswordModel.NewPassword" asp-postfix=":"></label>
+                                            <span>
+                                                <input asp-for="ChangePasswordModel.NewPassword" />
+                                                <nop-required />
+                                                <br />
+                                                <span asp-validation-for="ChangePasswordModel.NewPassword"></span>
+                                            </span>
+                                        </div>
+                                        <div class="inputs">
+                                            <label asp-for="ChangePasswordModel.ConfirmNewPassword" asp-postfix=":"></label>
+                                            <span>
+                                                <input asp-for="ChangePasswordModel.ConfirmNewPassword" />
+                                                <nop-required />
+                                                <br />
+                                                <span asp-validation-for="ChangePasswordModel.ConfirmNewPassword"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="buttons">
+                                    <button type="submit" class="button-1 custom-btn btn-success change-password-button">@T("Account.ChangePassword.Button")</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                </form>
+            </div>
+
             <div id="settignsTab" class="tab from-left-animation">
                 <div class="row">
                     <div class="col-xl-2">
-                        <ul class="secondary-sidebar">
-                            <li><a href="#investmentSection">Investment Profile</a></li>
-                            <li><a href="#tradingSection">Trading Account</a></li>
-                            <li><a href="#simulationSetion">Simulation Amount</a></li>
-                            <li><a href="#securitySetion">Security</a></li>
-                            <li><a href="#preferenceSetion">Preference</a></li>
-                        </ul>
+                        <div class="sticky-parent">
+                            <ul class="secondary-sidebar">
+                                <li><a href="#investmentSection">Investment Profile</a></li>
+                                <li><a href="#securitySection">Security</a></li>
+                                <li><a href="#withdrawalTypeSection">Withdrawal Types</a></li>
+                                <li><a href="#notificationSection">Notification Settings</a></li>
+                                <li><a href="#preferenceSection">Account Preference</a></li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="col-xl-10">
                         <div class="custom-tab-container">
+                            <form asp-action="CustomerSettings" method="post">
+                                <div id="investmentSection" class="title my-25">
+                                    <h2>@T("Account.investmentprofile")</h2>
+                                </div>
+                                <div class="form-block">
+                                    <div class="inputs">
+                                        <label>@T("Account.investment.type")</label>
+                                        <span>
+                                            <nop-select asp-for="PaymentType" asp-items="Model.AvailablePaymentType" />
+                                        </span>
+                                    </div>
+                                    <div class="inputs">
+                                        <label>@T("Account.Goal")</label>
+                                        <span>
+                                            <nop-select asp-for="GoalId" asp-items="Model.AvailableGoal" />
+                                        </span>
+                                    </div>
+                                    <div class="inputs">
+                                        <label>@T("Account.Timeline")</label>
+                                        <span>
+                                            <nop-select asp-for="TimelineId" asp-items="Model.AvailableTimeline" />
+                                        </span>
+                                    </div>
+                                    <div class="inputs">
+                                        <label>@T("Account.Experience")</label>
+                                        <span>
+                                            <nop-select asp-for="ExperienceId" asp-items="Model.AvailableExperience" />
+                                        </span>
+                                    </div>
+                                    <div class="inputs">
+                                        <label>@T("Account.RiskTolerance")</label>
+                                        <span>
+                                            <nop-select asp-for="RiskToleranceId" asp-items="Model.AvailableRiskTolerance" />
+                                        </span>
+                                    </div>
 
-                            <div id="tradingSection" class="title my-25">
-                                <h2>@T("Account.investment")</h2>
-                            </div>
-                            <div class="form-block">
-                                <div class="inputs">
-                                    <label>@T("Account.Goal")</label>
+                                    @*  <div class="inputs">
+                                    <label>@T("Account.Form")</label>
                                     <span>
-                                       <nop-select asp-for="GoalId" asp-items="Model.AvailableGoal" />
+                                    <input asp-for="FormId" class="form-control" />
                                     </span>
-                                </div>
-                                <div class="inputs">
-                                    <label>@T("Account.Timeline")</label>
-                                    <span>
-                                        <nop-select asp-for="TimelineId" asp-items="Model.AvailableTimeline" />
-                                    </span>
-                                </div>
-                                <div class="inputs">
-                                    <label>@T("Account.Experience")</label>
-                                    <span>
-                                        <nop-select asp-for="ExperienceId" asp-items="Model.AvailableExperience" />
-                                    </span>
-                                </div>
-                                <div class="inputs">
-                                    <label>@T("Account.RiskTolerance")</label>
-                                    <span>
-                                        <nop-select asp-for="RiskToleranceId" asp-items="Model.AvailableRiskTolerance" />
-                                    </span>
-                                </div>
-                            </div>
+                                    </div>
 
-                            <div id="securitySetion" class="title mt-50">
-                                <h2>@T("Account.investment")</h2>
-                            </div>
-                            <div class="form-block">
-                                <div class="inputs">
-                                    <label>@T("Account.Security")</label>
+                                    <div class="inputs">
+                                    <label>@T("Account.Document")</label>
                                     <span>
-                                        @* <label class="custom-switch">
-                                            <input type="checkbox" name="TwoFactorAuthentication" />
-                                            <span class="custom-slider round"></span>
-                                        </label> *@
-                                        <a href="@Url.RouteUrl("MultiFactorAuthenticationSettings")">@T("account.TwoFactorAuthentication")</a>
+                                    <input asp-for="Document" class="form-control" />
                                     </span>
-                                </div>
-                            </div>
+                                    </div>
 
-                            <div class="title mt-50">
-                                <h2>@T("Account.Alerts")</h2>
-                            </div>
-                            <div class="form-block">
-                                <div class="inputs">
-                                    <label>@T("Account.Email")</label>
+                                    <div class="inputs">
+                                    <label>@T("Account.Proofofaddress")</label>
                                     <span>
-                                        <label class="custom-switch">
-                                            <input type="checkbox" name="EmailAlert" />
-                                            <span class="custom-slider round"></span>
-                                        </label>
+                                    <input asp-for="ProofOfAddress" class="form-control" />
                                     </span>
-                                </div>
-                                <div class="inputs">
-                                    <label>@T("Account.Text")</label>
-                                    <span>
-                                        <label class="custom-switch">
-                                            <input type="checkbox" name="TextAlert" />
-                                            <span class="custom-slider round"></span>
-                                        </label>
-                                    </span>
-                                </div>
-                            </div>
+                                    </div> *@
 
-                            <div id="preferenceSetion" class="title mt-50">
-                                <h2>@T("Account.Preference")</h2>
-                            </div>
-                            <div class="form-block">
-                                <div class="inputs">
-                                    <label>@T("Account.Theme")</label>
-                                    <span>
-                                        <select class="form-select" id="selectTheme" aria-label="Default select example">
-                                            <option> </option>
-                                            <option value="dark">Dark</option>
-                                            <option value="grey">Grey</option>
-                                            <option value="egg-white">Egg White</option>
-                                            <option value="light">Light</option>
-                                        </select>
-                                    </span>
                                 </div>
-                            </div>
+
+                                <div id="securitySection" class="title my-25">
+                                    <h2>@T("Account.security")</h2>
+                                </div>
+                                <div class="form-block">
+                                    <div class="inputs">
+                                        <label>@T("Account.Security.mfa")</label>
+                                        <span>
+                                            <a href="@Url.RouteUrl("MultiFactorAuthenticationSettings")">@T("account.TwoFactorAuthentication")</a>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="Currency">
+                                    <div class="title my-25">
+                                        <h2>@T("Account.Currency")</h2>
+                                    </div>
+                                    <div class="form-block">
+                                        <div class="inputs" style="height: 53px;">
+                                            <label>@T("Account.Currency")</label>
+                                            <span>
+                                                @await Component.InvokeAsync(typeof(CurrencySelectorViewComponent))
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="withdrawalAccount">
+                                    <div class="title my-25">
+                                        <h2>@T("Account.Withdrawal.Account")</h2>
+                                    </div>
+                                    <div class="transaction">
+                                        @foreach (var item1 in Model.WithdrawalMethodModel)
+                                        {
+                                            <div class="ps-3 w-100">
+                                                @* <div class="title mt-4 mb-4">
+                                                    <h2>@item1.Name</h2>
+                                                </div> *@
+                                                @foreach (var item2 in item1.Fields)
+                                                {
+                                                    <div class="mt-4 ps-3 w-100">
+                                                        <div class="d-flex align-items-start">
+                                                            <input type="radio" asp-for="DefaultWithdrawalMethodId" value="@item2.Id" class="my-1 me-2" />
+                                                            <h6>@item2.Name</h6>
+                                                        </div>
+                                                        <div class="ps-4">
+                                                            @foreach (var item3 in item2.Fields)
+                                                            {
+                                                                <div class="form-block">
+                                                                    <div class="inputs">
+                                                                        <label>@item3.Name</label>
+                                                                        <input name="@($"{item3.Name}.{item2.Id}")" value="@item3.Value" />
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="title my-25">
+                                    <h2>@T("Account.Alerts")</h2>
+                                </div>
+                                <div class="form-block">
+                                    @if (Model.NewsletterEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label>@T("Account.Email")</label>
+                                            <span>
+                                                <label class="custom-switch">
+                                                    <input type="checkbox" asp-for="Newsletter" />
+                                                    <span class="custom-slider round"></span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                    }
+                                    <div class="inputs">
+                                        <label>@T("Account.Text")</label>
+                                        <span>
+                                            <label class="custom-switch">
+                                                <input type="checkbox" name="TextAlert" disabled />
+                                                <span class="custom-slider round"></span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div id="preferenceSecion" class="title my-25">
+                                    <h2>@T("Account.Preference")</h2>
+                                </div>
+                                @if (Model.AllowCustomersToSetTimeZone || Model.SignatureEnabled)
+                                {
+                                      <div class="form-block">
+                                            @if (Model.AllowCustomersToSetTimeZone)
+                                            {
+                                                <div class="inputs">
+                                                    <label asp-for="TimeZoneId" asp-postfix=":"></label>
+                                                    <select asp-for="TimeZoneId" asp-items="Model.AvailableTimeZones"></select>
+                                                </div>
+                                            }
+                                            @if (Model.SignatureEnabled)
+                                            {
+                                                <div class="inputs">
+                                                    <label asp-for="Signature" asp-postfix=":"></label>
+                                                    <textarea asp-for="Signature" class="account-signature-text"></textarea>
+                                                </div>
+                                            }
+                                       </div>
+                                            
+                                }
+                                <div class="form-block">
+                                    <div class="inputs" style="height: 53px;">
+                                        <label>@T("Account.Currency")</label>
+                                        <span>
+                                            @await Component.InvokeAsync(typeof(CurrencySelectorViewComponent))
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-block">
+                                    <div class="inputs">
+                                        <label>@T("Account.Theme")</label>
+                                        <span>
+                                            <select class="form-select" id="selectTheme" aria-label="Default select example">
+                                                <option> </option>
+                                                <option value="dark">Dark</option>
+                                                <option value="grey">Grey</option>
+                                                <option value="egg-white">Egg White</option>
+                                                <option value="light">Light</option>
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="buttons">
+                                    <button type="submit" class="custom-btn btn-success save-customer-info-button">@T("account.updateaccount")</button>
+                                </div>
+                            </form>
 
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="helpcenterTab" class="tab from-left-animation">
-                <h1>Test</h1>
+
+            <div id="documentTab" class="tab from-left-animation">
+                <form asp-action="CustomerDocument" method="post" enctype="multipart/form-data">
+                    <div class="col-xl-10">
+                        <div class="custom-tab-container">
+                            <div class="page-body">
+                                <div class="fieldset">
+                                    <div class="title my-25"><h2>Customer Documents</h2></div>
+                                    <div class="form-block">
+                                        <div class="inputs">
+                                            <label asp-for="FormId" asp-postfix=":"></label>
+                                            <span>
+                                                <input asp-for="FormId" />
+                                            </span>
+                                        </div>
+                                        <div class="inputs">
+                                            <label asp-for="Document" asp-postfix=":"></label>
+                                            <span>
+                                                <input asp-for="Document" />
+                                            </span>
+                                        </div>
+                                        <div class="inputs">
+                                            <label asp-for="ProofOfAddress" asp-postfix=":"></label>
+                                            <span>
+                                                <input asp-for="ProofOfAddress" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="buttons">
+                                    <button type="submit" class="button-1 custom-btn btn-success change-password-button">@T("Account.Document.Button")</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
+
             <div id="disclosureTab" class="tab from-left-animation">
-                <h1>Test</h1>
+                <div class="col-xl-10">
+                        <div class="custom-tab-container">
+                            <div class="page-body">
+                                <h2>Data Collection and Privacy Disclosure</h2>
+
+    <p>At @T("Platform.Company.Name"), we are committed to safeguarding your personal information and maintaining the highest standards of privacy and data protection. This disclosure outlines how we collect, use, and protect your personal information, including identification documents, as part of our services.</p>
+
+    <h5>1. Collection of Personal Information:</h5>
+    <ul>
+        <li>To provide you with our investment services, we collect certain personal information during the registration and account verification process. This information may include your:
+            <ul>
+                <li>Full Name</li>
+                <li>Address</li>
+                <li>Date of Birth</li>
+                <li>Phone Number</li>
+                <li>Email Address</li>
+                <li>Identification Documents (e.g., Passport, Driver's License)</li>
+                <li>Proof of Address (e.g., Utility Bill)</li>
+            </ul>
+        </li>
+        <li>We collect this data to verify your identity, prevent fraud, and comply with legal and regulatory requirements.</li>
+    </ul>
+
+    <h5>2. Use of Personal Information:</h5>
+    <ul>
+        <li>Your personal information is primarily used for the following purposes:
+            <ul>
+                <li>Account Verification: To confirm your identity and enable secure access to our platform.</li>
+                <li>Transaction Processing: To facilitate deposits, withdrawals, and investment activities.</li>
+                <li>Customer Support: To address your inquiries and provide assistance.</li>
+                <li>Regulatory Compliance: To meet legal and regulatory obligations.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h5>3. Protection of Your Data:</h5>
+    <ul>
+        <li>We employ industry-standard security measures to protect your personal information from unauthorized access, disclosure, alteration, and destruction.</li>
+        <li>Access to your data is restricted to authorized personnel and is stored securely on our servers.</li>
+    </ul>
+
+                           
+
+                             <h5>4. Third-Party Disclosure:</h5>
+    <ul>
+        <li>We do not sell, rent, or share your personal information with third parties for marketing purposes.</li>
+        <li>In certain cases, we may share your data with regulatory authorities or law enforcement agencies as required by law.</li>
+    </ul>
+
+    <h5>5. Data Retention:</h5>
+    <ul>
+        <li>We retain your personal information only for as long as necessary to fulfill the purposes for which it was collected and to comply with legal and regulatory requirements.</li>
+    </ul>
+
+    <h5>6. Your Rights:</h5>
+    <ul>
+        <li>You have the right to access, correct, or delete your personal information. You can also request information about the purposes of data processing.</li>
+        <li>If you have concerns about how your data is being used, please contact our customer support team.</li>
+    </ul>
+
+    <h5>7. Consent:</h5>
+    <ul>
+        <li>By using our services and providing your personal information, you consent to the collection, use, and disclosure of your data as outlined in this disclosure.</li>
+    </ul>
+
+    <h5>8. Updates to This Disclosure:</h5>
+    <ul>
+        <li>We may update this disclosure to reflect changes in our data handling practices. Any changes will be communicated to you through our platform or via email.</li>
+    </ul>
+
+    <p>By continuing to use our services, you acknowledge that you have read and understood this disclosure, and you consent to the collection and use of your personal information as described herein. Your privacy is important to us, and we are committed to protecting your data and ensuring a secure and transparent user experience. If you have any questions or concerns, please do not hesitate to contact us.</p>
+
+    <p>Thank you for choosing @T("Platform.Company.Name") for your investment needs.</p>
+     </div>
+                        </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- <nop-label asp-for="InvestmentApproachId" />
-<nop-select asp-for="InvestmentApproachId" asp-items="Model.AvailableInvestmentApproach" /> -->
+<!--
+<nop-label asp-for="InvestmentApproachId" />
+<nop-select asp-for="InvestmentApproachId" asp-items="Model.AvailableInvestmentApproach" />
+-->
 
 <script>
     $(document).ready(function () {
-        var selectedTheme = localStorage.getItem('selectedTheme');
+        // var selectedTheme = localStorage.getItem('selectedTheme');
 
-        if (selectedTheme) {
-            $('html').addClass(selectedTheme);
-            $('#selectTheme').val(selectedTheme);
-        }
+        // if (selectedTheme) {
+        //     $('html').addClass(selectedTheme);
+        //     $('#selectTheme').val(selectedTheme);
+        // }
+
+        $("#selectTheme").val($("html").attr("data-theme"));
 
         $('#selectTheme').change(function () {
             var selectedValue = $(this).val();
@@ -237,7 +861,75 @@
                 $('html').addClass('light');
             }
 
-            localStorage.setItem('selectedTheme', selectedValue);
+            //localStorage.setItem('selectedTheme', selectedValue);
+
+            $.ajax({
+                cache: false,
+                type: 'GET',
+                url: '@Url.Action("SaveCustomerTheme", "Customer")?themeClass=' + selectedValue,
+                success: function (resp, textStatus, jqXHR) {
+                    if (resp.success == false) {
+                        $('html').removeClass('dark grey egg-white light');
+                        displayBarNotification("Unable to Change Theme", 'error', 3500);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) { }
+            });
+
         });
+
+        $('#delete-account').on('click', function () {
+            if (confirm('Are you sure?')) {
+                $.ajax({
+                    url: '@Url.Action("DeleteAccountRequest")',
+                    method: 'POST',
+                    dataType: 'json',
+                    data: addAntiForgeryToken({}),
+                    success: function (response) {
+                        // Handle successful response here
+                        console.log('response', response);
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle errors here
+                        console.error('status', status, error);
+                    }
+                });
+            }
+        });
+        /* smooth side from sidebar */
+        var offsetValue = 150;
+
+        $('a[href^="#"]').on('click', function (e) {
+            e.preventDefault();
+
+            var targetId = $(this).attr('href');
+            var targetOffset = $(targetId).offset().top - offsetValue;
+
+            $('html, body').animate({
+                scrollTop: targetOffset
+            }, 1000);
+        });
+
+        /* side bar sticky affect */
+        var sidebar = $(".sticky-parent");
+        var sidebarTop = sidebar.offset().top;
+        
+        function onScroll() {
+            var windowTop = $(window).scrollTop()- 150;
+            var windowWidth = $(window).width();
+            if (windowWidth > 1024) {
+                var dynamicOffset = windowTop - sidebarTop + 0; 
+
+                if (windowTop > sidebarTop) {
+                    sidebar.css('margin-top', dynamicOffset + 'px');
+                } else {
+                    sidebar.css('margin-top', '0');
+                }
+            } else {
+                sidebar.css('margin-top', '0');
+            }
+        }
+        $(window).on('scroll', onScroll);
     });
+
 </script>

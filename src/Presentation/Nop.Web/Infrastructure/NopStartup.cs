@@ -112,6 +112,7 @@ namespace Nop.Web.Infrastructure
 
             //NCT back-end dev
             services.AddScoped<ITransactionModelFactory, TransactionModelFactory>();
+            services.AddScoped<IWithdrawalMethodModelFactory, WithdrawalMethodModelFactory>();
         }
 
         /// <summary>

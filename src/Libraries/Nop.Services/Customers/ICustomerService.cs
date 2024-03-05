@@ -48,7 +48,7 @@ namespace Nop.Services.Customers
             int dayOfBirth = 0, int monthOfBirth = 0,
             string company = null, string phone = null, string zipPostalCode = null, string ipAddress = null,
             int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false,
-            bool? dontInvestAmount = default, bool isInvested = default);
+            bool? dontInvestAmount = default);
 
         /// <summary>
         /// Gets online customers

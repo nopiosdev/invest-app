@@ -34,6 +34,7 @@ using Nop.Services.Shipping;
 using Nop.Services.Shipping.Pickup;
 using Nop.Services.Stores;
 using Nop.Services.Tax;
+using Nop.Services.Transactions;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Areas.Admin.Models.Localization;
@@ -89,7 +90,8 @@ namespace Nop.Web.Areas.Admin.Factories
         protected readonly MeasureSettings _measureSettings;
         protected readonly NopHttpClient _nopHttpClient;
         protected readonly ProxySettings _proxySettings;
-
+        protected readonly ITransactionService _transactionService;
+        protected readonly IPriceFormatter _priceFormatter;
         #endregion
 
         #region Ctor
@@ -133,7 +135,9 @@ namespace Nop.Web.Areas.Admin.Factories
             IWorkContext workContext,
             MeasureSettings measureSettings,
             NopHttpClient nopHttpClient,
-            ProxySettings proxySettings)
+            ProxySettings proxySettings,
+            ITransactionService transactionService,
+            IPriceFormatter priceFormatter)
         {
             _appSettings = appSettings;
             _catalogSettings = catalogSettings;
@@ -175,6 +179,8 @@ namespace Nop.Web.Areas.Admin.Factories
             _measureSettings = measureSettings;
             _nopHttpClient = nopHttpClient;
             _proxySettings = proxySettings;
+            _transactionService = transactionService;
+            _priceFormatter = priceFormatter;
         }
 
         #endregion
@@ -1160,13 +1166,25 @@ namespace Nop.Web.Areas.Admin.Factories
             model.NumberOfCustomers = (await _customerService.GetAllCustomersAsync(customerRoleIds: customerRoleIds,
                 pageIndex: 0, pageSize: 1, getOnlyTotalCount: true)).TotalCount;
 
-            var returnRequestStatus = ReturnRequestStatus.Pending;
-            model.NumberOfPendingReturnRequests = (await _returnRequestService.SearchReturnRequestsAsync(rs: returnRequestStatus,
-                pageIndex: 0, pageSize: 1, getOnlyTotalCount: true)).TotalCount;
+            //var returnRequestStatus = ReturnRequestStatus.Pending;
+            //model.NumberOfPendingReturnRequests = (await _returnRequestService.SearchReturnRequestsAsync(rs: returnRequestStatus,
+            //    pageIndex: 0, pageSize: 1, getOnlyTotalCount: true)).TotalCount;
 
-            model.NumberOfLowStockProducts =
-                (await _productService.GetLowStockProductsAsync(getOnlyTotalCount: true)).TotalCount +
-                (await _productService.GetLowStockProductCombinationsAsync(getOnlyTotalCount: true)).TotalCount;
+            //model.NumberOfLowStockProducts =
+            //    (await _productService.GetLowStockProductsAsync(getOnlyTotalCount: true)).TotalCount +
+            //    (await _productService.GetLowStockProductCombinationsAsync(getOnlyTotalCount: true)).TotalCount;
+
+            var allCustomersBalance = await (await _customerService.GetAllCustomersAsync())
+                .WhereAwait(async c => c.Active &&
+                    c.Verified &&
+                    await _customerService.IsRegisteredAsync(c))
+                .SumAsync(c => c.InvestedAmount + c.CurrentBalance);
+            model.TotalAmountOfDeposits = allCustomersBalance;
+
+            model.NumberOfPendingDeposits = (await _transactionService.GetNumberOfPendingOrders());
+            model.TotalAmountOfPendingDeposits = (await _transactionService.GetTotalAmountOfPendingDeposits());
+            model.LiquidityPoolLimitValue = Convert.ToDecimal(await _transactionService.GetCurrentLiquidityLimitAsync());
+            model.LiquityPoolTotalValue = Convert.ToDecimal(_transactionService.GetLiquidityPoolValue());
 
             return model;
         }

@@ -366,6 +366,9 @@ namespace Nop.Web.Areas.Admin.Controllers
                 customer.CreatedOnUtc = DateTime.UtcNow;
                 customer.LastActivityDateUtc = DateTime.UtcNow;
                 customer.RegisteredInStoreId = currentStore.Id;
+                customer.Verified = model.Verified;
+                customer.CommissionToHouse = model.CommissionToHouse;
+                customer.DontInvestAmount = model.DontInvestAmount;
 
                 //form fields
                 if (_dateTimeSettings.AllowCustomersToSetTimeZone)
@@ -484,6 +487,13 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //activity log
                 await _customerActivityService.InsertActivityAsync("AddNewCustomer",
                     string.Format(await _localizationService.GetResourceAsync("ActivityLog.AddNewCustomer"), customer.Id), customer);
+                if (model.Verified)
+                {
+                    //activity log
+                    await _customerActivityService.InsertActivityAsync(customer, "TransactionLog",
+                            string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Verified"), customer.Id), customer);
+                }
+
                 _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Customers.Customers.Added"));
 
                 if (!continueEditing)
@@ -565,8 +575,13 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 try
                 {
+                    var insertVerifiedLog = !customer.Verified && model.Verified;
+
                     customer.AdminComment = model.AdminComment;
                     customer.IsTaxExempt = model.IsTaxExempt;
+                    customer.Verified = model.Verified;
+                    customer.CommissionToHouse = model.CommissionToHouse;
+                    customer.DontInvestAmount = model.DontInvestAmount;
 
                     //prevent deactivation of the last active administrator
                     if (!await _customerService.IsAdminAsync(customer) || model.Active || await SecondAdminAccountExistsAsync(customer))
@@ -736,6 +751,12 @@ namespace Nop.Web.Areas.Admin.Controllers
                     //activity log
                     await _customerActivityService.InsertActivityAsync("EditCustomer",
                         string.Format(await _localizationService.GetResourceAsync("ActivityLog.EditCustomer"), customer.Id), customer);
+                    if (insertVerifiedLog)
+                    {
+                        //activity log
+                        await _customerActivityService.InsertActivityAsync(customer, "TransactionLog",
+                                string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Verified"), customer.Id), customer);
+                    }
 
                     _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Customers.Customers.Updated"));
 
@@ -1777,6 +1798,22 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             //prepare model
             var model = await _customerModelFactory.PrepareCustomerCommissionListModelAsync(searchModel);
+
+            return Json(model);
+        }
+
+        #endregion
+
+        #region Withdrawal Method
+
+        [HttpPost]
+        public virtual async Task<IActionResult> WithdrawalMethodList(CustomerWIthdrawalMethodSearchModel searchModel)
+        {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageCustomers))
+                return await AccessDeniedDataTablesJson();
+
+            //prepare model
+            var model = await _customerModelFactory.PrepareCustomerWithdrawalMethodListModelAsync(searchModel);
 
             return Json(model);
         }

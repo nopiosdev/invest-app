@@ -338,7 +338,11 @@ namespace Nop.Web.Areas.Admin.Factories
                 InstagramLink = storeInformationSettings.InstagramLink,
                 SubjectFieldOnContactUsForm = commonSettings.SubjectFieldOnContactUsForm,
                 UseSystemEmailForContactUsForm = commonSettings.UseSystemEmailForContactUsForm,
-                PopupForTermsOfServiceLinks = commonSettings.PopupForTermsOfServiceLinks
+                PopupForTermsOfServiceLinks = commonSettings.PopupForTermsOfServiceLinks,
+
+                LinkedinLink = storeInformationSettings.LinkedinLink,
+                TelegramLink = storeInformationSettings.TelegramLink,
+                DiscordLink = storeInformationSettings.DiscordLink,
             };
 
             //prepare available themes
@@ -1566,7 +1570,7 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare CustomerSettings list availableCountries
             await _baseAdminModelFactory.PrepareCountriesAsync(model.CustomerSettings.AvailableCountries);
-            
+
             //prepare multi-factor authentication settings model
             model.MultiFactorAuthenticationSettings = await PrepareMultiFactorAuthenticationSettingsModelAsync();
 

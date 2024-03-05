@@ -1,14 +1,97 @@
+@using Nop.Core.Domain.Transaction;
 @model TransactionModel
+<style>
+    .item img {
+        width: 60px;
+    }
+
+    .item .fields label {
+        font-size: 18px;
+    }
+
+    .custom-payment-method {
+        display: block;
+        position: relative;
+        cursor: pointer;
+        font-size: 17px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+        .custom-payment-method .input-option {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            width: 0px;
+            height: 0px;
+        }
+
+        .custom-payment-method .method-box {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1px solid #ced4da;
+        }
+
+            .custom-payment-method .method-box .payment-logo {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: center;
+                min-width: 50px;
+                min-height: 50px;
+            }
+
+            .custom-payment-method .method-box .payment-details {
+                display: block;
+                width: 100%;
+                padding: 5px 14px;
+            }
+
+                .custom-payment-method .method-box .payment-details label {
+                    font-size: 17px;
+                    margin-bottom: 7px;
+                    color: #fff;
+                }
+
+                .custom-payment-method .method-box .payment-details .payment-description {
+                    font-size: 15px;
+                    margin-bottom: 7px;
+                    color: #000;
+                }
+
+        .custom-payment-method input:checked ~ .method-box {
+            background-color: #f2f2f2;
+            border: 1px solid #f2f2f2;
+            color: #000;
+        }
+</style>
 
 <div class="card-body">
-    <div class="form-group row">
-        <div class="col-md-3">
-            <nop-label asp-for="CreateOnUtc" />
+    @if (!Model.Id.Equals(0) && Model.CanChangeDate)
+    {
+        <div class="form-group row">
+            <div class="col-md-3">
+                <nop-label asp-for="CreateOnUtc" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="CreateOnUtc" />
+            </div>
         </div>
-        <div class="col-md-9">
-            <div class="form-text-row">@Model.CreateOnUtc</div>
+    }
+    else
+    {
+        <div class="form-group row">
+            <div class="col-md-3">
+                <nop-label asp-for="CreateOnUtc" />
+            </div>
+            <div class="col-md-9">
+                <div class="form-text-row">@Model.CreateOnUtc</div>
+            </div>
         </div>
-    </div>
+    }
 
     <div class="form-group row">
         <div class="col-md-3">
@@ -16,6 +99,7 @@
         </div>
         <div class="col-md-9">
             <a asp-controller="Customer" asp-action="Edit" asp-route-id="@Model.CustomerId">@Model.CustomerInfo</a>
+            <input type="hidden" asp-for="CustomerId" />
         </div>
     </div>
 
@@ -29,26 +113,30 @@
         </div>
     </div>
 
-    <div class="form-group row">
-        <div class="col-md-3">
-            <nop-label asp-for="TransactionNote" />
+    @if (!Model.Id.Equals(0))
+    {
+        <div class="form-group row">
+            <div class="col-md-3">
+                <nop-label asp-for="TransactionNote" />
+            </div>
+            <div class="col-md-9">
+                <nop-textarea asp-for="TransactionNote" />
+                <span asp-validation-for="TransactionNote"></span>
+            </div>
         </div>
-        <div class="col-md-9">
-            <nop-textarea asp-for="TransactionNote" />
-            <span asp-validation-for="TransactionNote"></span>
+    }
+    @if (Model.TransactionTypeId.Equals((int)TransactionType.Debit))
+    {
+        <div class="form-group row advanced-setting">
+            <div class="col-md-3">
+                <nop-label asp-for="StatusId" />
+            </div>
+            <div class="col-md-9">
+                <nop-select asp-for="StatusId" asp-items="Model.AvaialableStatus" />
+                <span asp-validation-for="StatusId"></span>
+            </div>
         </div>
-    </div>
-
-    <div class="form-group row advanced-setting">
-        <div class="col-md-3">
-            <nop-label asp-for="StatusId" />
-        </div>
-        <div class="col-md-9">
-            <nop-select asp-for="StatusId" asp-items="Model.AvaialableStatus" />
-            <span asp-validation-for="StatusId"></span>
-        </div>
-    </div>
-
+    }
     <div class="form-group row advanced-setting">
         <div class="col-md-3">
             <nop-label asp-for="TransactionTypeId" />
@@ -58,4 +146,69 @@
             <span asp-validation-for="TransactionTypeId"></span>
         </div>
     </div>
+
+    @if (Model.Id.Equals(0))
+    {
+        <div id="selected-customer-withdrawalMethods" class="row">
+
+            @{
+                var child_item_count = 0; var child_item_active = "";
+            }
+            @foreach (var item1 in Model.WithdrawalMethodCustomerInfoModels)
+            {
+                child_item_active = "";
+                if (child_item_count == 0)
+                {
+                    child_item_active = "active";
+                }
+                <div class="item col-md-6">
+
+                    @foreach (var item2 in item1.Fields)
+                    {
+                        <div class="child-item @child_item_active">
+                            <div class="wallet-name">
+                                <label class="custom-payment-method">
+                                    <input class="input-option" type="radio" name="WithdrawalMethodId" value="@item2.Id">
+                                    <div class="method-box">
+                                        <div class="payment-details">
+                                            @* <h2>@item2.Name</h2> *@
+                                            <h3 class="payment-description">Pay by <span>@item2.Name</span></h3>
+                                        </div>
+                                        <div class="payment-logo">
+                                            <label for="digitalRadio">
+                                                <img src="@Url.Content("~/images/paymentMethods/digital.png")" alt="digitalRadio">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="fields row">
+                                @foreach (var item3 in item2.Fields)
+                                {
+                                    <div class="col-md-6">
+                                        <label>@item3.Name:</label>
+                                        <p class="info-input mt-2">@item3.Value</p>
+                                    </div>
+
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                child_item_count++;
+            }
+        </div>
+    }
 </div>
+
+<script>
+    $(document).on('change', '#@Html.IdFor(model => model.TransactionTypeId)', function () {
+        if ($(this).val() === '@((int)TransactionType.Debit)') {
+            $('#selected-customer-withdrawalMethods').show();
+        } else {
+            $('#selected-customer-withdrawalMethods').hide();
+        }
+    });
+
+    $('#@Html.IdFor(model=>model.TransactionTypeId)').change();
+</script>

@@ -1,4 +1,5 @@
-﻿@{
+﻿@inject Nop.Core.IWebHelper webHelper
+@{
     Layout = "_Root";
 }
 @{
@@ -25,6 +26,8 @@
     {
         currentProductId = Convert.ToInt32(Url.ActionContext.RouteData.Values["productId"].ToString());
     }
+
+    var currentPageUrl = webHelper.GetRawUrl(Context.Request);
 }
 
 <div id="sideDrawer" class="drawer-wrapper">
@@ -34,25 +37,35 @@
         </div>
         <div class="drawer-body">
             <div class="sub-container">
-                @* <ul class="drawer-total">
+                <ul class="drawer-total">
                     <li class="portfolio-total">
-                        <h5>PORTFOLIO TOTAL:</h5>
-                        <h2>$26,123.66</h2>
+                        <h5>@T("Account.AccountValue"):</h5>
+                        <h2 class="accountValue">0</h2>
                     </li>
-                    <li class="profit-loss-total">
-                        <h6>PROFIT/LOSS:</h6>
-                        <h3>-$6,049.94</h3>
+                    <li class="portfolio-total">
+                        <h5>@T("Account.NetReturn"):</h5>
+                        <h3 class="text-secondary netReturn">0</h3>
                     </li>
-                </ul> *@
+                    <!-- <li class="profit-loss-total">
+                        <h6>Investement:</h6>
+                        <h3 id="investmentTxt">0</h3>
+                    </li> -->
+                </ul>
                 <ul class="drawer-list">
-                    <li class="active">
-                        <a href="/">@T("Customer.Dashboard")</a>
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Dashboard")) ? Html.Raw("class=\"active\"") : "")>
+                        <a href="@Url.RouteUrl("Dashboard")">@T("Customer.Dashboard")</a>
                     </li>
-                    <li>
-                        <a href="@Url.RouteUrl("StockPicks")">@T("Customer.Transactions")</a>
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Analytics")) ? Html.Raw("class=\"active\"") : "")>
+                        <a href="@Url.RouteUrl("Analytics")">@T("Customer.Analytics")</a>
                     </li>
-                    <li>
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Transactions")) ? Html.Raw("class=\"active\"") : "")>
+                        <a href="@Url.RouteUrl("Transactions")">@T("Customer.Transactions")</a>
+                    </li>
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Invest")) ? Html.Raw("class=\"active\"") : "")>
                         <a href="@Url.RouteUrl("Invest")">@T("Customer.Invest")</a>
+                    </li>
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Withdraw")) ? Html.Raw("class=\"active\"") : "")>
+                        <a href="@Url.RouteUrl("Withdraw")">@T("Customer.Withdraw")</a>
                     </li>
                 </ul>
             </div>

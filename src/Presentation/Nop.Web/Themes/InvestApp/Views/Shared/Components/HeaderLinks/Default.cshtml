@@ -2,15 +2,19 @@
 @using Nop.Core.Domain.Customers
 @inject Nop.Core.IWebHelper webHelper
 
+<style>
+    #noti-counts{width: 16px; height: 16px; font-size: 9px; background: #cf1b1d; text-align: center; border-radius: 100%; color: #fff; position: absolute; top: 19px; margin-left: 20px; align-items: center; display: flex; justify-content: center; z-index: 99;}
+</style>
+
 @if(Model.IsAuthenticated){
     <div class="account-dropdown notification-dropdown">
         <div class="account-wrapper">
-        <i class="fa-regular fa-bell"></i>
+            <i class="fa-regular fa-bell"></i>
+            <span id="noti-counts" class="d-none"></span>
         </div>
         <div id="notificationList" class="dropdown-list"> </div>
     </div>
 }
-
 
 <div class="account-dropdown">
     @if (Model.IsAuthenticated){
@@ -24,7 +28,7 @@
                         <span class="email">Welcome</span>
                         <span class="name">@Model.CustomerName</span>
                     </span>
-                    <span class="balance-info">
+                    @* <span class="balance-info">
                         <span class="current-balance">
                             <span class="txt">Current</span>
                             <span id="currentBalanceTxt" class="num">0</span>
@@ -43,23 +47,28 @@
                             <span class="txt" style="min-width: 110px;">Return Percentage</span>
                             <span id="ReturnPercentage" class="num">0</span>
                         </span>
-                    </span>
+                    </span> *@
                 </span>
             </span>
             <ul class="dropdown-list">
                 <li>
-                    <a href="@Url.RouteUrl("CustomerInfo")"><i aria-label="icon: profile" class="anticon anticon-profile"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="profile" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M880 112H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V144c0-17.7-14.3-32-32-32zm-40 728H184V184h656v656zM492 400h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8H492c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8zm0 144h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8H492c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8zm0 144h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8H492c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8zM340 368a40 40 0 1 0 80 0 40 40 0 1 0-80 0zm0 144a40 40 0 1 0 80 0 40 40 0 1 0-80 0zm0 144a40 40 0 1 0 80 0 40 40 0 1 0-80 0z"></path></svg></i>
+                    <a href="@Url.RouteUrl("CustomerInfo")#account"><i aria-label="icon: profile" class="anticon anticon-profile"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="profile" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M880 112H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V144c0-17.7-14.3-32-32-32zm-40 728H184V184h656v656zM492 400h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8H492c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8zm0 144h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8H492c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8zm0 144h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8H492c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8zM340 368a40 40 0 1 0 80 0 40 40 0 1 0-80 0zm0 144a40 40 0 1 0 80 0 40 40 0 1 0-80 0zm0 144a40 40 0 1 0 80 0 40 40 0 1 0-80 0z"></path></svg></i>
                         <span> Account</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#"><i aria-label="icon: setting" class="anticon anticon-setting"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="setting" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M924.8 625.7l-65.5-56c3.1-19 4.7-38.4 4.7-57.8s-1.6-38.8-4.7-57.8l65.5-56a32.03 32.03 0 0 0 9.3-35.2l-.9-2.6a443.74 443.74 0 0 0-79.7-137.9l-1.8-2.1a32.12 32.12 0 0 0-35.1-9.5l-81.3 28.9c-30-24.6-63.5-44-99.7-57.6l-15.7-85a32.05 32.05 0 0 0-25.8-25.7l-2.7-.5c-52.1-9.4-106.9-9.4-159 0l-2.7.5a32.05 32.05 0 0 0-25.8 25.7l-15.8 85.4a351.86 351.86 0 0 0-99 57.4l-81.9-29.1a32 32 0 0 0-35.1 9.5l-1.8 2.1a446.02 446.02 0 0 0-79.7 137.9l-.9 2.6c-4.5 12.5-.8 26.5 9.3 35.2l66.3 56.6c-3.1 18.8-4.6 38-4.6 57.1 0 19.2 1.5 38.4 4.6 57.1L99 625.5a32.03 32.03 0 0 0-9.3 35.2l.9 2.6c18.1 50.4 44.9 96.9 79.7 137.9l1.8 2.1a32.12 32.12 0 0 0 35.1 9.5l81.9-29.1c29.8 24.5 63.1 43.9 99 57.4l15.8 85.4a32.05 32.05 0 0 0 25.8 25.7l2.7.5a449.4 449.4 0 0 0 159 0l2.7-.5a32.05 32.05 0 0 0 25.8-25.7l15.7-85a350 350 0 0 0 99.7-57.6l81.3 28.9a32 32 0 0 0 35.1-9.5l1.8-2.1c34.8-41.1 61.6-87.5 79.7-137.9l.9-2.6c4.5-12.3.8-26.3-9.3-35zM788.3 465.9c2.5 15.1 3.8 30.6 3.8 46.1s-1.3 31-3.8 46.1l-6.6 40.1 74.7 63.9a370.03 370.03 0 0 1-42.6 73.6L721 702.8l-31.4 25.8c-23.9 19.6-50.5 35-79.3 45.8l-38.1 14.3-17.9 97a377.5 377.5 0 0 1-85 0l-17.9-97.2-37.8-14.5c-28.5-10.8-55-26.2-78.7-45.7l-31.4-25.9-93.4 33.2c-17-22.9-31.2-47.6-42.6-73.6l75.5-64.5-6.5-40c-2.4-14.9-3.7-30.3-3.7-45.5 0-15.3 1.2-30.6 3.7-45.5l6.5-40-75.5-64.5c11.3-26.1 25.6-50.7 42.6-73.6l93.4 33.2 31.4-25.9c23.7-19.5 50.2-34.9 78.7-45.7l37.9-14.3 17.9-97.2c28.1-3.2 56.8-3.2 85 0l17.9 97 38.1 14.3c28.7 10.8 55.4 26.2 79.3 45.8l31.4 25.8 92.8-32.9c17 22.9 31.2 47.6 42.6 73.6L781.8 426l6.5 39.9zM512 326c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm79.2 255.2A111.6 111.6 0 0 1 512 614c-29.9 0-58-11.7-79.2-32.8A111.6 111.6 0 0 1 400 502c0-29.9 11.7-58 32.8-79.2C454 401.6 482.1 390 512 390c29.9 0 58 11.6 79.2 32.8A111.6 111.6 0 0 1 624 502c0 29.9-11.7 58-32.8 79.2z"></path></svg></i>
+                    <a href="@Url.RouteUrl("CustomerInfo")#setting"><i aria-label="icon: setting" class="anticon anticon-setting"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="setting" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M924.8 625.7l-65.5-56c3.1-19 4.7-38.4 4.7-57.8s-1.6-38.8-4.7-57.8l65.5-56a32.03 32.03 0 0 0 9.3-35.2l-.9-2.6a443.74 443.74 0 0 0-79.7-137.9l-1.8-2.1a32.12 32.12 0 0 0-35.1-9.5l-81.3 28.9c-30-24.6-63.5-44-99.7-57.6l-15.7-85a32.05 32.05 0 0 0-25.8-25.7l-2.7-.5c-52.1-9.4-106.9-9.4-159 0l-2.7.5a32.05 32.05 0 0 0-25.8 25.7l-15.8 85.4a351.86 351.86 0 0 0-99 57.4l-81.9-29.1a32 32 0 0 0-35.1 9.5l-1.8 2.1a446.02 446.02 0 0 0-79.7 137.9l-.9 2.6c-4.5 12.5-.8 26.5 9.3 35.2l66.3 56.6c-3.1 18.8-4.6 38-4.6 57.1 0 19.2 1.5 38.4 4.6 57.1L99 625.5a32.03 32.03 0 0 0-9.3 35.2l.9 2.6c18.1 50.4 44.9 96.9 79.7 137.9l1.8 2.1a32.12 32.12 0 0 0 35.1 9.5l81.9-29.1c29.8 24.5 63.1 43.9 99 57.4l15.8 85.4a32.05 32.05 0 0 0 25.8 25.7l2.7.5a449.4 449.4 0 0 0 159 0l2.7-.5a32.05 32.05 0 0 0 25.8-25.7l15.7-85a350 350 0 0 0 99.7-57.6l81.3 28.9a32 32 0 0 0 35.1-9.5l1.8-2.1c34.8-41.1 61.6-87.5 79.7-137.9l.9-2.6c4.5-12.3.8-26.3-9.3-35zM788.3 465.9c2.5 15.1 3.8 30.6 3.8 46.1s-1.3 31-3.8 46.1l-6.6 40.1 74.7 63.9a370.03 370.03 0 0 1-42.6 73.6L721 702.8l-31.4 25.8c-23.9 19.6-50.5 35-79.3 45.8l-38.1 14.3-17.9 97a377.5 377.5 0 0 1-85 0l-17.9-97.2-37.8-14.5c-28.5-10.8-55-26.2-78.7-45.7l-31.4-25.9-93.4 33.2c-17-22.9-31.2-47.6-42.6-73.6l75.5-64.5-6.5-40c-2.4-14.9-3.7-30.3-3.7-45.5 0-15.3 1.2-30.6 3.7-45.5l6.5-40-75.5-64.5c11.3-26.1 25.6-50.7 42.6-73.6l93.4 33.2 31.4-25.9c23.7-19.5 50.2-34.9 78.7-45.7l37.9-14.3 17.9-97.2c28.1-3.2 56.8-3.2 85 0l17.9 97 38.1 14.3c28.7 10.8 55.4 26.2 79.3 45.8l31.4 25.8 92.8-32.9c17 22.9 31.2 47.6 42.6 73.6L781.8 426l6.5 39.9zM512 326c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm79.2 255.2A111.6 111.6 0 0 1 512 614c-29.9 0-58-11.7-79.2-32.8A111.6 111.6 0 0 1 400 502c0-29.9 11.7-58 32.8-79.2C454 401.6 482.1 390 512 390c29.9 0 58 11.6 79.2 32.8A111.6 111.6 0 0 1 624 502c0 29.9-11.7 58-32.8 79.2z"></path></svg></i>
                         <span> Settings</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#"><i aria-label="icon: file-exclamation" class="anticon anticon-file-exclamation"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="file-exclamation" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M854.6 288.6L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326zm1.8 562H232V136h302v216a42 42 0 0 0 42 42h216v494zM472 744a40 40 0 1 0 80 0 40 40 0 1 0-80 0zm16-104h48c4.4 0 8-3.6 8-8V448c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v184c0 4.4 3.6 8 8 8z"></path></svg></i>
+                    <a href="@Url.RouteUrl("CustomerInfo")#disclosure"><i aria-label="icon: file-exclamation" class="anticon anticon-file-exclamation"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="file-exclamation" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M854.6 288.6L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326zm1.8 562H232V136h302v216a42 42 0 0 0 42 42h216v494zM472 744a40 40 0 1 0 80 0 40 40 0 1 0-80 0zm16-104h48c4.4 0 8-3.6 8-8V448c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v184c0 4.4 3.6 8 8 8z"></path></svg></i>
                         <span> Disclosure</span>
+                    </a>
+                </li>
+                 <li>
+                    <a href="@Url.RouteUrl("CustomerInfo")#password"><i aria-label="icon: file-exclamation" class="anticon anticon-file-exclamation"><svg viewBox="64 64 896 896" focusable="false" class="" data-icon="file-exclamation" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M854.6 288.6L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326zm1.8 562H232V136h302v216a42 42 0 0 0 42 42h216v494zM472 744a40 40 0 1 0 80 0 40 40 0 1 0-80 0zm16-104h48c4.4 0 8-3.6 8-8V448c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v184c0 4.4 3.6 8 8 8z"></path></svg></i>
+                        <span> Change Password</span>
                     </a>
                 </li>
                 <li>
@@ -79,6 +88,25 @@
                 getAccountBalance();
                 getAccountNotifications();
             });
+
+           $(".account-dropdown").click(function () {
+                $("#noti-counts").addClass('d-none');
+
+                $.ajax({
+                    url: "@Url.Action("SaveNotificationViewed", "Customer")",
+                    type: 'GET',
+                    beforeSend: function () {},
+                    success: function (resp) {
+                        if(!resp.success){
+                            console.log(resp.error);
+                        }
+                    }
+                });
+            });
+            $(document).ready(function() {
+               $("#noti-counts").addClass('d-none');
+            });
+
         </script>
     }
     else{
@@ -182,19 +210,38 @@
 
 <script>
 
-    function getAccountBalance(){
+    function getAccountBalance() {
         $.ajax({
             url: "@Url.Action("GetInvestedAndCurrentBalance","Customer")",
             type: 'GET',
             beforeSend: function () { },
             success: function (resp) {
-                //console.log("GetInvestedAndCurrentBalance resp ", resp);
-                $("#currentBalanceTxt").html(resp.CurrentBalance);
-                $("#investmentTxt").html(resp.InvestedBalance.Balance);
+                console.log("GetInvestedAndCurrentBalance resp ", resp);
+                var currency_symbol = resp.currenySymbol;
 
-                $("#ReturnAmount").html(resp.ReturnAmount);
-                $("#ReturnPercentage").html(resp.ReturnPercentage);
-            }
+                /* Account Value */
+                var accountValue = parseFloat(resp.CurrentBalance) + parseFloat(resp.InvestedBalance.Balance) + parseFloat(resp.ReturnAmount);
+                $(".accountValue").html(currency_symbol + ' ' + (isNaN(accountValue) ? '0.00' : accountValue.toFixed(2)));
+
+                /* Net Contribution */
+                var netContribution = parseFloat(resp.InvestedBalance.Balance) + parseFloat(resp.CurrentBalance);
+                $(".netContribution").html(currency_symbol + ' ' + (isNaN(netContribution) ? '0.00' : netContribution.toFixed(2)));
+                $('.allAmount').attr('data-text',(isNaN(netContribution) ? '0.00' : netContribution.toFixed(2)));
+
+                /* Net Return */
+                var netReturn = parseFloat(resp.ReturnAmount);
+                $(".netReturn").html(currency_symbol + ' ' + (isNaN(netReturn) ? '0.00' : netReturn.toFixed(2)));
+
+                /* Net Return Percentage */
+                @* var netReturnPercentage = parseFloat(resp.ReturnPercentage); *@
+                $(".netReturnPercentage").html(resp.ReturnPercentage);
+
+                /* Invested Amount */
+                var investedAmount = parseFloat(resp.InvestedBalance.Balance);
+                $(".investAmount").html(currency_symbol + ' ' + (isNaN(investedAmount) ? '0.00' : investedAmount.toFixed(2)));
+
+            },
+
         });
     }
 
@@ -205,19 +252,25 @@
             type: 'GET',
             beforeSend: function () { },
             success: function (resp) {
-                //console.log("GetCustomerNotification resp ", resp);
+                console.log("GetCustomerNotification resp ", resp);
                 if(resp.notificationList.length > 0){
                     resp.notificationList.forEach((item) => {
                         html += `<div class="notification-item">
                             <span>${item}</span>
                         </div>`;
                     });
-                    
+                    if(resp.newNotificationCount > 0){
+                        $("#noti-counts").removeClass('d-none');
+                        $("#noti-counts").text(resp.newNotificationCount);
+                    }else if(resp.newNotificationCount <= 0){
+                        $("#noti-counts").addClass('d-none');
+                    }
                 }
                 else{
                     html = `<div class="notification-item">
                         <span>Notification Empty!</span>
                     </div>`;
+                     $("#noti-counts").addClass('d-none');
                 }
                 $("#notificationList").html(html);
             }

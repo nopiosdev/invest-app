@@ -239,6 +239,8 @@ namespace Nop.Web.Areas.Admin.Models.Orders
 
         public OrderNoteSearchModel OrderNoteSearchModel { get; set; }
 
+        public bool CanRollBack { get; set; }
+
         #endregion
 
         #region Nested Classes

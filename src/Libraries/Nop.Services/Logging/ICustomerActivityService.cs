@@ -85,6 +85,7 @@ namespace Nop.Services.Logging
         /// </returns>
         Task<IPagedList<ActivityLog>> GetAllActivitiesAsync(DateTime? createdOnFrom = null, DateTime? createdOnTo = null,
             int? customerId = null, int? activityLogTypeId = null, string ipAddress = null, string entityName = null, int? entityId = null,
+            bool? viewed = default,
             int pageIndex = 0, int pageSize = int.MaxValue);
 
         /// <summary>
@@ -96,6 +97,7 @@ namespace Nop.Services.Logging
         /// The task result contains the activity log item
         /// </returns>
         Task<ActivityLog> GetActivityByIdAsync(int activityLogId);
+        Task UpdateActivityAsync(ActivityLog activityLog);
 
         /// <summary>
         /// Clears activity log

@@ -73,6 +73,9 @@ namespace Nop.Web.Areas.Admin.Models.Stores
 
         public IList<StoreLocalizedModel> Locales { get; set; }
 
+        [NopResourceDisplayName("Admin.Configuration.Stores.Fields.StoreEmailAddress")]
+        public string StoreEmailAddress { get; set; }
+
         #endregion
     }
 

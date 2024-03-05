@@ -1,8 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Web.Framework.Models;
+using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Models.Common;
 
 namespace Nop.Web.Models.Customer
 {
@@ -22,6 +25,10 @@ namespace Nop.Web.Models.Customer
             AvailableExperience = new List<SelectListItem>();
             AvailableRiskTolerance = new List<SelectListItem>();
             AvailableInvestmentApproach = new List<SelectListItem>();
+            AvailablePaymentType = new List<SelectListItem>();
+
+            WithdrawalMethodModel = new List<WithdrawalMethodCustomerInfoModel>();
+            Address = new AddressModel();
         }
 
         [DataType(DataType.EmailAddress)]
@@ -180,6 +187,25 @@ namespace Nop.Web.Models.Customer
         [NopResourceDisplayName("Account.TextAlert")]
         public bool TextAlert { get; set; }
 
+        [NopResourceDisplayName("Account.PaymentType")]
+        public int PaymentType { get; set; }
+        public IList<SelectListItem> AvailablePaymentType { get; set; }
+
+        [NopResourceDisplayName("account.document.Fields.FormId")]
+        public IFormFile FormId { get; set; }
+
+        [NopResourceDisplayName("account.document.Fields.ProofOfAddress")]
+        public IFormFile ProofOfAddress { get; set; }
+
+        [NopResourceDisplayName("account.document.Fields.Document")]
+        public IFormFile Document { get; set; }
+
+        public IList<WithdrawalMethodCustomerInfoModel> WithdrawalMethodModel { get; set; }
+        public int DefaultWithdrawalMethodId { get; set; }
+
+        public AddressModel Address { get; set; }
+        public ChangePasswordModel ChangePasswordModel { get; set; }
+
         #region Nested classes
 
         public partial record AssociatedExternalAuthModel : BaseNopEntityModel
@@ -190,6 +216,7 @@ namespace Nop.Web.Models.Customer
 
             public string AuthMethodName { get; set; }
         }
+
 
         #endregion
     }

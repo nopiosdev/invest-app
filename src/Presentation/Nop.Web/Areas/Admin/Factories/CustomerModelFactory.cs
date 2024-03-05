@@ -31,6 +31,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Areas.Admin.Models.ShoppingCart;
+using Nop.Web.Areas.Admin.Models.Transactions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
 
@@ -85,6 +86,7 @@ namespace Nop.Web.Areas.Admin.Factories
         protected readonly TaxSettings _taxSettings;
         protected readonly IDownloadService _downloadService;
         protected readonly ITransactionService _transactionService;
+        protected readonly IWithdrawService _withdrawService;
 
         #endregion
 
@@ -173,6 +175,7 @@ namespace Nop.Web.Areas.Admin.Factories
             _taxSettings = taxSettings;
             _downloadService = EngineContext.Current.Resolve<IDownloadService>();
             _transactionService = EngineContext.Current.Resolve<ITransactionService>();
+            _withdrawService = EngineContext.Current.Resolve<IWithdrawService>();
         }
 
         #endregion
@@ -763,6 +766,9 @@ namespace Nop.Web.Areas.Admin.Factories
                     model.ProofOfAddress = (await _downloadService.GetDownloadByIdAsync(identityVerificationRecord.ProofOfAddress)).DownloadGuid;
                     model.OtherDocument = (await _downloadService.GetDownloadByIdAsync(identityVerificationRecord.Document)).DownloadGuid;
                 }
+                model.Verified = customer.Verified;
+                model.CommissionToHouse = customer.CommissionToHouse;
+                model.DontInvestAmount = customer.DontInvestAmount;
             }
             else
             {
@@ -1344,7 +1350,10 @@ namespace Nop.Web.Areas.Admin.Factories
                 throw new ArgumentNullException(nameof(searchModel));
 
             //get commissions
-            var commissions = await _transactionService.GetAllCommissionsAsync(customerId: searchModel.SelectCustomer,
+            var commissions = searchModel.UnGrouped
+                ? await _transactionService.GetAllCommissionsAsync(customerId: searchModel.SelectCustomer,
+                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize)
+                : await _transactionService.GetAllCommissionsGroupedAsync(customerId: searchModel.SelectCustomer,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
             //prepare list model
@@ -1352,19 +1361,67 @@ namespace Nop.Web.Areas.Admin.Factories
             {
                 return commissions.SelectAwait(async commission =>
                 {
-                    var transaction = await _transactionService.GetTransactionByIdAsync(commission.TransactionId);
-                    var customer = await _customerService.GetCustomerByIdAsync(transaction.CustomerId);
+                    var customer = await _customerService.GetCustomerByIdAsync(commission.CustomerId)
+                        ?? await _customerService.GetCustomerByIdAsync(searchModel.SelectCustomer)
+                        ?? await _customerService.GetCustomerByIdAsync((await _transactionService.GetTransactionByIdAsync(commission.TransactionId)).CustomerId);
+
                     //fill in model values from the entity
                     return new CustomerCommissionModel()
                     {
                         CreatedOn = commission.CreatedOnUtc,
-                        PaidAmount = transaction.TransactionAmount,
-                        PaidCustomer = _customerSettings.UsernamesEnabled ? customer.Username : customer.Email
+                        PaidAmount = commission.Amount,
+                        PaidCustomer = _customerSettings.UsernamesEnabled ? customer.Username : customer.Email,
+                        CustomerId = customer.Id,
+                        Percentage = commission.Percentage
                     };
                 });
             });
 
             model.TotalPaidAmount = model.Data.Sum(x => x.PaidAmount);
+
+            return model;
+        }
+
+        public virtual async Task<CustomerWithdrawalMethodListModel> PrepareCustomerWithdrawalMethodListModelAsync(CustomerWIthdrawalMethodSearchModel searchModel)
+        {
+            if (searchModel == null)
+                throw new ArgumentNullException(nameof(searchModel));
+            else if (searchModel.CustomerId.Equals(default))
+                throw new ArgumentOutOfRangeException(nameof(searchModel.CustomerId));
+
+            //get all withdrawal methods
+            var withdrawalMethods = await _withdrawService.GetAllWithdrawalMethodAsync(isEnabled: true,
+                customerId: searchModel.CustomerId,
+                pageIndex: searchModel.Page - 1,
+                pageSize: searchModel.PageSize);
+
+            //prepare list model
+            var model = await new CustomerWithdrawalMethodListModel().PrepareToGridAsync(searchModel, withdrawalMethods, () =>
+            {
+                return withdrawalMethods.SelectAwait(async withdrawalMethod =>
+                {
+                    var withdrawalMethodFields = await _withdrawService.GetAllWithdrawalMethodFieldAsync(withdrawalMethodId: withdrawalMethod.Id,
+                        isEnabled: true);
+
+                    string fieldData = default;
+                    foreach (var withdrawalMethodField in withdrawalMethodFields)
+                    {
+                        var customerWithdrawalMethod = (await _withdrawService.GetAllCustomerWithdrawalMethodAsync(customerId: searchModel.CustomerId,
+                            withdrawalMethodFieldId: withdrawalMethodField.Id))
+                            .FirstOrDefault();
+
+                        fieldData += $"{withdrawalMethodField.FieldName}: {customerWithdrawalMethod?.Value}<br />";
+                    }
+
+                    //fill in model values from the entity
+                    return new CustomerWithdrawalMethodModel()
+                    {
+                        CustomerId = searchModel.CustomerId,
+                        WithdrawalMethodType = await _localizationService.GetLocalizedEnumAsync(withdrawalMethod.Type),
+                        WithdrawalMethodName = $"<b>{withdrawalMethod.Name}</b>" + (!string.IsNullOrEmpty(fieldData) ? $"<br />{fieldData}" : default)
+                    };
+                });
+            });
 
             return model;
         }

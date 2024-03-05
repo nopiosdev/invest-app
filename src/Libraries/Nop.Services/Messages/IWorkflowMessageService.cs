@@ -6,6 +6,7 @@ using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Domain.Vendors;
 
 namespace Nop.Services.Messages
@@ -598,7 +599,7 @@ namespace Nop.Services.Messages
         /// A task that represents the asynchronous operation
         /// The task result contains the queued email identifier
         /// </returns>
-        Task<IList<int>> SendContactUsMessageAsync(int languageId, string senderEmail, string senderName, string subject, string body);
+        Task<IList<int>> SendContactUsMessageAsync(int languageId, string senderEmail, string senderName, string subject, string body, string phoneNumber = "");
 
         /// <summary>
         /// Sends "contact vendor" message
@@ -627,6 +628,8 @@ namespace Nop.Services.Messages
         /// The task result contains the queued email identifier
         /// </returns>
         Task<int> SendTestEmailAsync(int messageTemplateId, string sendToEmail, List<Token> tokens, int languageId);
+
+        Task<IList<int>> SendDeleteAccountRequestAsync(Customer customer, int languageId);
 
         #endregion
 
@@ -664,6 +667,41 @@ namespace Nop.Services.Messages
         #region Transaction
 
         Task<IList<int>> SendTransactionDebitRequestAsync(decimal transactionAmount, int languageId, string senderEmail, string senderName);
+
+        #region Debit Transaction
+
+        Task<IList<int>> SendPendingDebitTransactionCustomerNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendCompletedDebitTransactionCustomerNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendDeclinedDebitTransactionCustomerNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendRemovedDebitTransactionCustomerNotificationAsync(Transaction transaction, int languageId);
+
+        Task<IList<int>> SendPendingDebitTransactionAdminNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendCompletedDebitTransactionAdminNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendDeclinedDebitTransactionAdminNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendRemovedDebitTransactionAdminNotificationAsync(Transaction transaction, int languageId);
+
+        #endregion
+
+        #region Credit Transaction
+
+        Task<IList<int>> SendPendingCreditTransactionCustomerNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendCompletedCreditTransactionCustomerNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendDeclinedCreditTransactionCustomerNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendRemovedCreditTransactionCustomerNotificationAsync(Transaction transaction, int languageId);
+
+        Task<IList<int>> SendPendingCreditTransactionAdminNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendCompletedCreditTransactionAdminNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendDeclinedCreditTransactionAdminNotificationAsync(Transaction transaction, int languageId);
+        Task<IList<int>> SendRemovedCreditTransactionAdminNotificationAsync(Transaction transaction, int languageId);
+
+        #endregion
+
+        #region Return Transaction
+
+        Task<IList<int>> SendReturnGeneratedCustomerNotificationAsync(ReturnTransaction returnTransaction, int languageId);
+        Task<IList<int>> SendReturnGeneratedAdminNotificationAsync(ReturnTransaction returnTransaction, int languageId);
+
+        #endregion
 
         #endregion
     }

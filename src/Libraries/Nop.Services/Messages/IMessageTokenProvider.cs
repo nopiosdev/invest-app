@@ -7,6 +7,7 @@ using Nop.Core.Domain.News;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Domain.Vendors;
 
 namespace Nop.Services.Messages
@@ -230,5 +231,7 @@ namespace Nop.Services.Messages
         /// <param name="messageTemplate">Message template</param>
         /// <returns>Collection of token group names</returns>
         IEnumerable<string> GetTokenGroups(MessageTemplate messageTemplate);
+
+        Task AddTransactionTokensAsync(IList<Token> tokens, Transaction transaction, int languageId);
     }
 }

@@ -72,6 +72,15 @@ namespace Nop.Web.Areas.Admin.Models.Settings
         public bool PopupForTermsOfServiceLinks { get; set; }
         public bool PopupForTermsOfServiceLinks_OverrideForStore { get; set; }
 
+        [NopResourceDisplayName("Admin.Configuration.Settings.GeneralCommon.TelegramLink")]
+        public string TelegramLink { get; set; }
+
+        [NopResourceDisplayName("Admin.Configuration.Settings.GeneralCommon.DiscordLink")]
+        public string DiscordLink { get; set; }
+        
+        [NopResourceDisplayName("Admin.Configuration.Settings.GeneralCommon.LinkedinLink")]
+        public string LinkedinLink { get; set; }
+
         #endregion
 
         #region Nested classes

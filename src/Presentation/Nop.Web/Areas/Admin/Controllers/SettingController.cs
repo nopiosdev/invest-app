@@ -1451,6 +1451,10 @@ namespace Nop.Web.Areas.Admin.Controllers
                 storeInformationSettings.TwitterLink = model.StoreInformationSettings.TwitterLink;
                 storeInformationSettings.YoutubeLink = model.StoreInformationSettings.YoutubeLink;
                 storeInformationSettings.InstagramLink = model.StoreInformationSettings.InstagramLink;
+                storeInformationSettings.LinkedinLink = model.StoreInformationSettings.LinkedinLink;
+                storeInformationSettings.TelegramLink = model.StoreInformationSettings.TelegramLink;
+                storeInformationSettings.DiscordLink = model.StoreInformationSettings.DiscordLink;
+
                 //contact us
                 commonSettings.SubjectFieldOnContactUsForm = model.StoreInformationSettings.SubjectFieldOnContactUsForm;
                 commonSettings.UseSystemEmailForContactUsForm = model.StoreInformationSettings.UseSystemEmailForContactUsForm;
@@ -1503,6 +1507,10 @@ namespace Nop.Web.Areas.Admin.Controllers
                 await _settingService.SaveSettingOverridablePerStoreAsync(commonSettings, x => x.UseResponseCompression, model.MinificationSettings.UseResponseCompression_OverrideForStore, storeScope, false);
                 await _settingService.SaveSettingOverridablePerStoreAsync(commonSettings, x => x.HeaderCustomHtml, model.CustomHtmlSettings.HeaderCustomHtml_OverrideForStore, storeScope, false);
                 await _settingService.SaveSettingOverridablePerStoreAsync(commonSettings, x => x.FooterCustomHtml, model.CustomHtmlSettings.FooterCustomHtml_OverrideForStore, storeScope, false);
+                
+                await _settingService.SaveSettingOverridablePerStoreAsync(storeInformationSettings, x => x.LinkedinLink, true, storeScope, false);
+                await _settingService.SaveSettingOverridablePerStoreAsync(storeInformationSettings, x => x.TelegramLink, true, storeScope, false);
+                await _settingService.SaveSettingOverridablePerStoreAsync(storeInformationSettings, x => x.DiscordLink, true, storeScope, false);
 
                 //now clear settings cache
                 await _settingService.ClearCacheAsync();

@@ -1,0 +1,122 @@
+﻿@model ReturnTransactionSearchModel
+@{
+    //page title
+    ViewBag.PageTitle = T("Admin.Customers.ReturnTransactions").Text;
+    //active menu item (system name)
+    NopHtml.SetActiveMenuItemSystemName("ReturnTransactions");
+}
+
+@{
+    const string hideSearchBlockAttributeName = "ReturnTransactionPage.HideSearchBlock";
+    var hideSearchBlock = await genericAttributeService.GetAttributeAsync<bool>(await workContext.GetCurrentCustomerAsync(), hideSearchBlockAttributeName);
+}
+
+<div class="content-header clearfix">
+    <h1 class="float-left">
+        @T("Admin.ReturnTransaction")
+    </h1>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="form-horizontal">
+            <div class="cards-group">
+                <div class="card card-default card-search">
+                    <div class="card-body">
+                        <div class="row search-row @(!hideSearchBlock ? "opened" : "")" data-hideAttribute="@hideSearchBlockAttributeName">
+                            <div class="search-text">@T("Admin.Common.Search")</div>
+                            <div class="icon-search"><i class="fas fa-search" aria-hidden="true"></i></div>
+                            <div class="icon-collapse"><i class="far fa-angle-@(!hideSearchBlock ? "up" : "down")" aria-hidden="true"></i></div>
+                        </div>
+
+                        <div class="search-body @(hideSearchBlock ? "closed" : "")">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <div class="col-md-4">
+                                            <nop-label asp-for="Month" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <nop-select asp-for="Month" asp-items="Model.AvailableMonths" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <div class="col-md-4">
+                                            <nop-label asp-for="Year" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <nop-select asp-for="Year" asp-items="Model.AvailableYears" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="text-center col-12">
+                                <button type="button" id="search-return-transactions" class="btn btn-primary btn-search">
+                                    <i class="fas fa-search"></i>
+                                    @T("Admin.Common.Search")
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-default">
+                <div class="card-body">
+                    @await Html.PartialAsync("Table", new DataTablesModel
+                    {
+                    Name = "return-transactions-grid",
+                    UrlRead = new DataUrl("ReturnList", "Transaction", null),
+                    SearchButtonId = "search-return-transactions",
+                    Length = Model.PageSize,
+                    LengthMenu = Model.AvailablePageSizes,
+                    Filters = new List<FilterParameter>
+                    {
+                    new FilterParameter(nameof(Model.Month)),
+                    new FilterParameter(nameof(Model.Year)),
+                    },
+                    ColumnCollection = new List<ColumnProperty>
+                    {
+                    new ColumnProperty(nameof(ReturnTransactionModel.CustomerFullName))
+                    {
+                    Title = T("Admin.ReturnTransactionModel.Fields.CustomerFullName").Text,
+                    },
+                    new ColumnProperty(nameof(ReturnTransactionModel.CustomerEmail))
+                    {
+                    Title = T("Admin.ReturnTransactionModel.Fields.CustomerEmail").Text,
+                    Render = new RenderLink(new DataUrl("~/Admin/Customer/Edit", nameof(ReturnTransactionModel.CustomerId)))
+                    },
+                    new ColumnProperty(nameof(ReturnTransactionModel.ReturnAmount))
+                    {
+                    Title = T("Admin.ReturnTransactionModel.Fields.ReturnAmount").Text,
+                    },
+                    new ColumnProperty(nameof(ReturnTransactionModel.ReturnPercentage))
+                    {
+                    Title = T("Admin.ReturnTransactionModel.Fields.ReturnPercentage").Text,
+                    },
+                    new ColumnProperty(nameof(ReturnTransactionModel.ReturnDateOnUtc))
+                    {
+                    Title = T("Admin.ReturnTransactionModel.Fields.Month").Text,
+                    Render = new RenderDate("MMMM")
+                    },
+                    new ColumnProperty(nameof(ReturnTransactionModel.ReturnDateOnUtc))
+                    {
+                    Title = T("Admin.ReturnTransactionModel.Fields.Year").Text,
+                    Render = new RenderDate("yyyy")
+                    },
+                    new ColumnProperty(nameof(ReturnTransactionModel.WithdrawalMethod))
+                    {
+                    Title = T("Admin.ReturnTransactionModel.Fields.WithdrawalMethod").Text,
+                    }
+                    }
+                    })
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>

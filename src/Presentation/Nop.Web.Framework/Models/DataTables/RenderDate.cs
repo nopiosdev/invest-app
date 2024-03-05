@@ -22,6 +22,12 @@
             //set default values
             Format = DEFAULT_DATE_FORMAT;
         }
+        
+        public RenderDate(string format)
+        {
+            //set default values
+            Format = format;
+        }
 
         #endregion
 

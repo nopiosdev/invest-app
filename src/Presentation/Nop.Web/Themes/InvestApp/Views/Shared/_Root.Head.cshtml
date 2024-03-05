@@ -48,7 +48,7 @@
     var keywords = await NopHtml.GenerateMetaKeywordsAsync();
 }
 <!DOCTYPE html>
-<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" dir="@Html.GetUIDirection(!await Html.ShouldUseRtlThemeAsync())" class="@NopHtml.GeneratePageCssClasses()">
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" dir="@Html.GetUIDirection(!await Html.ShouldUseRtlThemeAsync())" class="@NopHtml.GeneratePageCssClasses() @await NopHtml.GetCustomerThemeAsync()" data-theme="@await NopHtml.GetCustomerThemeAsync()">
 <head>
     <title>@title</title>
 
@@ -63,7 +63,7 @@
     @*<link href="~/Themes/InvestApp/Content/tas_datatable/scroller.dataTables.min.css" rel="stylesheet" />
     <link href="~/Themes/InvestApp/Content/tas_datatable/rowGroup.dataTables.css.css" rel="stylesheet" />
     <link href="~/Themes/InvestApp/Content/tas_datatable/dataTables.bootstrap5.min.css" rel="stylesheet" />*@
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     
     @await Html.PartialAsync("Head")
 
@@ -78,6 +78,7 @@
     @NopHtml.GenerateScripts(ResourceLocation.Head)
     @NopHtml.GenerateInlineScripts(ResourceLocation.Head)
     <!--Powered by nopCommerce - https://www.nopCommerce.com-->
+    
     
     @Html.Raw(commonSettings.HeaderCustomHtml)
 </head>

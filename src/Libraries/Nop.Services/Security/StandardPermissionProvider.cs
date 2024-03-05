@@ -71,6 +71,8 @@ namespace Nop.Services.Security
         //NCT back-end dev
         public static readonly PermissionRecord ManageTransaction = new() { Name = "Admin area. Manage Transaction", SystemName = "ManageTransaction", Category = "Customers" };
         public static readonly PermissionRecord DeleteTransaction = new() { Name = "Admin area. Delete Transaction", SystemName = "DeleteTransaction", Category = "Customers" };
+        public static readonly PermissionRecord ManageRollBackOrder = new() { Name = "Admin area. RollBack Order", SystemName = "ManageRollBackOrder", Category = "Orders" };
+
         /// <summary>
         /// Get permissions
         /// </summary>
@@ -135,7 +137,8 @@ namespace Nop.Services.Security
                 EnableMultiFactorAuthentication,
 
                 ManageTransaction,
-                DeleteTransaction
+                DeleteTransaction,
+                ManageRollBackOrder
             };
         }
 

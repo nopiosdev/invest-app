@@ -5,6 +5,7 @@ using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Events;
 using Nop.Services.Attributes;
@@ -860,6 +861,40 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 //prepare model
                 model = await _orderModelFactory.PrepareOrderModelAsync(model, order);
+
+                await _notificationService.ErrorNotificationAsync(exc);
+                return View(model);
+            }
+        }
+
+
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired("rollbackorder")]
+        public virtual async Task<IActionResult> RollBackOrder(int id)
+        {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            //try to get an order with the specified id
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            //a vendor does not have access to this functionality
+            if (await _workContext.GetCurrentVendorAsync() != null)
+                return RedirectToAction("Edit", new { id = order.Id });
+
+            try
+            {
+                await _orderProcessingService.RollBackOrderAsync(order);
+                await LogEditOrderAsync(order.Id);
+
+                return RedirectToAction("Edit", new { id = order.Id });
+            }
+            catch (Exception exc)
+            {
+                //prepare model
+                var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
 
                 await _notificationService.ErrorNotificationAsync(exc);
                 return View(model);

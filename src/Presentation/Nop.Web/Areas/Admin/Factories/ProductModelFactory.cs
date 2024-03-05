@@ -1825,7 +1825,14 @@ namespace Nop.Web.Areas.Admin.Factories
             {
                 return orders.SelectAwait(async order =>
                 {
-                    var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+                    var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+                    var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
+                        ?? new Address()
+                        {
+                            Email = customer.Email,
+                            FirstName = customer.FirstName,
+                            LastName = customer.LastName
+                        };
 
                     //fill in model values from the entity
                     var orderModel = new OrderModel

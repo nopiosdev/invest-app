@@ -15,12 +15,12 @@
     <h1 class="float-left">
         @T("Admin.Transaction")
     </h1>
-    <div class="float-right">
+    @* <div class="float-right">
         <a asp-action="Create" class="btn btn-primary">
             <i class="fas fa-plus-square"></i>
             @T("Admin.Common.AddNew")
         </a>
-    </div>
+    </div> *@
 </div>
 
 <section class="content">
@@ -95,37 +95,41 @@
                 <div class="card card-default">
                     <div class="card-body">
                         @await Html.PartialAsync("Table", new DataTablesModel
-                        {
-                        Name = "transactions-grid",
-                        UrlRead = new DataUrl("List", "Transaction", null),
-                        SearchButtonId = "search-transactions",
-                        Length = Model.PageSize,
-                        LengthMenu = Model.AvailablePageSizes,
-                        Filters = new List<FilterParameter>
+                   {
+                       Name = "transactions-grid",
+                       UrlRead = new DataUrl("List", "Transaction", null),
+                       SearchButtonId = "search-transactions",
+                       Length = Model.PageSize,
+                       LengthMenu = Model.AvailablePageSizes,
+                       Filters = new List<FilterParameter>
                         {
                         new FilterParameter(nameof(Model.CreatedOnFrom)),
                         new FilterParameter(nameof(Model.CreatedOnTo)),
                         new FilterParameter(nameof(Model.StatusId)),
                         new FilterParameter(nameof(Model.TransactionTypeId)),
                         },
-                        ColumnCollection = new List<ColumnProperty>
+                       ColumnCollection = new List<ColumnProperty>
                         {
                         new ColumnProperty(nameof(TransactionModel.CreateOnUtc))
                         {
                         Title = T("Admin.Transaction.Fields.CreateOnUtc").Text,
                         Render = new RenderDate(),
                         },
-                        new ColumnProperty(nameof(TransactionModel.TransactionAmount))
+                        new ColumnProperty(nameof(TransactionModel.FormattedTransactionAmount))
                         {
                         Title = T("Admin.Transaction.Fields.TransactionAmount").Text,
+                        Width = "150"
                         },
                         new ColumnProperty(nameof(TransactionModel.StatusString))
                         {
                         Title = T("Admin.Transaction.Fields.Status").Text,
+                        Width = "150",
+                        Render = new RenderCustom("renderColumnTransactionStatus")
                         },
                         new ColumnProperty(nameof(TransactionModel.TransactionTypeString))
                         {
                         Title = T("Admin.Transaction.Fields.TransactionType").Text,
+                        Width = "150"
                         },
                         new ColumnProperty(nameof(TransactionModel.Id))
                         {
@@ -135,7 +139,28 @@
                         Render = new RenderButtonEdit(new DataUrl("Edit"))
                         }
                         }
-                        })
+                   })
+
+                   <script>
+                            function renderColumnTransactionStatus(data, type, row, meta) {
+                                var color;
+                                switch (row.Status) {
+                                    case 100:
+                                        color = 'green';
+                                        break;
+                                    case 200:
+                                        color = 'yellow';
+                                        break;
+                                    case 300:
+                                        color = 'red';
+                                        break;
+                                    case 400:
+                                        color = 'red';
+                                        break;
+                                }
+                                return '<span class="grid-report-item ' + color + '">' + data + '</span >';
+                            }
+                   </script>
                     </div>
                 </div>
             </div>

@@ -70,14 +70,15 @@
                             },
                             ColumnCollection = new List<ColumnProperty>
                             {
-                            new ColumnProperty(nameof(CustomerCommissionModel.CreatedOn))
-                            {
-                            Title = T("Admin.Customers.CustomerCommissionModel.CreatedOn").Text,
-                            Render = new RenderDate()
-                            },
+                            // new ColumnProperty(nameof(CustomerCommissionModel.CreatedOn))
+                            // {
+                            // Title = T("Admin.Customers.CustomerCommissionModel.CreatedOn").Text,
+                            // Render = new RenderDate()
+                            // },
                             new ColumnProperty(nameof(CustomerCommissionModel.PaidCustomer))
                             {
                             Title = T("Admin.Customers.CustomerCommissionModel.PaidCustomer").Text,
+                            Render=new RenderLink(new DataUrl("~/Admin/Customer/Edit", nameof(CustomerCommissionModel.CustomerId)))
                             },
                             new ColumnProperty(nameof(CustomerCommissionModel.PaidAmount))
                             {

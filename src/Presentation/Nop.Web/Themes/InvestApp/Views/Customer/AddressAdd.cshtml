@@ -9,7 +9,7 @@
     NopHtml.AppendPageCssClassParts("html-address-edit-page");
 }
 @section left
-{
+{ 
     @await Component.InvokeAsync(typeof(CustomerNavigationViewComponent), new { selectedTabId = CustomerNavigationEnum.Addresses })
 }
 <form asp-route="CustomerAddressAdd" method="post">

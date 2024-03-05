@@ -20,6 +20,7 @@ using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Tax;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Events;
 using Nop.Core.Infrastructure;
@@ -969,7 +970,14 @@ namespace Nop.Services.Messages
             //lambda expression for choosing correct order address
             async Task<Address> orderAddress(Order o) => await _addressService.GetAddressByIdAsync((o.PickupInStore ? o.PickupAddressId : o.ShippingAddressId) ?? 0);
 
-            var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId) ?? new Address();
+            var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+            var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
+                ?? new Address()
+                {
+                    Email = customer.Email,
+                    FirstName = customer.FirstName,
+                    LastName = customer.LastName
+                };
             var (billingAddressLine, _) = await _addressService.FormatAddressAsync(billingAddress, languageId);
             var (shippingAddressLine, _) = await _addressService.FormatAddressAsync(await orderAddress(order), languageId);
 
@@ -1038,7 +1046,7 @@ namespace Nop.Services.Messages
             var language = await _languageService.GetLanguageByIdAsync(languageId);
             if (language != null && !string.IsNullOrEmpty(language.LanguageCulture))
             {
-                var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+                //var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
                 var createdOn = _dateTimeHelper.ConvertToUserTime(order.CreatedOnUtc, TimeZoneInfo.Utc, await _dateTimeHelper.GetCustomerTimeZoneAsync(customer));
                 tokens.Add(new Token("Order.CreatedOn", createdOn.ToString("D", new CultureInfo(language.LanguageCulture))));
             }
@@ -1611,6 +1619,17 @@ namespace Nop.Services.Messages
                 MessageTemplateSystemNames.ContactVendorMessage => new[] { TokenGroupNames.StoreTokens, TokenGroupNames.ContactVendor },
                 _ => Array.Empty<string>(),
             };
+        }
+
+        public virtual async Task AddTransactionTokensAsync(IList<Token> tokens, Transaction transaction, int languageId)
+        {
+            tokens.Add(new Token("Transaction.Amount", transaction.TransactionAmount));
+            tokens.Add(new Token("Transaction.Type", await _localizationService.GetLocalizedEnumAsync(transaction.TransactionType)));
+            tokens.Add(new Token("Transaction.Status", await _localizationService.GetLocalizedEnumAsync(transaction.Status)));
+            tokens.Add(new Token("Transaction.CreatedOn", transaction.CreatedOnUtc.ToString()));
+
+            //event notification
+            await _eventPublisher.EntityTokensAddedAsync(transaction, tokens);
         }
 
         #endregion

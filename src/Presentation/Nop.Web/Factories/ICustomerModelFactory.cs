@@ -179,5 +179,8 @@ namespace Nop.Web.Factories
         Task<IList<CustomerAttributeModel>> PrepareCustomCustomerAttributesAsync(Customer customer, string overrideAttributesXml = "");
 
         Task<TransactionModel> PrepareTransactionModelAsync(Customer customer, TransactionModel model = null);
+        Task<WithdrawModel> PrepareWithdawModelModelAsync(Customer customer, WithdrawModel model = null);
+        Task<AnalyticsModel> PrepareAnalyticsModelAsync(Customer customer);
+        Task PrepareWithdrawalMethodCustomerInfoModelAsync(IList<WithdrawalMethodCustomerInfoModel> model, Customer customer);
     }
 }

@@ -21,10 +21,11 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         #region Properties
 
-        [NopResourceDisplayName("Admin.Customers.CustomerCommission.List.CustomerRoles")]
+        [NopResourceDisplayName("Admin.Customers.CustomerCommission.List.Customers")]
         public int SelectCustomer { get; set; }
 
         public IList<SelectListItem> AvailableCustomer { get; set; }
+        public bool UnGrouped { get; set; }
 
         #endregion
     }

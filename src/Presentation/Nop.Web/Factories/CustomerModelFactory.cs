@@ -1,6 +1,10 @@
 ﻿using System.Globalization;
 using System.Runtime.InteropServices;
+using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.Presentation;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
@@ -11,6 +15,7 @@ using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Infrastructure;
 using Nop.Services.Attributes;
@@ -84,6 +89,8 @@ namespace Nop.Web.Factories
 
         //NCT Back-end dev
         protected readonly ITransactionService _transactionService;
+        protected readonly IWithdrawService _withdrawService;
+        protected readonly IPriceFormatter _priceFormatter;
 
         #endregion
 
@@ -126,7 +133,8 @@ namespace Nop.Web.Factories
             RewardPointsSettings rewardPointsSettings,
             SecuritySettings securitySettings,
             TaxSettings taxSettings,
-            VendorSettings vendorSettings)
+            VendorSettings vendorSettings,
+            IPriceFormatter priceFormatter)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -167,6 +175,8 @@ namespace Nop.Web.Factories
             _taxSettings = taxSettings;
             _vendorSettings = vendorSettings;
             _transactionService = EngineContext.Current.Resolve<ITransactionService>();
+            _withdrawService = EngineContext.Current.Resolve<IWithdrawService>();
+            _priceFormatter = EngineContext.Current.Resolve<IPriceFormatter>();
         }
 
         #endregion
@@ -417,15 +427,34 @@ namespace Nop.Web.Factories
                 new SelectListItem(){Text="Willing to risk losing money in order to make more",Value="2"},
                 new SelectListItem(){Text="Not important to me",Value="3"},
             };
-
+            foreach (PaymentTypeEnum enumValues in Enum.GetValues(typeof(PaymentTypeEnum)))
+            {
+                model.AvailablePaymentType.Add(new SelectListItem()
+                {
+                    Text = await _localizationService.GetLocalizedEnumAsync(enumValues),
+                    Value = $"{(int)enumValues}",
+                });
+            }
             model.GoalId = customer.GoalId;
             model.TimelineId = customer.TimelineId;
             model.ExperienceId = customer.ExperienceId;
             model.RiskToleranceId = customer.RiskToleranceId;
             model.InvestmentApproachId = customer.InvestmentApproachId;
-            //model.TwoFactorAuthentication = customer.TwoFactorAuthentication;
             model.EmailAlert = customer.EmailAlert;
             model.TextAlert = customer.TextAlert;
+            model.DefaultWithdrawalMethodId = customer.DefaultWithdrawalMethodId;
+            model.PaymentType = customer.PaymentTypeId;
+
+            await this.PrepareWithdrawalMethodCustomerInfoModelAsync(model.WithdrawalMethodModel, customer);
+
+            //find address (ensure that it belongs to the current customer)
+            var address = await _customerService.GetAddressesByCustomerIdAsync(customer.Id);
+            //prepare address model
+            await _addressModelFactory.PrepareAddressModelAsync(model.Address,
+                address: address.FirstOrDefault(),
+                excludeProperties: false,
+                addressSettings: _addressSettings,
+                loadCountries: async () => await _countryService.GetAllCountriesAsync((await _workContext.GetWorkingLanguageAsync()).Id));
 
             return model;
         }
@@ -1130,16 +1159,251 @@ namespace Nop.Web.Factories
             if (customer is null)
                 return model;
 
-            var transactions = await _transactionService.GetAllTransactionsAsync(customerId: customer.Id);
-            model.RecentTransactions = transactions.TakeLast(2).Select(x => new TransactionModel()
-            {
-                TransactionNote = x.TransactionNote,
-                TransactionAmount = x.TransactionAmount,
-                CreateOnUtc = x.CreatedOnUtc,
-            }).ToList();
+            var transactions = await _transactionService.GetAllTransactionsAsync(customerId: customer.Id,
+                orderBy: 2);
+            model.RecentTransactions = await transactions
+                .Take(3)
+                .SelectAwait(async x => new TransactionModel()
+                {
+                    TransactionNote = x.TransactionNote,
+                    TransactionAmount = x.TransactionAmount,
+                    CreateOnUtc = x.CreatedOnUtc,
+                    FormattedTransactionAmount = await _priceFormatter.FormatPriceInCurrencyAsync(x.TransactionAmount),
+                })
+                .ToListAsync();
+
+            model.CurrencySymbol = await _priceFormatter.GetCurrentSymbolAsync();
 
             return model;
         }
+
+        public virtual async Task<WithdrawModel> PrepareWithdawModelModelAsync(Customer customer, WithdrawModel model = null)
+        {
+            model ??= new WithdrawModel();
+            if (customer is null)
+                return model;
+
+            var transactions = await _transactionService.GetAllTransactionsAsync(customerId: customer.Id,
+               orderBy: 2);
+            model.RecentTransactions = await transactions
+                .Take(3)
+                .SelectAwait(async x => new TransactionModel()
+                {
+                    TransactionNote = x.TransactionNote,
+                    TransactionAmount = x.TransactionAmount,
+                    CreateOnUtc = x.CreatedOnUtc,
+                    FormattedTransactionAmount = await _priceFormatter.FormatPriceInCurrencyAsync(x.TransactionAmount),
+                })
+                .ToListAsync();
+
+            foreach (WalletTypeEnum enumValues in Enum.GetValues(typeof(WalletTypeEnum)))
+            {
+                model.AvailableWalletType.Add(new SelectListItem
+                {
+                    Text = await _localizationService.GetLocalizedEnumAsync(enumValues),
+                    Value = $"{(int)enumValues}",
+                });
+            }
+
+            await this.PrepareWithdrawalMethodCustomerInfoModelAsync(model.WithdrawalMethodModel, customer);
+
+            model.CurrencySymbol = await _priceFormatter.GetCurrentSymbolAsync();
+
+            return model;
+        }
+
+        public virtual async Task<AnalyticsModel> PrepareAnalyticsModelAsync(Customer customer)
+        {
+            var transactions = (await _transactionService.GetAllTransactionsAsync(customerId: customer.Id,
+                transactionNote: "Return"))
+                .Where(x => !x.Status.Equals(Status.Removed));
+
+            var returnTransactions = await _transactionService.GetAllReturnTransactionsAsync(customerId: customer.Id);
+
+            //var groupedTransactions = transactions
+            //    .GroupBy(x => x.CreatedOnUtc.Year)
+            //    .Select(group => new
+            //    {
+            //        Year = group.Key,
+            //        Transactions = group.ToList(),
+            //        ReturnAverage = group.Any()
+            //            ? group.Average(x => x.ReturnPercentage.GetValueOrDefault())
+            //            : decimal.Zero
+            //    })
+            //    .ToList();
+
+            //var a = groupedTransactions
+            //    .Select(item => new
+            //    {
+            //        name = item.Year,
+            //        y = item.ReturnAverage,
+            //        drilldown = item.Year
+            //    })
+            //    .ToList();
+
+            var startYear = returnTransactions.Any()
+                ? returnTransactions.Min(x => x.ReturnDateOnUtc.Year)
+                : DateTime.Now.Year;
+            var groupedReturnTransactions = await Enumerable.Range(startYear, DateTime.Now.Year - startYear + 1)
+                .SelectAwait(async year =>
+                {
+                    var group1 = returnTransactions
+                         .Where(a => a.ReturnDateOnUtc.Year.Equals(year))
+                         //make a pair of year
+                         .GroupBy(x => x.ReturnDateOnUtc.Year)
+                         .FirstOrDefault();
+                    return new
+                    {
+                        name = year,
+                        data = await Enumerable.Range(1, 12)
+                             .SelectAwait(async month =>
+                             {
+                                 //get the data of the each month and if any month does not have any data then pass empty values
+                                 var group2 = group1
+                                     ?.Where(y => y.ReturnDateOnUtc.Month.Equals(month))
+                                     //make a pair of month
+                                     .GroupBy(y => y.ReturnDateOnUtc.Month)
+                                     .FirstOrDefault();
+
+                                 return new object[]
+                                 {
+                                    //month
+                                     new DateTime(year, group2?.Key ?? month ,1).ToString("MMMM"),
+                                    //month average
+                                    group2?.Any() ?? false
+                                        ? group2.Average(y => y.ReturnPercentage)
+                                        : decimal.Zero,
+                                    //sum of amount in that month
+                                    await _priceFormatter.FormatPriceInCurrencyAsync(group2?.Sum(y => y.ReturnAmount) ?? decimal.Zero, false)
+                                 };
+                             }).ToListAsync()
+                    };
+                })
+                .OrderByDescending(x => x.name)
+                .ToListAsync();
+            //returnTransactions
+            ////make a pair of year
+            //.GroupBy(x => x.ReturnDateOnUtc.Year)
+            //.Select(group1 => new
+            //{
+            //    name = group1.Key,
+            //    data = Enumerable.Range(1, 12)
+            //            .Select(month =>
+            //            {
+            //                //get the data of the each month and if any month does not have any data then pass empty values
+            //                var group2 = group1
+            //                    .Where(y => y.ReturnDateOnUtc.Month.Equals(month))
+            //                    .GroupBy(y => y.ReturnDateOnUtc.Month).FirstOrDefault();
+
+            //                return new object[]
+            //                {
+            //                    //month
+            //                     new DateTime(group1.Key, group2?.Key ?? month ,1).ToString("MMMM"),
+            //                    //month average
+            //                    group2?.Any() ?? false
+            //                        ? group2.Average(y => y.ReturnPercentage)
+            //                        : decimal.Zero,
+            //                    //sum of amount in that month
+            //                    group2?.Sum(y => y.ReturnAmount) ?? decimal.Zero
+            //                };
+            //            })
+            //})
+            //.ToList();
+
+            //var groupedTransactions = transactions
+            //    //make a pair of year
+            //    .GroupBy(x => x.CreatedOnUtc.Year)
+            //    .Select(group1 => new
+            //    {
+            //        name = group1.Key,
+            //                //send data of every month even if any month does not have any data but if in case pass empty values like zero
+            //        data = Enumerable.Range(1, 12)
+            //                .Select(month =>
+            //                {
+            //                    var previousMonth = (month - 1 + 12) % 12 + 1; // Calculate the previous month
+
+            //                    //get the data of the each month and if any month does not have any data then pass empty values
+            //                    var group2 = group1
+            //                        .Where(y => y.CreatedOnUtc.Month.Equals(month))
+            //                        .GroupBy(y => y.CreatedOnUtc.Month).FirstOrDefault();
+
+            //                    return new object[]
+            //                    {
+            //                        //month
+            //                         new DateTime(group1.Key, group2?.Key ?? month ,1).ToString("MMMM"),
+            //                        //month average
+            //                        group2?.Any() ?? false
+            //                            ? group2.Average(y => y.ReturnPercentage.GetValueOrDefault())
+            //                            : decimal.Zero,
+            //                        //sum of amount in that month
+            //                        group2?.Sum(y => y.TransactionAmount) ?? decimal.Zero
+            //                    };
+            //                })
+            //    })
+            //    .ToList();
+
+            var model = new AnalyticsModel()
+            {
+                //Year = JsonConvert.SerializeObject(a),
+                MonthsAndGain = JsonConvert.SerializeObject(new
+                {
+                    groupedReturnTransactions = groupedReturnTransactions,
+                    currenySymbol = await _priceFormatter.GetCurrentSymbolAsync()
+                })
+            };
+
+            return model;
+        }
+
+        public virtual async Task PrepareWithdrawalMethodCustomerInfoModelAsync(IList<WithdrawalMethodCustomerInfoModel> model, Customer customer)
+        {
+            foreach (WalletTypeEnum enumValues in Enum.GetValues(typeof(WalletTypeEnum)))
+            {
+                var tempModel = new WithdrawalMethodCustomerInfoModel()
+                {
+                    Id = (int)enumValues,
+                    Name = await _localizationService.GetLocalizedEnumAsync(enumValues),
+                };
+
+                var withdrawalMethods = await _withdrawService.GetAllWithdrawalMethodAsync(typeId: (int)enumValues,
+                    isEnabled: true);
+                if (!withdrawalMethods.Any())
+                    continue;
+
+                foreach (var withdrawalMethod in withdrawalMethods)
+                {
+                    var tempModel1 = new WithdrawalMethodCustomerInfoModel()
+                    {
+                        Id = withdrawalMethod.Id,
+                        Name = withdrawalMethod.Name,
+                    };
+
+                    var withdrawalMethodFields = await _withdrawService.GetAllWithdrawalMethodFieldAsync(withdrawalMethodId: withdrawalMethod.Id,
+                        isEnabled: true);
+                    if (!withdrawalMethodFields.Any())
+                        continue;
+
+                    foreach (var withdrawalMethodField in withdrawalMethodFields)
+                    {
+                        var customerWithdrawalMethod = (await _withdrawService.GetAllCustomerWithdrawalMethodAsync(customerId: customer.Id,
+                            withdrawalMethodFieldId: withdrawalMethodField.Id))
+                            .FirstOrDefault();
+
+                        tempModel1.Fields.Add(new WithdrawalMethodCustomerInfoModel()
+                        {
+                            Id = withdrawalMethodField.Id,
+                            Name = withdrawalMethodField.FieldName,
+                            Value = customerWithdrawalMethod?.Value
+                        });
+                    }
+
+                    tempModel.Fields.Add(tempModel1);
+                }
+
+                model.Add(tempModel);
+            }
+        }
+
 
         #endregion
     }

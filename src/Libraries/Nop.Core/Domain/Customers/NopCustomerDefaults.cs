@@ -179,6 +179,7 @@
         /// Gets a name of generic attribute to store the value of 'CloseConfigurationSteps'
         /// </summary>
         public static string CloseConfigurationStepsAttribute => "CloseConfigurationSteps";
+        public static string CustomerThemeAttribute => "CustomerTheme";
 
         #endregion
     }

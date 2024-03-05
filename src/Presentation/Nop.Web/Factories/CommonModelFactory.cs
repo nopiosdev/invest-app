@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain;
@@ -10,6 +11,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Media;
+using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
@@ -21,6 +23,7 @@ using Nop.Services.Directory;
 using Nop.Services.Forums;
 using Nop.Services.Localization;
 using Nop.Services.Media;
+using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
@@ -75,6 +78,8 @@ namespace Nop.Web.Factories
         protected readonly SitemapXmlSettings _sitemapXmlSettings;
         protected readonly StoreInformationSettings _storeInformationSettings;
         protected readonly VendorSettings _vendorSettings;
+        protected readonly IEmailAccountService _emailAccountService;
+        protected readonly EmailAccountSettings _emailAccountSettings;
 
         #endregion
 
@@ -114,7 +119,9 @@ namespace Nop.Web.Factories
             SitemapSettings sitemapSettings,
             SitemapXmlSettings sitemapXmlSettings,
             StoreInformationSettings storeInformationSettings,
-            VendorSettings vendorSettings)
+            VendorSettings vendorSettings,
+            IEmailAccountService emailAccountService,
+            EmailAccountSettings emailAccountSettings)
         {
             _blogSettings = blogSettings;
             _captchaSettings = captchaSettings;
@@ -151,6 +158,8 @@ namespace Nop.Web.Factories
             _sitemapXmlSettings = sitemapXmlSettings;
             _storeInformationSettings = storeInformationSettings;
             _vendorSettings = vendorSettings;
+            _emailAccountService = emailAccountService;
+            _emailAccountSettings = emailAccountSettings;
         }
 
         #endregion
@@ -488,12 +497,30 @@ namespace Nop.Web.Factories
             if (!excludeProperties)
             {
                 var customer = await _workContext.GetCurrentCustomerAsync();
-                model.Email = customer.Email;
-                model.FullName = await _customerService.GetCustomerFullNameAsync(customer);
+
+                if (await _customerService.IsRegisteredAsync(customer))
+                {
+                    model.Email = customer.Email;
+                    model.FullName = await _customerService.GetCustomerFullNameAsync(customer);
+                    model.PhoneNumber = customer.Phone;
+                }
             }
 
             model.SubjectEnabled = _commonSettings.SubjectFieldOnContactUsForm;
             model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnContactUsPage;
+
+            model.TwitterLink = _storeInformationSettings.TwitterLink;
+            model.FacebookLink = _storeInformationSettings.FacebookLink;
+            model.LinkedinLink = _storeInformationSettings.LinkedinLink;
+            model.TelegramLink = _storeInformationSettings.TelegramLink;
+            model.DiscordLink = _storeInformationSettings.DiscordLink;
+
+            var store = await _storeContext.GetCurrentStoreAsync();
+            model.StoreName = store.Name;
+            model.StoreEmail = store.StoreEmailAddress;
+            model.StoreCompanyName = store.CompanyName;
+            model.CompanyPhoneNumber = store.CompanyPhoneNumber;
+            model.CompanyAddress = store.CompanyAddress;
 
             return model;
         }

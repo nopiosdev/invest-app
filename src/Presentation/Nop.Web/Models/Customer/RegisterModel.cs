@@ -150,15 +150,5 @@ namespace Nop.Web.Models.Customer
         public IList<CustomerAttributeModel> CustomerAttributes { get; set; }
 
         public IList<GdprConsentModel> GdprConsents { get; set; }
-
-
-        [NopResourceDisplayName("Account.ChangePassword.Fields.File")]
-        public IFormFile FormId { get; set; }
-
-        [NopResourceDisplayName("Account.ChangePassword.Fields.ProofOfAddress")]
-        public IFormFile ProofOfAddress { get; set; }
-
-        [NopResourceDisplayName("Account.ChangePassword.Fields.Document")]
-        public IFormFile Document { get; set; }
     }
 }

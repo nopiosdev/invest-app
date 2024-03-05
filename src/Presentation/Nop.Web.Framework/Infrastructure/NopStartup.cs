@@ -311,6 +311,7 @@ namespace Nop.Web.Framework.Infrastructure
 
             //NCT Back-end dev
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IWithdrawService, WithdrawService>();
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
+using Nop.Core.Domain.Transaction;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Events;
 using Nop.Core.Infrastructure;
@@ -28,6 +29,7 @@ using Nop.Services.Security;
 using Nop.Services.Shipping;
 using Nop.Services.Stores;
 using Nop.Services.Tax;
+using Nop.Services.Transactions;
 using Nop.Services.Vendors;
 
 namespace Nop.Services.Orders
@@ -85,6 +87,8 @@ namespace Nop.Services.Orders
         protected readonly ShippingSettings _shippingSettings;
         protected readonly TaxSettings _taxSettings;
         protected readonly CustomerSettings _customerSettings;
+        protected readonly ITransactionService _transactionService;
+        protected readonly TransactionSettings _transactionSettings;
 
         #endregion
 
@@ -182,6 +186,8 @@ namespace Nop.Services.Orders
             _shippingSettings = shippingSettings;
             _taxSettings = taxSettings;
             _customerSettings = EngineContext.Current.Resolve<CustomerSettings>();
+            _transactionService = EngineContext.Current.Resolve<ITransactionService>();
+            _transactionSettings = EngineContext.Current.Resolve<TransactionSettings>();
         }
 
         #endregion
@@ -755,7 +761,7 @@ namespace Nop.Services.Orders
                 ShippingRateComputationMethodSystemName = details.ShippingRateComputationMethodSystemName,
                 CustomValuesXml = _paymentService.SerializeCustomValues(processPaymentRequest),
                 VatNumber = details.VatNumber,
-                CreatedOnUtc = DateTime.UtcNow,
+                CreatedOnUtc = _transactionSettings.SimulatedDateTime ?? DateTime.UtcNow,
                 CustomOrderNumber = string.Empty
             };
 
@@ -1353,12 +1359,13 @@ namespace Nop.Services.Orders
         /// A task that represents the asynchronous operation
         /// The task result contains the 
         /// </returns>
-        protected virtual async Task<ProcessPaymentResult> GetProcessPaymentResultAsync(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
+        protected virtual async Task<ProcessPaymentResult> GetProcessPaymentResultAsync(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details, bool byPassPaymentProcess = false)
         {
             //process payment
             ProcessPaymentResult processPaymentResult;
             //check if is payment workflow required
-            if (await IsPaymentWorkflowRequiredAsync(details.Cart))
+            if (await IsPaymentWorkflowRequiredAsync(details.Cart) &&
+                !byPassPaymentProcess)
             {
                 var customer = await _customerService.GetCustomerByIdAsync(processPaymentRequest.CustomerId);
                 var paymentMethod = await _paymentPluginManager
@@ -1525,11 +1532,12 @@ namespace Nop.Services.Orders
         /// Places an order
         /// </summary>
         /// <param name="processPaymentRequest">Process payment request</param>
+        /// <param name="byPassPaymentProcess">By pass payment request when order is creating from admin side as a transaction</param>
         /// <returns>
         /// A task that represents the asynchronous operation
         /// The task result contains the place order result
         /// </returns>
-        public virtual async Task<PlaceOrderResult> PlaceOrderAsync(ProcessPaymentRequest processPaymentRequest)
+        public virtual async Task<PlaceOrderResult> PlaceOrderAsync(ProcessPaymentRequest processPaymentRequest, bool byPassPaymentProcess = false)
         {
             if (processPaymentRequest == null)
                 throw new ArgumentNullException(nameof(processPaymentRequest));
@@ -1543,7 +1551,7 @@ namespace Nop.Services.Orders
                 //prepare order details
                 var details = await PreparePlaceOrderDetailsAsync(processPaymentRequest);
 
-                var processPaymentResult = await GetProcessPaymentResultAsync(processPaymentRequest, details);
+                var processPaymentResult = await GetProcessPaymentResultAsync(processPaymentRequest, details, byPassPaymentProcess);
 
                 if (processPaymentResult == null)
                     throw new NopException("processPaymentResult is not available");
@@ -2498,7 +2506,12 @@ namespace Nop.Services.Orders
             await CheckOrderStatusAsync(order);
 
             if (order.PaymentStatus == PaymentStatus.Paid)
+            {
                 await ProcessOrderPaidAsync(order);
+
+                //update transaction
+                await _transactionService.MarkDepositTransactionAsCompletedAsync(order: order);
+            }
         }
 
         /// <summary>
@@ -3226,6 +3239,25 @@ namespace Nop.Services.Orders
                 result = 0;
 
             return result;
+        }
+
+        public virtual async Task RollBackOrderAsync(Order order)
+        {
+            if (order == null)
+                throw new ArgumentNullException(nameof(order));
+
+            if (!order.PaymentStatus.Equals(PaymentStatus.Paid))
+                throw new NopException("You can't roll back this order.");
+
+            order.PaymentStatus = PaymentStatus.Pending;
+            order.OrderStatus = OrderStatus.Pending;
+            order.PaidDateUtc = null;
+            await _orderService.UpdateOrderAsync(order);
+
+            //add a note
+            await AddOrderNoteAsync(order, "Order payment has been rolled back.");
+
+            await _transactionService.RollBackOrderTransactionAsync(order: order);
         }
 
         #endregion

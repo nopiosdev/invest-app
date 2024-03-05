@@ -66,6 +66,7 @@ using Nop.Web.Areas.Admin.Models.Templates;
 using Nop.Web.Areas.Admin.Models.Topics;
 using Nop.Web.Areas.Admin.Models.Transactions;
 using Nop.Web.Areas.Admin.Models.Vendors;
+using Nop.Web.Areas.Admin.Models.WithdrawMethods;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.WebOptimizer;
 using Org.BouncyCastle.Asn1.Misc;
@@ -1748,6 +1749,15 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
 
             CreateMap<Transaction, Nop.Web.Models.Customer.TransactionModel>();
             CreateMap<Nop.Web.Models.Customer.TransactionModel, Transaction>();
+
+            CreateMap<WithdrawalMethodModel, WithdrawalMethod>();
+            CreateMap<WithdrawalMethod, WithdrawalMethodModel>();
+
+            CreateMap<WithdrawalMethodFieldModel, WithdrawalMethodField>();
+            CreateMap<WithdrawalMethodField, WithdrawalMethodFieldModel>();
+
+            CreateMap<ReturnTransaction, ReturnTransactionModel>();
+            CreateMap<ReturnTransactionModel, ReturnTransaction>();
         }
 
         #endregion

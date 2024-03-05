@@ -1,11 +1,14 @@
 /* Grey Theme Css */
 
+.grey .drawer-total .netReturn{ color: #fff !important; }
 .grey .side-drawer-content .page { background: #405056; }
 .grey .secondary-sidebar { background: hsla(0,0%,100%,.1); border-color: hsla(0,0%,100%,.2); }
-.grey .form-block .inputs select { background: #fff; color: #2a2a2a; border-color: #ccc; }
+.grey .form-block .inputs select { background: #4f5f63; color: #fff; border-color: #ccc; }
+
 .grey .custom-switch input:checked+.custom-slider { background-color: #21ce99; }
 .grey .sidebar {background: #4a616b; border-color: hsla(0,0%,100%,.2); box-shadow: none; }
 .grey .search-box form input { background: transparent; border-color: hsla(0,0%,100%,.2); }
+.grey .search-box form input::placeholder{ color: #bebebe; }
 .grey .account-dropdown .account-wrapper { background: transparent; border-bottom-color: hsla(0,0%,100%,.2); color: #fff; border-left-color:  hsla(0,0%,100%,.2); }
 .grey .drawer-body .drawer-list li a { text-decoration: none; color: #eee; }
 .grey .secondary-sidebar li a {color: #9ba1a5;}
@@ -13,13 +16,38 @@
 .grey .side-drawer { background-color: #4a616b; border-right-color: hsla(0,0%,100%,.2) } 
 .grey #small-search-box-form {background: #546167;}
 .grey .header { background-color: #546167; }
+.grey .home-page .line-chart-box{background: #282b31!important; color: #fff;border-color: #282b31 !important; } 
+.grey .home-page .info-box{background: #4f5f63!important; color: #fff;border-color: #4a616b !important; }
 .grey .form-block .inputs input:not([type="radio"],[type="checkbox"]) { background: #4f5f63; color: #fff; border-color: #ccc; }
 .grey .side-drawer .drawer-body .drawer-total { border-bottom-color: hsla(0,0%,100%,.2); }
 .grey .drawer-body .drawer-total .portfolio-total h5 { color: #fff; }
-.grey .account-dropdown {border-bottom: 1px solid #768185; border-left: 1px solid #768185;}
+.grey .account-dropdown{border-bottom: 1px solid #768185; border-left: 1px solid #768185;}
 .grey .form-block .inputs { border-bottom-color: hsla(0,0%,100%,.2); }
 .grey .custom-tabs-wrapper .tabs-navigation { border-bottom-color: hsla(0,0%,100%,.2); }
+.grey .stock-datatable thead,
+.grey .datatable-grid .dataTables_paginate .paginate_button a{ background-color: #4a616b; }
+.grey .datatable th, 
+.grey .datatable td{ border-bottom-color: #4a616b;color: #fff; }
+.grey .invest-page .invest-form .text-box,
+.grey .withdraw-page .withdraw-form .text-box {background: #4f5f63; color: #fff;border-color: #ccc; }
+.grey .invest-cards-group .invest-card,
+.grey .withdraw-cards-group .withdraw-card { background: #4a616b;color: #eee; }
+.grey .info-input{background: #4f5f63; color: #fff; border-color: #ccc;}
+.grey .custom-slider.round{background-color: #4f5f63;}
+.grey .datatable-grid .dataTables_paginate .paginate_button.active a{background-color: #405056;} 
+.grey .account-dropdown .dropdown-list{background-color: #546167}
+.grey .account-dropdown .dropdown-list li a{color: #eee;}
+.grey .account-dropdown .dropdown-list li a:hover { background-color: #405056; color: #fff; }
+.grey .currency-selector.inputs{border-bottom: 1px solid #768185;}
+/* custom scroll css start */
+.grey .notification-dropdown .dropdown-list{color: #fff; background: #405056;}
+.grey ::-webkit-scrollbar-track{background:#4f5f63;}
+.grey ::-webkit-scrollbar-thumb{background:#fff;}
 
+/* contact us*/
+.grey .contact-page .user-layout {background-color: #405056;}
+.grey .contact-page .inputs input, .grey .inputs .enquiry{background: #4f5f63; color: #fff; border-color: #ccc}
+.grey .contact-page .invest-card {border-color: #ccc !important}
 /* Egg White Theme Css */
 
 .egg-white .side-drawer-content .page { background: #fff; }
@@ -44,8 +72,58 @@
 .egg-white .custom-tabs-wrapper .tabs-navigation ul li a {color: #434343;}
 .egg-white .custom-tabs-wrapper .tabs-navigation ul li.active a { background-color: #1cb183; color: #fff !important;  }
 .egg-white .custom-tabs-wrapper .tabs-navigation {border-bottom-color: #ddd;}
-.egg-white .account-dropdown {border-bottom: 1px solid #e6e6e6; border-left: 1px solid #e6e6e6;}
+.egg-white .side-drawer h1, 
+.egg-white .side-drawer h2, 
+.egg-white .side-drawer h3, 
+.egg-white .side-drawer h4, 
+.egg-white .side-drawer h5, 
+.egg-white .side-drawer h6 { color: #e0e0e0 !important; }
+.egg-white .home-page .line-chart-box, 
+.egg-white .home-page .info-box,
+.egg-white .invest-cards-group .invest-card,
+.egg-white .withdraw-cards-group .withdraw-card {border-color: #ddd !important; background: linear-gradient(180deg,#fff 0,#f0f0f0);}
+.egg-white .invest-page .invest-form .text-box,
+.egg-white .info-input,
+.egg-white .withdraw-page .withdraw-form .text-box {background: #fff; color: #2a2a2a; border: 1px solid #ccc;}
+.egg-white .custom-payment-method {border-color: #ccc}
+.egg-white .custom-payment-method input:checked~.method-box {background-color: #ddd;}
+.egg-white .invest-page .page-title-header,
+.egg-white .withdraw-page .page-title-header,
+.egg-white .home-page .custom-dash-wrapper {border-bottom:1px solid #ccc ;}
+.egg-white .datatable th,.egg-white  .datatable td {border-bottom: 1px solid #ccc; color: #2a2a2a;}
+.egg-white .home-page .line-chart-box,  
+.egg-white .home-page .info-box {border-color: #ddd!important; background: linear-gradient(180deg,#fff 0,#f0f0f0) !important;}
+.egg-white .bar-chart-box{ background-color: #fff; }
+.egg-white .highcharts-background{fill: #fff !important;}
+.egg-white .stock-datatable thead,
+.egg-white .datatable-grid .dataTables_paginate .paginate_button a { background: linear-gradient(180deg,#fff 0,#f0f0f0); color: #2a2a2a ; border: 1px solid #ddd;}
+.egg-white .custom-slider.round {background-color: #e0e0e0;}
+.egg-white .info-box svg{ filter: contrast(0.1); }
+.egg-white .invest-page .invest-amount-btn,
+.egg-white .withdraw-page .withdraw-amount-btn  {color: #000 !important;}
 
+/* notification dropdown */
+.egg-white .notification-dropdown .dropdown-list,
+.egg-white .account-dropdown .dropdown-list{ background: linear-gradient(180deg,#fff 0,#f0f0f0);color: #222; }
+.egg-white .account-dropdown .dropdown-list a{  color: #222; }
+.egg-white .account-dropdown .dropdown-list a:hover{ background-color: #ccc; }
+.egg-white .notification-dropdown .dropdown-list .notification-item{ border-bottom: 1px solid #ddd; }
+
+/* data table */
+.egg-white .invest-page .buttons label{ color: #000; }
+.egg-white .datatable-grid .dataTables_paginate .paginate_button.active a{background:linear-gradient(180deg,#c5bcbc 0,#f0f0f0);} 
+.egg-white ::-webkit-scrollbar-track{background: linear-gradient(180deg,#c5bcbc 0,#f0f0f0);}
+.egg-white ::-webkit-scrollbar-thumb{background:#4f5f63;}
+.egg-white .btn-chart-filter{ border-color: #e6e6e6;background-color: #e6e6e6;color: #000; }
+.egg-white .btn-chart-filter:hover, 
+.egg-white .btn-chart-filter.active{ border-color: #ccc;background-color: #ccc;color: #000; }
+/* .egg-white .account-dropdown {border-bottom: 1px solid #e6e6e6; border-left: 1px solid #e6e6e6;} */
+.egg-white .currency-selector {background: linear-gradient(180deg,#fff 0,#f0f0f0);}
+
+/* contact us*/
+.egg-white .contact-page .user-layout {background-color: #fff;}
+.egg-white .contact-page .inputs input, .egg-white .inputs .enquiry{background: #fff; color: #2a2a2a; border-color: #ccc}
+.egg-white .contact-page .invest-card {border-color: #ccc !important}
 /* Light Theme Css */
 
 .light .side-drawer-content .page { background: #fff; }
@@ -60,15 +138,57 @@
 .light .form-block label {color: #434343;}
 .light .side-drawer { background: #fff; border-color: #e0e0e0; box-shadow: none; } 
 .light #small-search-box-form { background:#fff; }
-.light .header  { background-color: transparent; } 
+.light .header  { background-color: #ffffff; } 
 .light .form-block .inputs input:not([type="radio"],[type="checkbox"]) { background: #fff; color: #2a2a2a; border-color: #ccc; }
 .light .side-drawer .drawer-body .drawer-total { border-color: rgba(0,0,0,.08); }
 .light .drawer-body .drawer-total .portfolio-total h5 { color: #82929f; }
 .light .account-dropdown .account-text { color: #222; }
 .light .form-block .inputs { border-bottom-color: #e0e0e0; }
-.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 { color: #434343; }
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 { color: #6c757d; }
 .light .custom-tabs-wrapper .tabs-navigation ul li a {color: #434343;}
 .light .custom-tabs-wrapper .tabs-navigation ul li.active a { background-color: #1cb183; color: #fff !important;  }
 .light .custom-tabs-wrapper .tabs-navigation {border-bottom-color: #ddd;}
 .light .drawer-body .drawer-total .profit-loss-total h6 { color: #434343; }
-.light .account-dropdown {border-bottom: 1px solid #e6e6e6; border-left: 1px solid #e6e6e6;}
+.light .drawer-body .drawer-total .portfolio-total h2 {color: #6c757d;}
+.light .withdraw-page .page-title-header,
+.light .home-page .custom-dash-wrapper,
+.light .invest-page .page-title-header {border-bottom:1px solid #ebebeb ;}
+.light .title h2 {color:#434343 ;}
+.light .invest-page .invest-form .text-box,
+.light .withdraw-page .withdraw-form .text-box,
+.light .info-input {border:1px solid ; background: #fff; color: #2a2a2a; border-color: #ccc;}
+.light .datatable th, 
+.light .datatable td { border-bottom: 1px solid #ebebeb; color: #333; }
+.light .home-page .line-chart-box, 
+.light .home-page .info-box {border-color: #ccc; background: #fff;}
+.light .stock-datatable thead tr th {border-color: #ccc; background: #fff; color: #6c757d;}
+.light .datatable-grid .dataTables_paginate .paginate_button a {border: 1px solid #ccc; background: #fff; color: #6c757d;}
+.light .datatable-grid .dataTables_paginate .paginate_button.active a{background-color: #e1dcdc;} 
+.light .bar-chart-box{ background-color: #fff; }
+.light .highcharts-background{fill: #fff !important;}
+.light .invest-cards-group .invest-card,
+.light .withdraw-cards-group .withdraw-card {border-color: #ccc !important; background: #fff;}
+.light .custom-payment-method {border-color: #ccc}
+.light .custom-payment-method input:checked~.method-box {background-color: #ddd;}
+.light .info-box svg{ filter: contrast(0.1); }
+.light .custom-slider.round {background-color: #e0e0e0;}
+.light .invest-page .invest-amount-btn,
+.light .withdraw-page .withdraw-amount-btn  {color: #000 !important;}
+.light .invest-page .invest-form label{ color: #000; }
+.light .notification-dropdown .dropdown-list { background-color: #fff;color: #222; }
+.light .account-dropdown .dropdown-list{background-color: #fff}
+.light .account-dropdown .dropdown-list li a{color: #000;}
+.light .account-dropdown .dropdown-list li a:hover { background-color: #e1dcdc; color: #000; }
+.light .withdraw-page .withdraw-form label{ color: #222; }
+
+.light ::-webkit-scrollbar-track{background:#4f5f63;}
+.light ::-webkit-scrollbar-thumb{background: linear-gradient(180deg,#fff 0,#f0f0f0);}
+.light .btn-chart-filter{ border-color: #e6e6e6;background-color: #e6e6e6;color: #000; }
+.light .btn-chart-filter:hover, 
+.light .btn-chart-filter.active{ border-color: #ccc;background-color: #ccc;color: #000; }
+/* .light .account-dropdown {border-bottom: 1px solid #e6e6e6; border-left: 1px solid #e6e6e6;} */
+
+/* contact us*/
+.light .contact-page .user-layout {background-color: #fff;}
+.light .contact-page .inputs input, .light .inputs .enquiry{background: #fff; color: #2a2a2a; border-color: #ccc}
+.light .contact-page .invest-card {border-color: #ccc !important}

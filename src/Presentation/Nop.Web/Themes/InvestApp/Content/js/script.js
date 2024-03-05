@@ -19,7 +19,35 @@ $(document).on("click",".tabs-navigation li a",function(){
   that.parents("li").addClass("active");
 });
 
+function handleTabClick(tabId, sectionId) {
+  $(".tabs-content .tab, .tabs-navigation li").removeClass("active");
+  $(`#${tabId}`).addClass("active");
+  $(`#${sectionId}`).parents("li").addClass("active");
+};
 
+function urlHash() {
+  var urlPara = window.location.hash;
+
+  if (urlPara === '#account') {
+    handleTabClick('accountTab', 'accountSection');
+  } else if (urlPara === '#setting') {
+    handleTabClick('settignsTab', 'settingsSection');
+  } else if (urlPara === '#disclosure') {
+    handleTabClick('disclosureTab', 'disclosureSection');
+  } else if (urlPara === '#password') {
+    handleTabClick('changePasswordTab', 'passwordSection');
+  }else if (urlPara === '#securitySection'){
+    handleTabClick('settignsTab', 'settingsSection');
+  }
+};
+
+$(window).on('load', function() {
+  urlHash();
+})
+
+$(window).on('hashchange', function() {
+  urlHash();
+});
 
 /* account-dropdown js start */
 $(document).on("click",".account-dropdown .account-wrapper",function(e){

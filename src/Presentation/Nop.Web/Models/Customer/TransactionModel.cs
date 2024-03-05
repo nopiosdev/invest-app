@@ -4,7 +4,7 @@ using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Customer
 {
-    public partial record TransactionModel:BaseNopEntityModel
+    public partial record TransactionModel : BaseNopEntityModel
     {
         public TransactionModel()
         {
@@ -19,9 +19,12 @@ namespace Nop.Web.Models.Customer
         public IList<SelectListItem> AvailableTransactionType { get; set; }
         public string TransactionNote { get; set; }
         public decimal TransactionAmount { get; set; }
+        public string FormattedTransactionAmount { get; set; }
         public decimal UpdateBalance { get; set; }
         public int StatusId { get; set; }
         public IList<TransactionModel> RecentTransactions { get; set; }
+        public string CurrencySymbol { get; set; }
+
 
         public TransactionType TransactionType
         {

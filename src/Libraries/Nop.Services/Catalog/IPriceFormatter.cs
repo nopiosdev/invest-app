@@ -16,7 +16,7 @@ namespace Nop.Services.Catalog
         /// A task that represents the asynchronous operation
         /// The task result contains the price
         /// </returns>
-        Task<string> FormatPriceAsync(decimal price);
+        Task<string> FormatPriceAsync(decimal price, bool dontShowCurrencySymbol = false);
 
         /// <summary>
         /// Formats the price
@@ -28,7 +28,7 @@ namespace Nop.Services.Catalog
         /// A task that represents the asynchronous operation
         /// The task result contains the price
         /// </returns>
-        Task<string> FormatPriceAsync(decimal price, bool showCurrency, Currency targetCurrency);
+        Task<string> FormatPriceAsync(decimal price, bool showCurrency, Currency targetCurrency, bool formatAsCurrency = true);
 
         /// <summary>
         /// Formats the price
@@ -104,7 +104,7 @@ namespace Nop.Services.Catalog
         /// The task result contains the price
         /// </returns>
         Task<string> FormatPriceAsync(decimal price, bool showCurrency,
-            Currency targetCurrency, int languageId, bool priceIncludesTax);
+            Currency targetCurrency, int languageId, bool priceIncludesTax, bool formatAsCurrency = true);
 
         /// <summary>
         /// Formats the price
@@ -120,7 +120,7 @@ namespace Nop.Services.Catalog
         /// The task result contains the price
         /// </returns>
         Task<string> FormatPriceAsync(decimal price, bool showCurrency,
-            Currency targetCurrency, int languageId, bool priceIncludesTax, bool showTax);
+            Currency targetCurrency, int languageId, bool priceIncludesTax, bool showTax, bool formatAsCurrency = true);
 
         /// <summary>
         /// Formats the price of rental product (with rental period)
@@ -233,5 +233,7 @@ namespace Nop.Services.Catalog
         /// The task result contains the base price
         /// </returns>
         Task<string> FormatBasePriceAsync(Product product, decimal? productPrice, decimal? totalWeight = null);
+        Task<string> GetCurrentSymbolAsync();
+        Task<string> FormatPriceInCurrencyAsync(decimal price, bool showCurrencySymbol = true);
     }
 }

@@ -1,5 +1,8 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Http;
@@ -16,10 +19,10 @@ namespace Nop.Plugin.ExternalAuth.Facebook.Controllers
     {
         #region Fields
 
-        protected readonly FacebookExternalAuthSettings _facebookExternalAuthSettings;
-        protected readonly IExternalAuthenticationService _externalAuthenticationService;
-        protected readonly ILogger _logger;
-        protected readonly IWebHelper _webHelper;
+        private readonly FacebookExternalAuthSettings _facebookExternalAuthSettings;
+        private readonly IExternalAuthenticationService _externalAuthenticationService;
+        private readonly ILogger _logger;
+        private readonly IWebHelper _webHelper;
 
         #endregion
 
@@ -40,9 +43,7 @@ namespace Nop.Plugin.ExternalAuth.Facebook.Controllers
 
         #region Utilities
 
-        /// <summary>
-        /// Convert string to a valid Base64 encoded string
-        /// </summary>
+        // Convert string to a valid Base64 encoded string
         protected static string DecodeUrlBase64(string str)
         {
             if (string.IsNullOrEmpty(str))
@@ -115,5 +116,6 @@ namespace Nop.Plugin.ExternalAuth.Facebook.Controllers
         }
 
         #endregion
+
     }
 }

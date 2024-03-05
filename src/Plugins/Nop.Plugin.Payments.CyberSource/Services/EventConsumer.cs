@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Orders;
@@ -30,17 +33,17 @@ namespace Nop.Plugin.Payments.CyberSource.Services
     {
         #region Fields
 
-        protected readonly CustomerTokenService _customerTokenService;
-        protected readonly CyberSourceSettings _cyberSourceSettings;
-        protected readonly IHttpContextAccessor _httpContextAccessor;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IOrderProcessingService _orderProcessingService;
-        protected readonly IOrderService _orderService;
-        protected readonly IPaymentPluginManager _paymentPluginManager;
-        protected readonly IPaymentService _paymentService;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IWorkContext _workContext;
+        private readonly CustomerTokenService _customerTokenService;
+        private readonly CyberSourceSettings _cyberSourceSettings;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IOrderProcessingService _orderProcessingService;
+        private readonly IOrderService _orderService;
+        private readonly IPaymentPluginManager _paymentPluginManager;
+        private readonly IPaymentService _paymentService;
+        private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -191,12 +194,12 @@ namespace Nop.Plugin.Payments.CyberSource.Services
                 return;
 
             var key = string.Format(CyberSourceDefaults.OrderStatusesSessionKey, order.OrderGuid);
-            var (orderStatus, paymentStatus) = await _httpContextAccessor.HttpContext.Session.GetAsync<(OrderStatus?, PaymentStatus?)>(key);
+            var (orderStatus, paymentStatus) = _httpContextAccessor.HttpContext.Session.Get<(OrderStatus?, PaymentStatus?)>(key);
             if (!orderStatus.HasValue || !paymentStatus.HasValue)
                 return;
 
             //remove value from session
-            await _httpContextAccessor.HttpContext.Session.RemoveAsync(key);
+            _httpContextAccessor.HttpContext.Session.Remove(key);
 
             var note = $"Order status has been changed to {orderStatus.Value} by CyberSource AVS/CVN/decision profile results";
             await _orderService.InsertOrderNoteAsync(new OrderNote

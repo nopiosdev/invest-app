@@ -1,4 +1,7 @@
-﻿using FluentMigrator;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FluentMigrator;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Processors;
 
@@ -18,7 +21,7 @@ namespace Nop.Data.Migrations
 
         #endregion
 
-        #region Utilities
+        #region Utils
 
         /// <summary>
         /// Configure processor
@@ -38,7 +41,7 @@ namespace Nop.Data.Migrations
                 {
                     DataProviderType.SqlServer => FindGenerator(processors, "SqlServer"),
                     DataProviderType.MySql => FindGenerator(processors, "MySQL"),
-                    DataProviderType.PostgreSQL => FindGenerator(processors, "Postgres"),
+					DataProviderType.PostgreSQL => FindGenerator(processors, "Postgres"),
                     _ => throw new ProcessorFactoryNotFoundException(
                         $@"A migration generator for Data provider type {dataSettings.DataProvider} couldn't be found.")
                 };

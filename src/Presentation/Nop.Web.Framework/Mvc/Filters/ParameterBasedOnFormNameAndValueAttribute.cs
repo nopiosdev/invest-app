@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Nop.Web.Framework.Mvc.Filters
@@ -33,9 +35,9 @@ namespace Nop.Web.Framework.Mvc.Filters
         {
             #region Fields
 
-            protected readonly string _formKeyName;
-            protected readonly string _formValue;
-            protected readonly string _actionParameterName;
+            private readonly string _formKeyName;
+            private readonly string _formValue;
+            private readonly string _actionParameterName;
 
             #endregion
 

@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Common;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Orders;
 using Nop.Services.Plugins;
 using Nop.Services.Shipping.Tracking;

@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Domain.Messages;
 using Nop.Services.Configuration;
 using Nop.Services.Messages;

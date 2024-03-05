@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 
 namespace Nop.Core
 {
@@ -9,8 +10,8 @@ namespace Nop.Core
     {
         #region Field
 
-        protected bool _disposed;
-        protected readonly RandomNumberGenerator _rng;
+        private bool _disposed = false;
+        private readonly RandomNumberGenerator _rng;
 
         #endregion
 

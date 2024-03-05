@@ -1,4 +1,5 @@
-﻿using FluentMigrator;
+﻿using System.Collections.Generic;
+using FluentMigrator;
 using Nop.Core.Infrastructure;
 using Nop.Data;
 using Nop.Data.Migrations;

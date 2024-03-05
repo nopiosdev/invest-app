@@ -1,4 +1,5 @@
-﻿using Nop.Web.Areas.Admin.Models.Security;
+﻿using System.Threading.Tasks;
+using Nop.Web.Areas.Admin.Models.Security;
 
 namespace Nop.Web.Areas.Admin.Factories
 {

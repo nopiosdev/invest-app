@@ -4,8 +4,8 @@
 @if (Model.CountryEnabled && Model.StateProvinceEnabled)
 {
     <script>
-        $(document).ready(function () {
-            $("#@Html.IdFor(model => model.CountryId)").change(function () {
+        $(document).ready(function() {
+            $("#@Html.IdFor(model => model.CountryId)").change(function() {
                 var selectedItem = $(this).val();
                 var ddlStates = $("#@Html.IdFor(model => model.StateProvinceId)");
 
@@ -21,7 +21,7 @@
                     data: postData,
                     success: function (data, textStatus, jqXHR) {
                         ddlStates.html('');
-                        $.each(data, function (id, option) {
+                        $.each(data, function(id, option) {
                             ddlStates.append($('<option></option>').val(option.id).html(option.name));
                         });
                     },
@@ -63,7 +63,7 @@
         </div>
         <div class="col-md-9">
             <div class="input-group">
-                <nop-editor asp-for="Password" html-attributes="@(new { autocomplete = "new-password" })" />
+                <nop-editor asp-for="Password" html-attributes="@(new { autocomplete = "new-password" })"/>
                 <div class="input-group-append">
                     @if (Model.Id > 0)
                     {
@@ -114,15 +114,6 @@
                             @T("Admin.Customers.Customers.Fields.Gender.Female")
                         </label>
                     </div>
-                    @if (Model.NeutralGenderEnabled)
-                    {
-                        <div class="form-check">
-                            <input type="radio" class="form-check-input" name="Gender" id="Gender_Neutral" value="N" @(Model.Gender == "N" ? Html.Raw("checked") : null)>
-                            <label class="form-check-label" for="Gender_Female">
-                                @T("Admin.Customers.Customers.Fields.Gender.Neutral")
-                            </label>
-                        </div>
-                    }
                 </div>
             </div>
         </div>
@@ -319,9 +310,13 @@
                     <div class="input-group-btn"></div>
                 </div>
                 <script>
-                    $(document).ready(function () {
-                        var newsletterSubscriptionStoreIdsInput = $('#@Html.IdFor(model => model.SelectedNewsletterSubscriptionStoreIds)').select2();
+                $(document).ready(function() {
+                    var newsletterSubscriptionStoreIdsInput = $('#@Html.IdFor(model => model.SelectedNewsletterSubscriptionStoreIds)').data("kendoMultiSelect");
+                    newsletterSubscriptionStoreIdsInput.setOptions({
+                        newsletterSubscriptionStoreIdsInput: false,
+                        filter: "contains"
                     });
+                });
                 </script>
             </div>
         </div>
@@ -331,7 +326,7 @@
             <nop-label asp-for="SelectedCustomerRoleIds" />
         </div>
 
-        <div class="col-md-9">
+        <div class="col-md-9">            
             <div class="input-group-append input-group-required">
                 <div class="input-group">
                     <nop-select asp-for="SelectedCustomerRoleIds" asp-items="Model.AvailableCustomerRoles" asp-multiple="true" />
@@ -341,18 +336,25 @@
                 </div>
             </div>
             <script>
-                $(document).ready(function () {
-                    var customerRoleIdsInput = $('#@Html.IdFor(model => model.SelectedCustomerRoleIds)').select2({
-                        closeOnSelect: false,
-                @if (!Model.AvailableCustomerRoles.Any())
-                {
-                    <text>
-                            disabled: true,
-                            placeholder: '@T("Admin.Customers.Customers.Fields.CustomerRoles.NoRoles")',
-                    </text>
-                }
-                                    });
-                                });
+                $(document).ready(function() {
+                    var customerRoleIdsInput = $('#@Html.IdFor(model => model.SelectedCustomerRoleIds)').data("kendoMultiSelect");
+                    customerRoleIdsInput.setOptions({
+                        customerRoleIdsInput: false,
+                        filter: "contains"
+                    });
+
+                    @if (Model.AvailableCustomerRoles.Count == 0)
+                    {
+                        <text>
+                            customerRoleIdsInput.setOptions({
+                                enable: false,
+                                placeholder: '@T("Admin.Customers.Customers.Fields.CustomerRoles.NoRoles")'
+                            });
+                            customerRoleIdsInput._placeholder();
+                            customerRoleIdsInput._enable();
+                        </text>
+                    }
+                });
             </script>
         </div>
     </div>
@@ -389,15 +391,6 @@
             <span asp-validation-for="Active"></span>
         </div>
     </div>
-    <div class="form-group row advanced-setting">
-        <div class="col-md-3">
-            <nop-label asp-for="Verified" />
-        </div>
-        <div class="col-md-9">
-            <nop-editor asp-for="Verified" />
-            <span asp-validation-for="Verified"></span>
-        </div>
-    </div>
     @if (!string.IsNullOrEmpty(Model.MultiFactorAuthenticationProvider))
     {
         <div class="form-group row">
@@ -406,7 +399,7 @@
             </div>
             <div class="col-md-9">
                 <div class="input-group">
-                    <nop-editor asp-for="MultiFactorAuthenticationProvider" html-attributes="@(new { disabled = true })" />
+                    <nop-editor asp-for="MultiFactorAuthenticationProvider" html-attributes="@(new { disabled = true })"/>
                     <div class="input-group-append">
                         @if (Model.Id > 0)
                         {
@@ -429,38 +422,38 @@
             </div>
             <div class="col-md-9">
                 @await Html.PartialAsync("Table", new DataTablesModel
-            {
-            Name = "externalauthrecords-grid",
-            Paging = false,
-            ServerSide = false,
-            Length = Model.CustomerAssociatedExternalAuthRecordsSearchModel.PageSize,
-            LengthMenu = Model.CustomerAssociatedExternalAuthRecordsSearchModel.AvailablePageSizes,
-            ColumnCollection = new List<ColumnProperty>
-            {
-            new ColumnProperty(nameof(CustomerAssociatedExternalAuthModel.AuthMethodName))
-            {
-            Title = T("Admin.Customers.Customers.AssociatedExternalAuth.Fields.AuthMethodName").Text,
-            Width = "100"
-            },
-            new ColumnProperty(nameof(CustomerAssociatedExternalAuthModel.Email))
-            {
-            Title = T("Admin.Customers.Customers.AssociatedExternalAuth.Fields.Email").Text,
-            Width = "100"
-            },
-            new ColumnProperty(nameof(CustomerAssociatedExternalAuthModel.ExternalIdentifier))
-            {
-            Title = T("Admin.Customers.Customers.AssociatedExternalAuth.Fields.ExternalIdentifier").Text,
-            Width = "300"
-            }
-            },
-            Data = JsonConvert.SerializeObject(Model.CustomerAssociatedExternalAuthRecordsSearchModel.AssociatedExternalAuthRecords.Select(externalAuthRecord => new
-            {
-            //We must display this data encoded, since the data can contain Unicode characters or malicious exploits
-            AuthMethodName = WebUtility.HtmlEncode(externalAuthRecord.AuthMethodName),
-            Email = WebUtility.HtmlEncode(externalAuthRecord.Email),
-            ExternalIdentifier = WebUtility.HtmlEncode(externalAuthRecord.ExternalIdentifier)
-            }).ToList())
-            })
+                {
+                    Name = "externalauthrecords-grid",
+                    Paging = false,
+                    ServerSide = false,
+                    Length = Model.CustomerAssociatedExternalAuthRecordsSearchModel.PageSize,
+                    LengthMenu = Model.CustomerAssociatedExternalAuthRecordsSearchModel.AvailablePageSizes,
+                    ColumnCollection = new List<ColumnProperty>
+                    {
+                        new ColumnProperty(nameof(CustomerAssociatedExternalAuthModel.AuthMethodName))
+                        {
+                            Title = T("Admin.Customers.Customers.AssociatedExternalAuth.Fields.AuthMethodName").Text,
+                            Width = "100"
+                        },
+                        new ColumnProperty(nameof(CustomerAssociatedExternalAuthModel.Email))
+                        {
+                            Title = T("Admin.Customers.Customers.AssociatedExternalAuth.Fields.Email").Text,
+                            Width = "100"
+                        },
+                        new ColumnProperty(nameof(CustomerAssociatedExternalAuthModel.ExternalIdentifier))
+                        {
+                            Title = T("Admin.Customers.Customers.AssociatedExternalAuth.Fields.ExternalIdentifier").Text,
+                            Width = "300"
+                        }
+                    },
+                    Data = JsonConvert.SerializeObject(Model.CustomerAssociatedExternalAuthRecordsSearchModel.AssociatedExternalAuthRecords.Select(externalAuthRecord => new
+                    {
+                        //We must display this data encoded, since the data can contain Unicode characters or malicious exploits
+                        AuthMethodName = WebUtility.HtmlEncode(externalAuthRecord.AuthMethodName),
+                        Email = WebUtility.HtmlEncode(externalAuthRecord.Email),
+                        ExternalIdentifier = WebUtility.HtmlEncode(externalAuthRecord.ExternalIdentifier)
+                    }).ToList())
+                })
             </div>
         </div>
     }
@@ -471,24 +464,6 @@
         <div class="col-md-9">
             <nop-textarea asp-for="AdminComment" />
             <span asp-validation-for="AdminComment"></span>
-        </div>
-    </div>
-    <div class="form-group row advanced-setting">
-        <div class="col-md-3">
-            <nop-label asp-for="CommissionToHouse" />
-        </div>
-        <div class="col-md-9">
-            <nop-editor asp-for="CommissionToHouse" />
-            <span asp-validation-for="CommissionToHouse"></span>
-        </div>
-    </div>
-    <div class="form-group row advanced-setting">
-        <div class="col-md-3">
-            <nop-label asp-for="DontInvestAmount" />
-        </div>
-        <div class="col-md-9">
-            <nop-editor asp-for="DontInvestAmount" />
-            <span asp-validation-for="DontInvestAmount"></span>
         </div>
     </div>
     @if (Model.DisplayRegisteredInStore)
@@ -543,44 +518,6 @@
             </div>
             <div class="col-md-9">
                 <div class="form-text-row">@Model.LastVisitedPage</div>
-            </div>
-        </div>
-    }
-    @if (Model.Id > 0)
-    {
-        <div class="form-group row">
-            <div class="col-md-3">
-                <nop-label asp-for="FormId" />
-            </div>
-            <div class="col-md-9">
-                @if (Model.FormId != Guid.Empty)
-                {
-                    <a asp-controller="Download" asp-action="DownloadFile" asp-route-downloadGuid="@Model.FormId">@T("admin.catalog.customer.fields.download")</a>
-                }
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <div class="col-md-3">
-                <nop-label asp-for="ProofOfAddress" />
-            </div>
-            <div class="col-md-9">
-                @if (Model.ProofOfAddress != Guid.Empty)
-                {
-                    <a asp-controller="Download" asp-action="DownloadFile" asp-route-downloadGuid="@Model.ProofOfAddress">@T("admin.catalog.customer.fields.download")</a>
-                }
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <div class="col-md-3">
-                <nop-label asp-for="OtherDocument" />
-            </div>
-            <div class="col-md-9">
-                @if (Model.OtherDocument != Guid.Empty)
-                {
-                    <a asp-controller="Download" asp-action="DownloadFile" asp-route-downloadGuid="@Model.OtherDocument">@T("admin.catalog.customer.fields.download")</a>
-                }
             </div>
         </div>
     }

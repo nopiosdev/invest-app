@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Directory;
 using Nop.Data;
 
@@ -11,9 +15,9 @@ namespace Nop.Services.Directory
     {
         #region Fields
 
-        protected readonly IRepository<MeasureDimension> _measureDimensionRepository;
-        protected readonly IRepository<MeasureWeight> _measureWeightRepository;
-        protected readonly MeasureSettings _measureSettings;
+        private readonly IRepository<MeasureDimension> _measureDimensionRepository;
+        private readonly IRepository<MeasureWeight> _measureWeightRepository;
+        private readonly MeasureSettings _measureSettings;
 
         #endregion
 
@@ -29,7 +33,7 @@ namespace Nop.Services.Directory
         }
 
         #endregion
-
+        
         #region Methods
 
         #region Dimensions
@@ -89,8 +93,8 @@ namespace Nop.Services.Directory
             var measureDimensions = await _measureDimensionRepository.GetAllAsync(query =>
             {
                 return from md in query
-                       orderby md.DisplayOrder, md.Id
-                       select md;
+                    orderby md.DisplayOrder, md.Id
+                    select md;
             }, cache => default);
 
             return measureDimensions;
@@ -166,7 +170,7 @@ namespace Nop.Services.Directory
 
             var result = value;
             var baseDimensionIn = await GetMeasureDimensionByIdAsync(_measureSettings.BaseDimensionId);
-            if (result == decimal.Zero || targetMeasureDimension.Id == baseDimensionIn.Id)
+            if (result == decimal.Zero || targetMeasureDimension.Id == baseDimensionIn.Id) 
                 return result;
 
             var exchangeRatio = targetMeasureDimension.Ratio;
@@ -176,7 +180,7 @@ namespace Nop.Services.Directory
 
             return result;
         }
-
+        
         /// <summary>
         /// Converts to primary measure dimension
         /// </summary>
@@ -265,10 +269,10 @@ namespace Nop.Services.Directory
             var measureWeights = await _measureWeightRepository.GetAllAsync(query =>
             {
                 return from mw in query
-                       orderby mw.DisplayOrder, mw.Id
-                       select mw;
+                    orderby mw.DisplayOrder, mw.Id
+                    select mw;
             }, cache => default);
-
+            
             return measureWeights;
         }
 
@@ -342,7 +346,7 @@ namespace Nop.Services.Directory
 
             var result = value;
             var baseWeightIn = await GetMeasureWeightByIdAsync(_measureSettings.BaseWeightId);
-            if (result == decimal.Zero || targetMeasureWeight.Id == baseWeightIn.Id)
+            if (result == decimal.Zero || targetMeasureWeight.Id == baseWeightIn.Id) 
                 return result;
 
             var exchangeRatio = targetMeasureWeight.Ratio;
@@ -352,7 +356,7 @@ namespace Nop.Services.Directory
 
             return result;
         }
-
+        
         /// <summary>
         /// Converts to primary measure weight
         /// </summary>

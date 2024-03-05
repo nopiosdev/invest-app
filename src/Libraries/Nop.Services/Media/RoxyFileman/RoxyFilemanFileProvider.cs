@@ -1,5 +1,10 @@
-﻿using System.IO.Compression;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Nop.Core.Domain.Media;
@@ -16,7 +21,7 @@ namespace Nop.Services.Media.RoxyFileman
         #region Fields
 
         protected INopFileProvider _nopFileProvider;
-        protected readonly MediaSettings _mediaSettings;
+        private readonly MediaSettings _mediaSettings;
 
         #endregion
 
@@ -34,7 +39,7 @@ namespace Nop.Services.Media.RoxyFileman
 
         #endregion
 
-        #region Utilities
+        #region Utils
 
         /// <summary>
         /// Adjust image measures to target size
@@ -388,10 +393,23 @@ namespace Nop.Services.Media.RoxyFileman
                 .Where(f => !f.IsDirectory && isMatchType(f.Name))
                 .Select(f =>
                 {
-                    using var skData = SKData.Create(f.PhysicalPath);
-                    var image = SKBitmap.DecodeBounds(skData);
+                    var width = 0;
+                    var height = 0;
 
-                    return new RoxyImageInfo(getRelativePath(f.Name), f.LastModified, f.Length, image.Width, image.Height);
+                    if (GetFileType(f.Name) == "image")
+                    {
+                        using var skData = SKData.Create(f.PhysicalPath);
+                        
+                        if (skData != null)
+                        {
+                            var image = SKBitmap.DecodeBounds(skData);
+
+                            width = image.Width;
+                            height = image.Height;
+                        }
+                    }
+
+                    return new RoxyImageInfo(getRelativePath(f.Name), f.LastModified, f.Length, width, height);
                 });
 
             bool isMatchType(string name) => string.IsNullOrEmpty(type) || GetFileType(name) == type;
@@ -537,7 +555,7 @@ namespace Nop.Services.Media.RoxyFileman
             var sourceFile = GetFileInfo(sourcePath);
 
             if (!sourceFile.Exists)
-                throw new RoxyFilemanException("E_CopyFileInvalidPath");
+                throw new RoxyFilemanException("E_CopyFileInvalisPath");
 
             var newFilePath = Path.Combine(destinationPath, sourceFile.Name);
             var destinationFile = GetFileInfo(newFilePath);

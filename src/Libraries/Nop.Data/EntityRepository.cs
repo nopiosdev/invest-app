@@ -1,4 +1,8 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using System.Transactions;
 using Nop.Core;
 using Nop.Core.Caching;
@@ -15,9 +19,9 @@ namespace Nop.Data
     {
         #region Fields
 
-        protected readonly IEventPublisher _eventPublisher;
-        protected readonly INopDataProvider _dataProvider;
-        protected readonly IStaticCacheManager _staticCacheManager;
+        private readonly IEventPublisher _eventPublisher;
+        private readonly INopDataProvider _dataProvider;
+        private readonly IStaticCacheManager _staticCacheManager;
 
         #endregion
 
@@ -111,28 +115,6 @@ namespace Nop.Data
             return query.OfType<ISoftDeletedEntity>().Where(entry => !entry.Deleted).OfType<TEntity>();
         }
 
-        /// <summary>
-        /// Transactionally deletes a list of entities
-        /// </summary>
-        /// <param name="entities">Entities to delete</param>
-        protected virtual async Task DeleteAsync(IList<TEntity> entities)
-        {
-            using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            await _dataProvider.BulkDeleteEntitiesAsync(entities);
-            transaction.Complete();
-        }
-
-        /// <summary>
-        /// Soft-deletes <see cref="ISoftDeletedEntity"/> entities
-        /// </summary>
-        /// <param name="entities">Entities to delete</param>
-        protected virtual async Task DeleteAsync<T>(IList<T> entities) where T : ISoftDeletedEntity, TEntity
-        {
-            foreach (var entity in entities)
-                entity.Deleted = true;
-            await _dataProvider.UpdateEntitiesAsync(entities);
-        }
-
         #endregion
 
         #region Methods
@@ -208,7 +190,7 @@ namespace Nop.Data
         /// </returns>
         public virtual async Task<IList<TEntity>> GetByIdsAsync(IList<int> ids, Func<IStaticCacheManager, CacheKey> getCacheKey = null, bool includeDeleted = true)
         {
-            if (ids?.Any() != true)
+            if (!ids?.Any() ?? true)
                 return new List<TEntity>();
 
             async Task<IList<TEntity>> getByIdsAsync()
@@ -216,15 +198,14 @@ namespace Nop.Data
                 var query = AddDeletedFilter(Table, includeDeleted);
 
                 //get entries
-                var entriesById = await query
-                    .Where(entry => ids.Contains(entry.Id))
-                    .ToDictionaryAsync(entry => entry.Id);
+                var entries = await query.Where(entry => ids.Contains(entry.Id)).ToListAsync();
 
                 //sort by passed identifiers
                 var sortedEntries = new List<TEntity>();
                 foreach (var id in ids)
                 {
-                    if (entriesById.TryGetValue(id, out var sortedEntry))
+                    var sortedEntry = entries.Find(entry => entry.Id == id);
+                    if (sortedEntry != null)
                         sortedEntries.Add(sortedEntry);
                 }
 
@@ -621,10 +602,23 @@ namespace Nop.Data
             if (entities == null)
                 throw new ArgumentNullException(nameof(entities));
 
-            if (!entities.Any())
-                return;
-
-            await DeleteAsync(entities);
+            if (entities.OfType<ISoftDeletedEntity>().Any())
+            {
+                foreach (var entity in entities)
+                {
+                    if (entity is ISoftDeletedEntity softDeletedEntity)
+                    {
+                        softDeletedEntity.Deleted = true;
+                        await _dataProvider.UpdateEntityAsync(entity);
+                    }
+                }
+            }
+            else
+            {
+                using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+                await _dataProvider.BulkDeleteEntitiesAsync(entities);
+                transaction.Complete();
+            }
 
             //event notification
             if (!publishEvent)

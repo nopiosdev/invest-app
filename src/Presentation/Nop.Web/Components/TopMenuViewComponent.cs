@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
 
@@ -6,7 +7,7 @@ namespace Nop.Web.Components
 {
     public partial class TopMenuViewComponent : NopViewComponent
     {
-        protected readonly ICatalogModelFactory _catalogModelFactory;
+        private readonly ICatalogModelFactory _catalogModelFactory;
 
         public TopMenuViewComponent(ICatalogModelFactory catalogModelFactory)
         {

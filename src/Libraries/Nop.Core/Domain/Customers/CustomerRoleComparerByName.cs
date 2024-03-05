@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Customers
+﻿using System.Collections.Generic;
+
+namespace Nop.Core.Domain.Customers
 {
     /// <summary>
     /// Custom comparer for the CustomerRole class by Name and SystemName

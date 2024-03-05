@@ -1,6 +1,11 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Media;
 using Nop.Data;
+using Nop.Services.Catalog;
 
 namespace Nop.Services.Media
 {
@@ -11,8 +16,8 @@ namespace Nop.Services.Media
     {
         #region Fields
 
-        protected readonly IRepository<ProductVideo> _productVideoRepository;
-        protected readonly IRepository<Video> _videoRepository;
+        private readonly IRepository<ProductVideo> _productVideoRepository;
+        private readonly IRepository<Video> _videoRepository;
 
         #endregion
 
@@ -91,7 +96,7 @@ namespace Nop.Services.Media
         public virtual async Task<Video> UpdateVideoAsync(Video video)
         {
             await _videoRepository.UpdateAsync(video);
-
+            
             return video;
         }
 

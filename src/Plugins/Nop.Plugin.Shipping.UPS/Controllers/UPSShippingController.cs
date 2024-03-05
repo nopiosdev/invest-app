@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Plugin.Shipping.UPS.Domain;
 using Nop.Plugin.Shipping.UPS.Models;
@@ -22,13 +26,13 @@ namespace Nop.Plugin.Shipping.UPS.Controllers
     {
         #region Fields
 
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IMeasureService _measureService;
-        protected readonly INotificationService _notificationService;
-        protected readonly IPermissionService _permissionService;
-        protected readonly ISettingService _settingService;
-        protected readonly UPSService _upsService;
-        protected readonly UPSSettings _upsSettings;
+        private readonly ILocalizationService _localizationService;
+        private readonly IMeasureService _measureService;
+        private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
+        private readonly ISettingService _settingService;
+        private readonly UPSService _upsService;
+        private readonly UPSSettings _upsSettings;
 
         #endregion
 
@@ -94,7 +98,7 @@ namespace Nop.Plugin.Shipping.UPS.Controllers
                 .Select(item => new SelectListItem(item.Text, item.Value)).ToList();
             model.AvailablePackagingTypes = (await PackagingType.CustomerSuppliedPackage.ToSelectListAsync(false))
                 .Select(item => new SelectListItem(item.Text?.TrimStart('_'), item.Value)).ToList();
-            model.AvailablePackingTypes = (await PackingType.PackByDimensions.ToSelectListAsync(false))
+            model.AvaliablePackingTypes = (await PackingType.PackByDimensions.ToSelectListAsync(false))
                 .Select(item => new SelectListItem(item.Text, item.Value)).ToList();
             model.AvailableCarrierServices = (await DeliveryService.Standard.ToSelectListAsync(false))
                 .Select(item =>
@@ -102,8 +106,8 @@ namespace Nop.Plugin.Shipping.UPS.Controllers
                 var serviceCode = _upsService.GetUpsCode((DeliveryService)int.Parse(item.Value));
                 return new SelectListItem($"UPS {item.Text?.TrimStart('_')}", serviceCode, servicesCodes.Contains(serviceCode));
             }).ToList();
-            model.AvailableWeightTypes = new List<SelectListItem> { new SelectListItem("LBS", "LBS"), new SelectListItem("KGS", "KGS") };
-            model.AvailableDimensionsTypes = new List<SelectListItem> { new SelectListItem("IN", "IN"), new SelectListItem("CM", "CM") };
+            model.AvaliableWeightTypes = new List<SelectListItem> { new SelectListItem("LBS", "LBS"), new SelectListItem("KGS", "KGS") };
+            model.AvaliableDimensionsTypes = new List<SelectListItem> { new SelectListItem("IN", "IN"), new SelectListItem("CM", "CM") };
 
             //check measures
             var weightSystemName = _upsSettings.WeightType switch { "LBS" => "lb", "KGS" => "kg", _ => null };

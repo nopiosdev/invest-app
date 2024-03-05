@@ -9,7 +9,7 @@ namespace Nop.Services.Common
     {
         #region Fields
 
-        protected readonly StoreHttpClient _storeHttpClient;
+        private readonly StoreHttpClient _storeHttpClient;
 
         #endregion
 

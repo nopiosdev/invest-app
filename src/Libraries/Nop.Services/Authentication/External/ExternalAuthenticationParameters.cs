@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Nop.Services.Authentication.External
 {
     /// <summary>

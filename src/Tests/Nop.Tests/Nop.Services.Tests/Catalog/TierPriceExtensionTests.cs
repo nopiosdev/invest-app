@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FluentAssertions;
 using Nop.Core.Domain.Catalog;
 using Nop.Services.Catalog;
 using NUnit.Framework;

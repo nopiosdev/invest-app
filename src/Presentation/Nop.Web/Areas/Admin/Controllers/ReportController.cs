@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Reports;
@@ -9,8 +10,8 @@ namespace Nop.Web.Areas.Admin.Controllers
     {
         #region Fields
 
-        protected readonly IPermissionService _permissionService;
-        protected readonly IReportModelFactory _reportModelFactory;
+        private readonly IPermissionService _permissionService;
+        private readonly IReportModelFactory _reportModelFactory;
 
         #endregion
 
@@ -30,17 +31,13 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #region Sales summary
 
-        public virtual async Task<IActionResult> SalesSummary(List<int> orderStatuses = null, List<int> paymentStatuses = null)
+        public virtual async Task<IActionResult> SalesSummary()
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.SalesSummaryReport))
                 return AccessDeniedView();
 
             //prepare model
-            var model = await _reportModelFactory.PrepareSalesSummarySearchModelAsync(new SalesSummarySearchModel
-            {
-                OrderStatusIds = orderStatuses,
-                PaymentStatusIds = paymentStatuses
-            });
+            var model = await _reportModelFactory.PrepareSalesSummarySearchModelAsync(new SalesSummarySearchModel());
 
             return View(model);
         }
@@ -249,7 +246,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             var model = await _reportModelFactory.PrepareRegisteredCustomersReportListModelAsync(searchModel);
 
             return Json(model);
-        }
+        }        
 
         #endregion
 

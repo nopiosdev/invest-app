@@ -1,4 +1,7 @@
-﻿using Nop.Services.Common;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Services.Common;
 using Nop.Services.Helpers;
 using Nop.Services.ScheduleTasks;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
@@ -15,8 +18,8 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly IDateTimeHelper _dateTimeHelper;
-        protected readonly IScheduleTaskService _scheduleTaskService;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IScheduleTaskService _scheduleTaskService;
 
         #endregion
 

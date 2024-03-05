@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Customers
 {

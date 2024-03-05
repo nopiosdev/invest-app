@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Plugin.Tax.Avalara.Models.Log;
 using Nop.Plugin.Tax.Avalara.Services;
 using Nop.Services.Customers;
@@ -16,13 +20,13 @@ namespace Nop.Plugin.Tax.Avalara.Controllers
     {
         #region Fields
 
-        protected readonly ICustomerService _customerService;
-        protected readonly IDateTimeHelper _dateTimeHelper;
-        protected readonly IHtmlFormatter _htmlFormatter;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly INotificationService _notificationService;
-        protected readonly IPermissionService _permissionService;
-        protected readonly TaxTransactionLogService _taxTransactionLogService;
+        private readonly ICustomerService _customerService;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IHtmlFormatter _htmlFormatter;
+        private readonly ILocalizationService _localizationService;
+        private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
+        private readonly TaxTransactionLogService _taxTransactionLogService;
 
         #endregion
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Razor;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Nop.Core.Infrastructure;
 
 namespace Nop.Web.Framework.Themes
@@ -8,7 +10,7 @@ namespace Nop.Web.Framework.Themes
     /// </summary>
     public class ThemeableViewLocationExpander : IViewLocationExpander
     {
-        protected const string THEME_KEY = "nop.themename";
+        private const string THEME_KEY = "nop.themename";
 
         /// <summary>
         /// Invoked by a Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine to determine the

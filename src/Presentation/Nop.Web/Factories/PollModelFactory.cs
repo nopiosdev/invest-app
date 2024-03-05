@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Polls;
 using Nop.Services.Polls;
@@ -14,10 +18,10 @@ namespace Nop.Web.Factories
     {
         #region Fields
 
-        protected readonly IPollService _pollService;
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IWorkContext _workContext;
+        private readonly IPollService _pollService;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
 
         #endregion
 

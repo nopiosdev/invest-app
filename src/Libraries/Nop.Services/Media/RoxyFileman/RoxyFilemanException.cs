@@ -1,4 +1,6 @@
-﻿using System.Text;
+using System;
+using System.Collections.Generic;
+using System.Text;
 using Newtonsoft.Json;
 using Nop.Core.Infrastructure;
 
@@ -11,7 +13,7 @@ namespace Nop.Services.Media.RoxyFileman
     {
         #region Fields
 
-        protected static Dictionary<string, string> _languageResources;
+        private static Dictionary<string, string> _languageResources;
 
         #endregion
 
@@ -40,7 +42,7 @@ namespace Nop.Services.Media.RoxyFileman
 
         #endregion
 
-        #region Utilities
+        #region Utils
 
         /// <summary>
         /// Get the language resource value

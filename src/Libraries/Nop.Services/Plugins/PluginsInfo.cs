@@ -1,5 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Infrastructure;
@@ -13,20 +18,11 @@ namespace Nop.Services.Plugins
     {
         #region Fields
 
-        protected const string OBSOLETE_FIELD = "Obsolete field, using only for compatibility";
-        protected List<string> _installedPluginNames = new();
-        protected IList<PluginDescriptorBaseInfo> _installedPlugins = new List<PluginDescriptorBaseInfo>();
+        private const string OBSOLETE_FIELD = "Obsolete field, using only for compatibility";
+        private List<string> _installedPluginNames = new();
+        private IList<PluginDescriptorBaseInfo> _installedPlugins = new List<PluginDescriptorBaseInfo>();
 
         protected readonly INopFileProvider _fileProvider;
-
-        #endregion
-        
-        #region Ctor
-        
-        public PluginsInfo(INopFileProvider fileProvider)
-        {
-            _fileProvider = fileProvider ?? CommonHelper.DefaultFileProvider;
-        }
 
         #endregion
 
@@ -159,6 +155,15 @@ namespace Nop.Services.Plugins
 
         #endregion
 
+        #region Ctor
+        
+        public PluginsInfo(INopFileProvider fileProvider)
+        {
+            _fileProvider = fileProvider ?? CommonHelper.DefaultFileProvider;
+        }
+
+        #endregion
+
         #region Methods
 
         /// <summary>
@@ -189,7 +194,7 @@ namespace Nop.Services.Plugins
             DeserializePluginInfo(text);
 
             var pluginDescriptors = new List<(PluginDescriptor pluginDescriptor, bool needToDeploy)>();
-            var incompatiblePlugins = new Dictionary<string, PluginIncompatibleType>();
+            var incompatiblePlugins = new Dictionary<string, string>();
 
             //ensure plugins directory is created
             var pluginsDirectory = _fileProvider.MapPath(NopPluginDefaults.Path);
@@ -208,7 +213,7 @@ namespace Nop.Services.Plugins
                 //ensure that plugin is compatible with the current version
                 if (!pluginDescriptor.SupportedVersions.Contains(NopVersion.CURRENT_VERSION, StringComparer.InvariantCultureIgnoreCase))
                 {
-                    incompatiblePlugins.Add(pluginDescriptor.SystemName, PluginIncompatibleType.NotCompatibleWithCurrentVersion);
+                    incompatiblePlugins.Add(pluginDescriptor.SystemName, "The plugin isn't compatible with the current version. Hence this plugin can't be loaded.");
                     continue;
                 }
 
@@ -246,7 +251,7 @@ namespace Nop.Services.Plugins
                     if (mainPluginFile == null)
                     {
                         //so plugin is incompatible
-                        incompatiblePlugins.Add(pluginDescriptor.SystemName, PluginIncompatibleType.MainAssemblyNotFound);
+                        incompatiblePlugins.Add(pluginDescriptor.SystemName, "The main assembly isn't found. Hence this plugin can't be loaded.");
                         continue;
                     }
 
@@ -399,7 +404,7 @@ namespace Nop.Services.Plugins
         /// Value - the reason of incompatibility.
         /// </remarks>
         [JsonIgnore]
-        public virtual IDictionary<string, PluginIncompatibleType> IncompatiblePlugins { get; set; }
+        public virtual IDictionary<string, string> IncompatiblePlugins { get; set; }
 
         /// <summary>
         /// Gets or sets the list of assembly loaded collisions

@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -15,10 +19,10 @@ namespace Nop.Plugin.Misc.Zettle.Services
     {
         #region Fields
 
-        protected readonly HttpClient _httpClient;
-        protected readonly ZettleSettings _zettleSettings;
+        private readonly HttpClient _httpClient;
+        private readonly ZettleSettings _zettleSettings;
 
-        protected string _accessToken;
+        private string _accessToken;
 
         #endregion
 
@@ -43,7 +47,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// Get access token
         /// </summary>
         /// <returns>The asynchronous task whose result contains access token</returns>
-        protected async Task<string> GetAccessTokenAsync()
+        private async Task<string> GetAccessTokenAsync()
         {
             if (!string.IsNullOrEmpty(_accessToken))
                 return _accessToken;

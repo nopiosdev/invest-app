@@ -1,4 +1,7 @@
-﻿using Nop.Core.Domain.Stores;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Stores;
 using Nop.Services.Localization;
 using Nop.Services.Stores;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
@@ -15,10 +18,10 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ILocalizedModelFactory _localizedModelFactory;
-        protected readonly IStoreService _storeService;
+        private readonly IBaseAdminModelFactory _baseAdminModelFactory;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedModelFactory _localizedModelFactory;
+        private readonly IStoreService _storeService;
 
         #endregion
 
@@ -36,7 +39,7 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         #endregion
-
+        
         #region Methods
 
         /// <summary>
@@ -116,7 +119,7 @@ namespace Nop.Web.Areas.Admin.Factories
             }
 
             //prepare available languages
-            await _baseAdminModelFactory.PrepareLanguagesAsync(model.AvailableLanguages,
+            await _baseAdminModelFactory.PrepareLanguagesAsync(model.AvailableLanguages, 
                 defaultItemText: await _localizationService.GetResourceAsync("Admin.Common.EmptyItemText"));
 
             //prepare localized models

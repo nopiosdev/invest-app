@@ -1,4 +1,5 @@
-﻿using Nop.Core;
+﻿using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 
 namespace Nop.Services.Catalog
@@ -67,7 +68,7 @@ namespace Nop.Services.Catalog
         /// The task result contains the number of sent email
         /// </returns>
         Task<int> SendNotificationsToSubscribersAsync(Product product);
-
+        
         /// <summary>
         /// Gets all subscriptions
         /// </summary>

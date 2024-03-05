@@ -1,4 +1,5 @@
-﻿using Nop.Web.Areas.Admin.Models.Logging;
+﻿using System.Threading.Tasks;
+using Nop.Web.Areas.Admin.Models.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories
 {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
@@ -38,6 +39,6 @@ namespace Nop.Web.Areas.Admin.Models.Settings
 
         public string AdditionsInstruction { get; set; }
 
-        #endregion
+    #endregion
     }
 }

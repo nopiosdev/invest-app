@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Vendors
+﻿using System;
+
+namespace Nop.Core.Domain.Vendors
 {
     /// <summary>
     /// Represents a vendor note

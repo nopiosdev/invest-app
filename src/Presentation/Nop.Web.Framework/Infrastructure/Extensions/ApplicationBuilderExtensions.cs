@@ -1,4 +1,7 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
@@ -52,7 +55,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
             EngineContext.Current.ConfigureRequestPipeline(application);
         }
 
-        public static async Task StartEngineAsync(this IApplicationBuilder _)
+        public static void StartEngine(this IApplicationBuilder application)
         {
             var engine = EngineContext.Current;
 
@@ -60,12 +63,12 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
             if (DataSettingsManager.IsDatabaseInstalled())
             {
                 //log application start
-                await engine.Resolve<ILogger>().InformationAsync("Application started");
+                engine.Resolve<ILogger>().Information("Application started");
 
                 //install and update plugins
                 var pluginService = engine.Resolve<IPluginService>();
-                await pluginService.InstallPluginsAsync();
-                await pluginService.UpdatePluginsAsync();
+                pluginService.InstallPluginsAsync().Wait();
+                pluginService.UpdatePluginsAsync().Wait();
 
                 //update nopCommerce core and db
                 var migrationManager = engine.Resolve<IMigrationManager>();
@@ -75,7 +78,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
                 migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update);
 
                 var taskScheduler = engine.Resolve<ITaskScheduler>();
-                await taskScheduler.InitializeAsync();
+                taskScheduler.InitializeAsync().Wait();
                 taskScheduler.StartScheduler();
             }
         }
@@ -394,7 +397,8 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
         /// <summary>
         /// Configure PDF
         /// </summary>
-        public static void UseNopPdf(this IApplicationBuilder _)
+        /// <param name="application">Builder for configuring an application's request pipeline</param>
+        public static void UseNopPdf(this IApplicationBuilder application)
         {
             if (!DataSettingsManager.IsDatabaseInstalled())
                 return;
@@ -417,7 +421,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
         /// <param name="application">Builder for configuring an application's request pipeline</param>
         public static void UseNopRequestLocalization(this IApplicationBuilder application)
         {
-            application.UseRequestLocalization(options =>
+            application.UseRequestLocalization(async options =>
             {
                 if (!DataSettingsManager.IsDatabaseInstalled())
                     return;
@@ -433,7 +437,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
                     .ToList();
                 options.SupportedCultures = cultures;
                 options.SupportedUICultures = cultures;
-                options.DefaultRequestCulture = new RequestCulture(cultures.FirstOrDefault() ?? new CultureInfo(NopCommonDefaults.DefaultLanguageCulture));
+                options.DefaultRequestCulture = new RequestCulture(cultures.FirstOrDefault());
                 options.ApplyCurrentCultureToResponseHeaders = true;
 
                 //configure culture providers
@@ -474,47 +478,38 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
         public static void UseNopProxy(this IApplicationBuilder application)
         {
             var appSettings = EngineContext.Current.Resolve<AppSettings>();
+            var hostingConfig = appSettings.Get<HostingConfig>();
 
-            if (appSettings.Get<HostingConfig>().UseProxy)
+            if (hostingConfig.UseProxy)
             {
                 var options = new ForwardedHeadersOptions
                 {
-                    ForwardedHeaders = ForwardedHeaders.All,
+                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
                     // IIS already serves as a reverse proxy and will add X-Forwarded headers to all requests,
                     // so we need to increase this limit, otherwise, passed forwarding headers will be ignored.
                     ForwardLimit = 2
                 };
 
-                if (!string.IsNullOrEmpty(appSettings.Get<HostingConfig>().ForwardedForHeaderName))
-                    options.ForwardedForHeaderName = appSettings.Get<HostingConfig>().ForwardedForHeaderName;
+                if (!string.IsNullOrEmpty(hostingConfig.ForwardedForHeaderName))
+                    options.ForwardedForHeaderName = hostingConfig.ForwardedForHeaderName;
 
-                if (!string.IsNullOrEmpty(appSettings.Get<HostingConfig>().ForwardedProtoHeaderName))
-                    options.ForwardedProtoHeaderName = appSettings.Get<HostingConfig>().ForwardedProtoHeaderName;
+                if (!string.IsNullOrEmpty(hostingConfig.ForwardedProtoHeaderName))
+                    options.ForwardedProtoHeaderName = hostingConfig.ForwardedProtoHeaderName;
 
-                if (!string.IsNullOrEmpty(appSettings.Get<HostingConfig>().KnownProxies))
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+
+                if (!string.IsNullOrEmpty(hostingConfig.KnownProxies))
                 {
-                    foreach (var strIp in appSettings.Get<HostingConfig>().KnownProxies.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList())
+                    foreach (var strIp in hostingConfig.KnownProxies.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList())
                     {
                         if (IPAddress.TryParse(strIp, out var ip))
                             options.KnownProxies.Add(ip);
                     }
-                }
 
-                if (!string.IsNullOrEmpty(appSettings.Get<HostingConfig>().KnownNetworks))
-                {
-                    foreach (var strIpNet in appSettings.Get<HostingConfig>().KnownNetworks.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList())
-                    {
-                        string[] ipNetParts = strIpNet.Split("/");
-                        if (ipNetParts.Length == 2)
-                        {
-                            if (IPAddress.TryParse(ipNetParts[0], out var ip) && int.TryParse(ipNetParts[1], out var length))
-                                options.KnownNetworks.Add(new IPNetwork(ip, length));
-                        }
-                    }
+                    if (options.KnownProxies.Count > 1)
+                        options.ForwardLimit = null; //disable the limit, because KnownProxies is configured
                 }
-
-                if (options.KnownProxies.Count > 1 || options.KnownNetworks.Count > 1)
-                    options.ForwardLimit = null; //disable the limit, because KnownProxies is configured
 
                 //configure forwarding
                 application.UseForwardedHeaders(options);

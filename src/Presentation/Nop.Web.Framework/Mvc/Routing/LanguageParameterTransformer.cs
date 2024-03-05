@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Nop.Core;
 using Nop.Core.Infrastructure;
@@ -13,8 +15,8 @@ namespace Nop.Web.Framework.Mvc.Routing
     {
         #region Fields
 
-        protected readonly IHttpContextAccessor _httpContextAccessor;
-        protected readonly ILanguageService _languageService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILanguageService _languageService;
 
         #endregion
 

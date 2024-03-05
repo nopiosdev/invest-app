@@ -1,4 +1,8 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
@@ -22,8 +26,8 @@ namespace Nop.Tests.Nop.Services.Tests.Messages
             _httpContext = GetService<IHttpContextAccessor>().HttpContext;
         }
 
-        private IList<NotifyData> DeserializedDataDictionary =>
-             JsonConvert.DeserializeObject<IList<NotifyData>>(_tempDataDictionaryFactory.GetTempData(_httpContext)[NopMessageDefaults.NotificationListKey].ToString());
+       private IList<NotifyData> DeserializedDataDictionary => 
+            JsonConvert.DeserializeObject<IList<NotifyData>>(_tempDataDictionaryFactory.GetTempData(_httpContext)[NopMessageDefaults.NotificationListKey].ToString());
 
         [Test]
         public void CanAddNotification()

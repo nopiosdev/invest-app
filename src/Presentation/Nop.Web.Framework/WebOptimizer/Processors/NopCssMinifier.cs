@@ -1,4 +1,7 @@
-﻿using Nop.Core.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Infrastructure;
 using Nop.Services.Logging;
 using NUglify;
 using NUglify.Css;
@@ -24,7 +27,7 @@ namespace Nop.Web.Framework.WebOptimizer.Processors
 
             foreach (var key in context.Content.Keys)
             {
-                if (key.EndsWith(".min.css", StringComparison.InvariantCultureIgnoreCase))
+                if (key.EndsWith(".min.js", StringComparison.InvariantCultureIgnoreCase))
                 {
                     content[key] = context.Content[key];
                     continue;

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Nop.Core;
@@ -33,11 +35,11 @@ namespace Nop.Web.Framework.Mvc.Filters
         {
             #region Fields
 
-            protected readonly IGenericAttributeService _genericAttributeService;
-            protected readonly IMultiFactorAuthenticationPluginManager _multiFactorAuthenticationPluginManager;
-            protected readonly IPermissionService _permissionService;
-            protected readonly IWorkContext _workContext;
-            protected readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
+            private readonly IGenericAttributeService _genericAttributeService;
+            private readonly IMultiFactorAuthenticationPluginManager _multiFactorAuthenticationPluginManager;
+            private readonly IPermissionService _permissionService;
+            private readonly IWorkContext _workContext;
+            private readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
 
             #endregion
 

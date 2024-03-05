@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Media
+﻿using System;
+
+namespace Nop.Core.Domain.Media
 {
     /// <summary>
     /// Helper class for making pictures hashes from DB

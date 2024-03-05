@@ -1,6 +1,10 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
-using Nop.Services.Attributes;
+using Nop.Services.Common;
 using Nop.Services.Localization;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Common;
@@ -16,17 +20,17 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly IAttributeParser<AddressAttribute, AddressAttributeValue> _addressAttributeParser;
-        protected readonly IAttributeService<AddressAttribute, AddressAttributeValue> _addressAttributeService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ILocalizedModelFactory _localizedModelFactory;
+        private readonly IAddressAttributeParser _addressAttributeParser;
+        private readonly IAddressAttributeService _addressAttributeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedModelFactory _localizedModelFactory;
 
         #endregion
 
         #region Ctor
 
-        public AddressAttributeModelFactory(IAttributeParser<AddressAttribute, AddressAttributeValue> addressAttributeParser,
-            IAttributeService<AddressAttribute, AddressAttributeValue> addressAttributeService,
+        public AddressAttributeModelFactory(IAddressAttributeParser addressAttributeParser,
+            IAddressAttributeService addressAttributeService,
             ILocalizationService localizationService,
             ILocalizedModelFactory localizedModelFactory)
         {
@@ -99,7 +103,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 throw new ArgumentNullException(nameof(searchModel));
 
             //get address attributes
-            var addressAttributes = (await _addressAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
+            var addressAttributes = (await _addressAttributeService.GetAllAddressAttributesAsync()).ToPagedList(searchModel);
 
             //prepare grid model
             var model = await new AddressAttributeListModel().PrepareToGridAsync(searchModel, addressAttributes, () =>
@@ -175,7 +179,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 throw new ArgumentNullException(nameof(addressAttribute));
 
             //get address attribute values
-            var addressAttributeValues = (await _addressAttributeService.GetAttributeValuesAsync(addressAttribute.Id)).ToPagedList(searchModel);
+            var addressAttributeValues = (await _addressAttributeService.GetAddressAttributeValuesAsync(addressAttribute.Id)).ToPagedList(searchModel);
 
             //prepare grid model
             var model = new AddressAttributeValueListModel().PrepareToGrid(searchModel, addressAttributeValues, () =>
@@ -218,7 +222,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 };
             }
 
-            model.AttributeId = addressAttribute.Id;
+            model.AddressAttributeId = addressAttribute.Id;
 
             //prepare localized models
             if (!excludeProperties)
@@ -238,7 +242,7 @@ namespace Nop.Web.Areas.Admin.Factories
             if (models == null)
                 throw new ArgumentNullException(nameof(models));
 
-            var attributes = await _addressAttributeService.GetAllAttributesAsync();
+            var attributes = await _addressAttributeService.GetAllAddressAttributesAsync();
             foreach (var attribute in attributes)
             {
                 var attributeModel = new AddressModel.AddressAttributeModel
@@ -249,10 +253,10 @@ namespace Nop.Web.Areas.Admin.Factories
                     AttributeControlType = attribute.AttributeControlType,
                 };
 
-                if (attribute.ShouldHaveValues)
+                if (attribute.ShouldHaveValues())
                 {
                     //values
-                    var attributeValues = await _addressAttributeService.GetAttributeValuesAsync(attribute.Id);
+                    var attributeValues = await _addressAttributeService.GetAddressAttributeValuesAsync(attribute.Id);
                     foreach (var attributeValue in attributeValues)
                     {
                         var attributeValueModel = new AddressModel.AddressAttributeValueModel
@@ -272,39 +276,39 @@ namespace Nop.Web.Areas.Admin.Factories
                     case AttributeControlType.DropdownList:
                     case AttributeControlType.RadioList:
                     case AttributeControlType.Checkboxes:
+                    {
+                        if (!string.IsNullOrEmpty(selectedAddressAttributes))
                         {
-                            if (!string.IsNullOrEmpty(selectedAddressAttributes))
-                            {
-                                //clear default selection
-                                foreach (var item in attributeModel.Values)
-                                    item.IsPreSelected = false;
+                            //clear default selection
+                            foreach (var item in attributeModel.Values)
+                                item.IsPreSelected = false;
 
-                                //select new values
-                                var selectedValues = await _addressAttributeParser.ParseAttributeValuesAsync(selectedAddressAttributes);
-                                foreach (var attributeValue in selectedValues)
-                                    foreach (var item in attributeModel.Values)
-                                        if (attributeValue.Id == item.Id)
-                                            item.IsPreSelected = true;
-                            }
+                            //select new values
+                            var selectedValues = await _addressAttributeParser.ParseAddressAttributeValuesAsync(selectedAddressAttributes);
+                            foreach (var attributeValue in selectedValues)
+                                foreach (var item in attributeModel.Values)
+                                    if (attributeValue.Id == item.Id)
+                                        item.IsPreSelected = true;
                         }
-                        break;
+                    }
+                    break;
                     case AttributeControlType.ReadonlyCheckboxes:
-                        {
-                            //do nothing
-                            //values are already pre-set
-                        }
-                        break;
+                    {
+                        //do nothing
+                        //values are already pre-set
+                    }
+                    break;
                     case AttributeControlType.TextBox:
                     case AttributeControlType.MultilineTextbox:
+                    {
+                        if (!string.IsNullOrEmpty(selectedAddressAttributes))
                         {
-                            if (!string.IsNullOrEmpty(selectedAddressAttributes))
-                            {
-                                var enteredText = _addressAttributeParser.ParseValues(selectedAddressAttributes, attribute.Id);
-                                if (enteredText.Any())
-                                    attributeModel.DefaultValue = enteredText[0];
-                            }
+                            var enteredText = _addressAttributeParser.ParseValues(selectedAddressAttributes, attribute.Id);
+                            if (enteredText.Any())
+                                attributeModel.DefaultValue = enteredText[0];
                         }
-                        break;
+                    }
+                    break;
                     case AttributeControlType.ColorSquares:
                     case AttributeControlType.ImageSquares:
                     case AttributeControlType.Datepicker:

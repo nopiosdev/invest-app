@@ -1,6 +1,8 @@
-﻿using System.Net;
-using DocumentFormat.OpenXml.Wordprocessing;
-using System.Numerics;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Nop.Core;
 using Nop.Core.Domain.Blogs;
 using Nop.Core.Domain.Catalog;
@@ -20,9 +22,6 @@ using Nop.Services.Customers;
 using Nop.Services.Localization;
 using Nop.Services.Orders;
 using Nop.Services.Stores;
-using Nop.Core.Domain.Transaction;
-using Nop.Services.Transactions;
-using Nop.Core.Infrastructure;
 
 namespace Nop.Services.Messages
 {
@@ -33,24 +32,24 @@ namespace Nop.Services.Messages
     {
         #region Fields
 
-        protected readonly CommonSettings _commonSettings;
-        protected readonly EmailAccountSettings _emailAccountSettings;
-        protected readonly IAddressService _addressService;
-        protected readonly IAffiliateService _affiliateService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IEmailAccountService _emailAccountService;
-        protected readonly IEventPublisher _eventPublisher;
-        protected readonly ILanguageService _languageService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IMessageTemplateService _messageTemplateService;
-        protected readonly IMessageTokenProvider _messageTokenProvider;
-        protected readonly IOrderService _orderService;
-        protected readonly IProductService _productService;
-        protected readonly IQueuedEmailService _queuedEmailService;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IStoreService _storeService;
-        protected readonly ITokenizer _tokenizer;
-        protected readonly MessagesSettings _messagesSettings;
+        private readonly CommonSettings _commonSettings;
+        private readonly EmailAccountSettings _emailAccountSettings;
+        private readonly IAddressService _addressService;
+        private readonly IAffiliateService _affiliateService;
+        private readonly ICustomerService _customerService;
+        private readonly IEmailAccountService _emailAccountService;
+        private readonly IEventPublisher _eventPublisher;
+        private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IMessageTemplateService _messageTemplateService;
+        private readonly IMessageTokenProvider _messageTokenProvider;
+        private readonly IOrderService _orderService;
+        private readonly IProductService _productService;
+        private readonly IQueuedEmailService _queuedEmailService;
+        private readonly IStoreContext _storeContext;
+        private readonly IStoreService _storeService;
+        private readonly ITokenizer _tokenizer;
+        private readonly MessagesSettings _messagesSettings;
 
         #endregion
 
@@ -183,64 +182,10 @@ namespace Nop.Services.Messages
         /// <returns>Email address and name to send email fore store owner</returns>
         protected virtual async Task<(string email, string name)> GetStoreOwnerNameAndEmailAsync(EmailAccount messageTemplateEmailAccount)
         {
-            var storeOwnerEmailAccount = _messagesSettings.UseDefaultEmailAccountForSendStoreOwnerEmails ? await _emailAccountService.GetEmailAccountByIdAsync(_emailAccountSettings.DefaultEmailAccountId) : null;
+            var storeOwnerEmailAccount = _messagesSettings.UseDefaultEmailAccountForSendStoreOwnerEmails ?  await _emailAccountService.GetEmailAccountByIdAsync(_emailAccountSettings.DefaultEmailAccountId) : null;
             storeOwnerEmailAccount ??= messageTemplateEmailAccount;
 
             return (storeOwnerEmailAccount.Email, storeOwnerEmailAccount.DisplayName);
-        }
-
-        /// <summary>
-        /// Get email and name to set ReplyTo property of email from customer 
-        /// </summary>
-        /// <param name="messageTemplate">Message template</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Email address and name when reply to email</returns>
-        protected virtual async Task<(string email, string name)> GetCustomerReplyToNameAndEmailAsync(MessageTemplate messageTemplate, int customerId)
-        {
-            if (!messageTemplate.AllowDirectReply ||
-                customerId.Equals(0))
-                return (null, null);
-
-            return await this.GetCustomerReplyToNameAndEmailAsync(messageTemplate, await _customerService.GetCustomerByIdAsync(customerId));
-        }
-
-        protected virtual async Task<(string email, string name)> GetCustomerReplyToNameAndEmailAsync(MessageTemplate messageTemplate, Customer customer)
-        {
-            if (!messageTemplate.AllowDirectReply)
-                return (null, null);
-
-            var replyToEmail = await _customerService.IsGuestAsync(customer)
-                ? string.Empty
-                : customer.Email;
-
-            var replyToName = await _customerService.IsGuestAsync(customer)
-                ? string.Empty
-                : await _customerService.GetCustomerFullNameAsync(customer);
-
-            return (replyToEmail, replyToName);
-        }
-
-        /// <summary>
-        /// Get email and name to set ReplyTo property of email from order
-        /// </summary>
-        /// <param name="messageTemplate">Message template</param>
-        /// <param name="order">Order</param>
-        /// <returns>Email address and name when reply to email</returns>
-        protected virtual async Task<(string email, string name)> GetCustomerReplyToNameAndEmailAsync(MessageTemplate messageTemplate, Order order)
-        {
-            if (!messageTemplate.AllowDirectReply)
-                return (null, null);
-
-            var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
-            var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
-                ?? new Address()
-                {
-                    Email = customer.Email,
-                    FirstName = customer.FirstName,
-                    LastName = customer.LastName
-                };
-
-            return (billingAddress.Email, $"{billingAddress.FirstName} {billingAddress.LastName}");
         }
 
         #endregion
@@ -285,12 +230,9 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
+                var (toEmail,toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
 
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, customer);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                    replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -557,10 +499,8 @@ namespace Nop.Services.Messages
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, order);
 
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                    replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -652,10 +592,8 @@ namespace Nop.Services.Messages
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, order);
 
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                    replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -749,14 +687,8 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
-                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
-                    ?? new Address()
-                    {
-                        Email = customer.Email,
-                        FirstName = customer.FirstName,
-                        LastName = customer.LastName
-                    };
+                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+
                 var toEmail = billingAddress.Email;
                 var toName = $"{billingAddress.FirstName} {billingAddress.LastName}";
 
@@ -853,14 +785,8 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
-                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
-                    ?? new Address()
-                    {
-                        Email = customer.Email,
-                        FirstName = customer.FirstName,
-                        LastName = customer.LastName
-                    };
+                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+
                 var toEmail = billingAddress.Email;
                 var toName = $"{billingAddress.FirstName} {billingAddress.LastName}";
 
@@ -1060,14 +986,7 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
-                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
-                    ?? new Address()
-                    {
-                        Email = customer.Email,
-                        FirstName = customer.FirstName,
-                        LastName = customer.LastName
-                    };
+                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
 
                 var toEmail = billingAddress.Email;
                 var toName = $"{billingAddress.FirstName} {billingAddress.LastName}";
@@ -1117,14 +1036,7 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
-                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
-                    ?? new Address()
-                    {
-                        Email = customer.Email,
-                        FirstName = customer.FirstName,
-                        LastName = customer.LastName
-                    };
+                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
 
                 var toEmail = billingAddress.Email;
                 var toName = $"{billingAddress.FirstName} {billingAddress.LastName}";
@@ -1171,14 +1083,7 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
-                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
-                    ?? new Address()
-                    {
-                        Email = customer.Email,
-                        FirstName = customer.FirstName,
-                        LastName = customer.LastName
-                    };
+                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
 
                 var toEmail = billingAddress.Email;
                 var toName = $"{billingAddress.FirstName} {billingAddress.LastName}";
@@ -1227,10 +1132,8 @@ namespace Nop.Services.Messages
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, order);
 
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                    replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -1325,14 +1228,7 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
-                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId)
-                    ?? new Address()
-                    {
-                        Email = customer.Email,
-                        FirstName = customer.FirstName,
-                        LastName = customer.LastName
-                    };
+                var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
 
                 var toEmail = billingAddress.Email;
                 var toName = $"{billingAddress.FirstName} {billingAddress.LastName}";
@@ -1385,10 +1281,8 @@ namespace Nop.Services.Messages
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, order);
 
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                    replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -1732,10 +1626,8 @@ namespace Nop.Services.Messages
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, order);
 
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                    replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -2050,12 +1942,7 @@ namespace Nop.Services.Messages
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
 
-                var vendorAddress = await _addressService.GetAddressByIdAsync(vendor.AddressId);
-                var replyToEmail = messageTemplate.AllowDirectReply ? vendorAddress.Email : "";
-                var replyToName = messageTemplate.AllowDirectReply ? $"{vendorAddress.FirstName} {vendorAddress.LastName}" : "";
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                    replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -2097,12 +1984,7 @@ namespace Nop.Services.Messages
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
 
-                var vendorAddress = await _addressService.GetAddressByIdAsync(vendor.AddressId);
-                var replyToEmail = messageTemplate.AllowDirectReply ? vendorAddress.Email : "";
-                var replyToName = messageTemplate.AllowDirectReply ? $"{vendorAddress.FirstName} {vendorAddress.LastName}" : "";
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                    replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -2189,13 +2071,9 @@ namespace Nop.Services.Messages
                 //event notification
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
-                var customer = await _customerService.GetCustomerByIdAsync(productReview.CustomerId);
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, customer);
-
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
 
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                     replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -2379,10 +2257,8 @@ namespace Nop.Services.Messages
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, customer);
 
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                     replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -2407,8 +2283,6 @@ namespace Nop.Services.Messages
             if (!messageTemplates.Any())
                 return new List<int>();
 
-            var customer = await _customerService.GetCustomerByIdAsync(blogComment.CustomerId);
-
             //tokens
             var commonTokens = new List<Token>();
             await _messageTokenProvider.AddBlogCommentTokensAsync(commonTokens, blogComment);
@@ -2426,10 +2300,8 @@ namespace Nop.Services.Messages
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, customer);
 
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                     replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -2454,8 +2326,6 @@ namespace Nop.Services.Messages
             if (!messageTemplates.Any())
                 return new List<int>();
 
-            var customer = await _customerService.GetCustomerByIdAsync(newsComment.CustomerId);
-
             //tokens
             var commonTokens = new List<Token>();
             await _messageTokenProvider.AddNewsCommentTokensAsync(commonTokens, newsComment);
@@ -2473,10 +2343,8 @@ namespace Nop.Services.Messages
                 await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
 
                 var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-                var (replyToEmail, replyToName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, customer);
 
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                      replyToEmailAddress: replyToEmail, replyToName: replyToName);
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToListAsync();
         }
 
@@ -2546,7 +2414,7 @@ namespace Nop.Services.Messages
         /// The task result contains the queued email identifier
         /// </returns>
         public virtual async Task<IList<int>> SendContactUsMessageAsync(int languageId, string senderEmail,
-            string senderName, string subject, string body, string phoneNumber = "")
+            string senderName, string subject, string body)
         {
             var store = await _storeContext.GetCurrentStoreAsync();
             languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
@@ -2555,17 +2423,11 @@ namespace Nop.Services.Messages
             if (!messageTemplates.Any())
                 return new List<int>();
 
-            if (phoneNumber == string.Empty)
-            {
-                phoneNumber = "N/A";
-            }
-
             //tokens
             var commonTokens = new List<Token>
             {
                 new Token("ContactUs.SenderEmail", senderEmail),
-                new Token("ContactUs.SenderName", senderName),
-                new Token("ContactUs.SenderPhoneNumber", phoneNumber)
+                new Token("ContactUs.SenderName", senderName)
             };
 
             return await messageTemplates.SelectAwait(async messageTemplate =>
@@ -2708,38 +2570,6 @@ namespace Nop.Services.Messages
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, sendToEmail, null);
         }
-        public virtual async Task<IList<int>> SendDeleteAccountRequestAsync(Customer customer, int languageId)
-        {
-            if (customer is null)
-                throw new ArgumentNullException(nameof(customer));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.DeleteAccountRequestNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                string fromEmail = customer.Email,
-                    fromName = await _customerService.GetCustomerFullNameAsync(customer);
-
-                var tokens = new List<Token>();
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, emailAccount.Email, emailAccount.DisplayName,
-                    fromEmail: fromEmail,
-                    fromName: fromName);
-            }).ToListAsync();
-
-        }
 
         #endregion
 
@@ -2816,679 +2646,6 @@ namespace Nop.Services.Messages
             await _queuedEmailService.InsertQueuedEmailAsync(email);
             return email.Id;
         }
-
-        #endregion
-
-        #region Transaction
-
-        #region Debit
-
-        public virtual async Task<IList<int>> SendTransactionDebitRequestAsync(decimal transactionAmount, int languageId, string senderEmail, string senderName)
-        {
-            if (senderEmail == null)
-                throw new ArgumentNullException(nameof(senderEmail));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.TransactionDebitNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>
-            {
-                new Token("Transaction.DebitAmount", transactionAmount),
-            };
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                string fromEmail = senderEmail,
-                 fromName = senderName;
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var toEmail = emailAccount.Email;
-                var toName = emailAccount.DisplayName;
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
-                    fromEmail: fromEmail,
-                    fromName: fromName,
-                    replyToEmailAddress: senderEmail,
-                    replyToName: senderName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendPendingDebitTransactionCustomerNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.PendingDebitTransactionCustomerNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, transaction.CustomerId);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendCompletedDebitTransactionCustomerNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.CompletedDebitTransactionCustomerNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, transaction.CustomerId);
-                
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendDeclinedDebitTransactionCustomerNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.DeclinedDebitTransactionCustomerNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, transaction.CustomerId);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendRemovedDebitTransactionCustomerNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.RemovedDebitTransactionCustomerNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, transaction.CustomerId);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendPendingDebitTransactionAdminNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.PendingDebitTransactionAdminNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendCompletedDebitTransactionAdminNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.CompletedDebitTransactionAdminNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendDeclinedDebitTransactionAdminNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.DeclinedDebitTransactionAdminNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendRemovedDebitTransactionAdminNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.RemovedDebitTransactionAdminNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        #endregion
-
-        #region Credit
-
-        public virtual async Task<IList<int>> SendPendingCreditTransactionCustomerNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.PendingCreditTransactionCustomerNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, transaction.CustomerId);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendCompletedCreditTransactionCustomerNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.CompletedCreditTransactionCustomerNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, transaction.CustomerId);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendDeclinedCreditTransactionCustomerNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.DeclinedCreditTransactionCustomerNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, transaction.CustomerId);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendRemovedCreditTransactionCustomerNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.RemovedCreditTransactionCustomerNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetCustomerReplyToNameAndEmailAsync(messageTemplate, transaction.CustomerId);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendPendingCreditTransactionAdminNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.PendingCreditTransactionAdminNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendCompletedCreditTransactionAdminNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.CompletedCreditTransactionAdminNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendDeclinedCreditTransactionAdminNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.DeclinedCreditTransactionAdminNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendRemovedCreditTransactionAdminNotificationAsync(Transaction transaction, int languageId)
-        {
-            if (transaction == null)
-                throw new ArgumentNullException(nameof(transaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.RemovedCreditTransactionAdminNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        #endregion
-
-        #region Return Transaction
-
-        public virtual async Task<IList<int>> SendReturnGeneratedCustomerNotificationAsync(ReturnTransaction returnTransaction, int languageId)
-        {
-            if (returnTransaction == null)
-                throw new ArgumentNullException(nameof(returnTransaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.ReturnGeneratedCustomerNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            var transaction = await EngineContext.Current.Resolve<ITransactionService>().GetTransactionByReturnTransactionAsync(returnTransaction);
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        public virtual async Task<IList<int>> SendReturnGeneratedAdminNotificationAsync(ReturnTransaction returnTransaction, int languageId)
-        {
-            if (returnTransaction == null)
-                throw new ArgumentNullException(nameof(returnTransaction));
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
-
-            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.ReturnGeneratedAdminNotification, store.Id);
-            if (!messageTemplates.Any())
-                return new List<int>();
-
-            var transaction = await EngineContext.Current.Resolve<ITransactionService>().GetTransactionByReturnTransactionAsync(returnTransaction);
-            //tokens
-            var commonTokens = new List<Token>();
-            await _messageTokenProvider.AddTransactionTokensAsync(commonTokens, transaction, languageId);
-            await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, transaction.CustomerId);
-
-            return await messageTemplates.SelectAwait(async messageTemplate =>
-            {
-                //email account
-                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
-
-                var tokens = new List<Token>(commonTokens);
-                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
-
-                //event notification
-                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
-
-                var (toEmail, toName) = await GetStoreOwnerNameAndEmailAsync(emailAccount);
-
-                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
-            }).ToListAsync();
-        }
-
-        #endregion
 
         #endregion
 

@@ -28,12 +28,12 @@ namespace Nop.Web.Framework.Events
         /// <summary>
         /// Gets a model
         /// </summary>
-        public T Model { get; protected set; }
+        public T Model { get; private set; }
 
         /// <summary>
         /// Gets a model state
         /// </summary>
-        public ModelStateDictionary ModelState { get; protected set; }
+        public ModelStateDictionary ModelState { get; private set; }
 
         #endregion
     }

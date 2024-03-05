@@ -1,4 +1,8 @@
-﻿namespace Nop.Core
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Nop.Core
 {
     /// <summary>
     /// Paged list

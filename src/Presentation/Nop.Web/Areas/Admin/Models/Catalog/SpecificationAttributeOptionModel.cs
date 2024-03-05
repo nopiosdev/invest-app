@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog
@@ -35,7 +36,7 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
 
         [NopResourceDisplayName("Admin.Catalog.Attributes.SpecificationAttributes.SpecificationAttribute.Options.Fields.NumberOfAssociatedProducts")]
         public int NumberOfAssociatedProducts { get; set; }
-
+        
         public IList<SpecificationAttributeOptionLocalizedModel> Locales { get; set; }
 
         #endregion
@@ -47,5 +48,5 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
 
         [NopResourceDisplayName("Admin.Catalog.Attributes.SpecificationAttributes.SpecificationAttribute.Options.Fields.Name")]
         public string Name { get; set; }
-    }
+    }    
 }

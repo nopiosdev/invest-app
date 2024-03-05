@@ -1,4 +1,9 @@
-﻿using MimeKit;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using MimeKit;
 using MimeKit.Text;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
@@ -14,9 +19,9 @@ namespace Nop.Services.Messages
     {
         #region Fields
 
-        protected readonly IDownloadService _downloadService;
-        protected readonly INopFileProvider _fileProvider;
-        protected readonly ISmtpBuilder _smtpBuilder;
+        private readonly IDownloadService _downloadService;
+        private readonly INopFileProvider _fileProvider;
+        private readonly ISmtpBuilder _smtpBuilder;
 
         #endregion
 
@@ -57,7 +62,7 @@ namespace Nop.Services.Messages
         /// A task that represents the asynchronous operation
         /// The task result contains a leaf-node MIME part that contains an attachment.
         /// </returns>
-        protected virtual async Task<MimePart> CreateMimeAttachmentAsync(string filePath, string attachmentFileName = null)
+        protected async Task<MimePart> CreateMimeAttachmentAsync(string filePath, string attachmentFileName = null)
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentNullException(nameof(filePath));

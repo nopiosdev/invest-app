@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.ScheduleTasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.ScheduleTasks;
 
 namespace Nop.Services.ScheduleTasks
 {

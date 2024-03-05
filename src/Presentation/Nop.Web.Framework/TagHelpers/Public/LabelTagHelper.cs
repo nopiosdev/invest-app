@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Nop.Web.Framework.TagHelpers.Public
@@ -11,11 +13,21 @@ namespace Nop.Web.Framework.TagHelpers.Public
     {
         #region Constants
 
-        protected const string FOR_ATTRIBUTE_NAME = "asp-for";
-        protected const string POSTFIX_ATTRIBUTE_NAME = "asp-postfix";
+        private const string FOR_ATTRIBUTE_NAME = "asp-for";
+        private const string POSTFIX_ATTRIBUTE_NAME = "asp-postfix";
 
         #endregion
-        
+
+        #region Properties
+
+        /// <summary>
+        /// Indicates whether the input is disabled
+        /// </summary>
+        [HtmlAttributeName(POSTFIX_ATTRIBUTE_NAME)]
+        public string Postfix { get; set; }
+
+        #endregion
+
         #region Ctor
 
         public LabelTagHelper(IHtmlGenerator generator) : base(generator)
@@ -44,16 +56,6 @@ namespace Nop.Web.Framework.TagHelpers.Public
 
             await base.ProcessAsync(context, output);
         }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Indicates whether the input is disabled
-        /// </summary>
-        [HtmlAttributeName(POSTFIX_ATTRIBUTE_NAME)]
-        public string Postfix { get; set; }
 
         #endregion
     }

@@ -1,6 +1,6 @@
-﻿using Nop.Web.Areas.Admin.Models.Vendors;
+﻿using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Models;
-using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Areas.Admin.Models.Vendors;
 
 namespace Nop.Web.Areas.Admin.Models.Settings
 {

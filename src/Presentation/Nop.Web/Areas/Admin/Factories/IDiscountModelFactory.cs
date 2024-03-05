@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Discounts;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Discounts;
 using Nop.Web.Areas.Admin.Models.Discounts;
 
 namespace Nop.Web.Areas.Admin.Factories

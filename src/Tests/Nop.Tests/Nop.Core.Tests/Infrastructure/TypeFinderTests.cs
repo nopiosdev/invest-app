@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using FluentAssertions;
 using Nop.Core.Infrastructure;
 using NUnit.Framework;
 

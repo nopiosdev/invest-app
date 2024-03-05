@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Nop.Web.Framework.Models;
 using Nop.Web.Models.Media;
 
 namespace Nop.Web.Models.Catalog

@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.News;
+﻿using System.Threading.Tasks;
+using Nop.Core.Domain.News;
 using Nop.Web.Areas.Admin.Models.News;
 
 namespace Nop.Web.Areas.Admin.Factories
@@ -62,7 +63,7 @@ namespace Nop.Web.Areas.Admin.Factories
         /// The task result contains the news comment list model
         /// </returns>
         Task<NewsCommentListModel> PrepareNewsCommentListModelAsync(NewsCommentSearchModel searchModel, int? newsItemId);
-
+        
         /// <summary>
         /// Prepare news item search model
         /// </summary>

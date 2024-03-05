@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Media;
 using Nop.Services.Caching;
+using System.Threading.Tasks;
 
 namespace Nop.Services.Media.Caching
 {

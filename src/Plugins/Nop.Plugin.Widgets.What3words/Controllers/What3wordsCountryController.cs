@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Services.Directory;
 using Nop.Web.Controllers;
 
@@ -9,7 +10,7 @@ namespace Nop.Plugin.Widgets.What3words.Controllers
     {
         #region Fields
 
-        protected readonly ICountryService _countryService;
+        private readonly ICountryService _countryService;
 
         #endregion
 

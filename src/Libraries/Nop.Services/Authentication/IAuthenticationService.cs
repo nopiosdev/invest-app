@@ -1,11 +1,12 @@
-﻿using Nop.Core.Domain.Customers;
+﻿using System.Threading.Tasks;
+using Nop.Core.Domain.Customers;
 
 namespace Nop.Services.Authentication
 {
     /// <summary>
     /// Authentication service interface
     /// </summary>
-    public partial interface IAuthenticationService
+    public partial interface IAuthenticationService 
     {
         /// <summary>
         /// Sign in

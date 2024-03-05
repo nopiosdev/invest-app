@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Common;
 using Nop.Data;
@@ -12,8 +16,8 @@ namespace Nop.Services.Common
     {
         #region Fields
 
-        protected readonly IRepository<GenericAttribute> _genericAttributeRepository;
-        protected readonly IStaticCacheManager _staticCacheManager;
+        private readonly IRepository<GenericAttribute> _genericAttributeRepository;
+        private readonly IStaticCacheManager _staticCacheManager;
 
         #endregion
 
@@ -49,7 +53,7 @@ namespace Nop.Services.Common
         {
             await _genericAttributeRepository.DeleteAsync(attributes);
         }
-
+        
         /// <summary>
         /// Inserts an attribute
         /// </summary>
@@ -92,11 +96,11 @@ namespace Nop.Services.Common
         public virtual async Task<IList<GenericAttribute>> GetAttributesForEntityAsync(int entityId, string keyGroup)
         {
             var key = _staticCacheManager.PrepareKeyForShortTermCache(NopCommonDefaults.GenericAttributeCacheKey, entityId, keyGroup);
-
+            
             var query = from ga in _genericAttributeRepository.Table
-                        where ga.EntityId == entityId &&
-                              ga.KeyGroup == keyGroup
-                        select ga;
+                where ga.EntityId == entityId &&
+                      ga.KeyGroup == keyGroup
+                select ga;
             var attributes = await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
 
             return attributes;
@@ -143,7 +147,7 @@ namespace Nop.Services.Common
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(valueStr))
+                if (string.IsNullOrWhiteSpace(valueStr)) 
                     return;
 
                 //insert

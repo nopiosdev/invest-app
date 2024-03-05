@@ -1,4 +1,7 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 

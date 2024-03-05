@@ -1,4 +1,7 @@
-﻿namespace Nop.Data.Mapping
+﻿using System;
+using System.Collections.Generic;
+
+namespace Nop.Data.Mapping
 {
     /// <summary>
     /// Backward compatibility of table naming

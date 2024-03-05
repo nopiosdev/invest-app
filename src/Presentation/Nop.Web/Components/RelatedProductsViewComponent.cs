@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Services.Catalog;
 using Nop.Services.Security;
 using Nop.Services.Stores;
@@ -9,10 +11,10 @@ namespace Nop.Web.Components
 {
     public partial class RelatedProductsViewComponent : NopViewComponent
     {
-        protected readonly IAclService _aclService;
-        protected readonly IProductModelFactory _productModelFactory;
-        protected readonly IProductService _productService;
-        protected readonly IStoreMappingService _storeMappingService;
+        private readonly IAclService _aclService;
+        private readonly IProductModelFactory _productModelFactory;
+        private readonly IProductService _productService;
+        private readonly IStoreMappingService _storeMappingService;
 
         public RelatedProductsViewComponent(IAclService aclService,
             IProductModelFactory productModelFactory,

@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Messages
+﻿using System;
+
+namespace Nop.Core.Domain.Messages
 {
     /// <summary>
     /// Represents a campaign

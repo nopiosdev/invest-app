@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
@@ -17,12 +20,12 @@ namespace Nop.Plugin.Payments.CyberSource.Components
     {
         #region Fields
 
-        protected readonly CustomerTokenService _customerTokenService;
-        protected readonly CyberSourceService _cyberSourceService;
-        protected readonly CyberSourceSettings _cyberSourceSettings;
-        protected readonly INotificationService _notificationService;
-        protected readonly IWorkContext _workContext;
-        protected readonly OrderSettings _orderSettings;
+        private readonly CustomerTokenService _customerTokenService;
+        private readonly CyberSourceService _cyberSourceService;
+        private readonly CyberSourceSettings _cyberSourceSettings;
+        private readonly INotificationService _notificationService;
+        private readonly IWorkContext _workContext;
+        private readonly OrderSettings _orderSettings;
 
         #endregion
 

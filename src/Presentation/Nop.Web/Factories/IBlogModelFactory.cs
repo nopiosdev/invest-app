@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Blogs;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Blogs;
 using Nop.Web.Models.Blogs;
 
 namespace Nop.Web.Factories

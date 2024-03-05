@@ -1,6 +1,10 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Text;
-using DocumentFormat.OpenXml.Office2010.PowerPoint;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain;
@@ -11,7 +15,6 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Media;
-using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
@@ -23,7 +26,6 @@ using Nop.Services.Directory;
 using Nop.Services.Forums;
 using Nop.Services.Localization;
 using Nop.Services.Media;
-using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
@@ -43,43 +45,41 @@ namespace Nop.Web.Factories
     {
         #region Fields
 
-        protected readonly BlogSettings _blogSettings;
-        protected readonly CaptchaSettings _captchaSettings;
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly CommonSettings _commonSettings;
-        protected readonly CustomerSettings _customerSettings;
-        protected readonly DisplayDefaultFooterItemSettings _displayDefaultFooterItemSettings;
-        protected readonly ForumSettings _forumSettings;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IForumService _forumService;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly IHttpContextAccessor _httpContextAccessor;
-        protected readonly ILanguageService _languageService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly INopFileProvider _fileProvider;
-        protected readonly INopHtmlHelper _nopHtmlHelper;
-        protected readonly IPermissionService _permissionService;
-        protected readonly IPictureService _pictureService;
-        protected readonly IShoppingCartService _shoppingCartService;
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IThemeContext _themeContext;
-        protected readonly IThemeProvider _themeProvider;
-        protected readonly ITopicService _topicService;
-        protected readonly IUrlRecordService _urlRecordService;
-        protected readonly IWebHelper _webHelper;
-        protected readonly IWorkContext _workContext;
-        protected readonly LocalizationSettings _localizationSettings;
-        protected readonly MediaSettings _mediaSettings;
-        protected readonly NewsSettings _newsSettings;
-        protected readonly RobotsTxtSettings _robotsTxtSettings;
-        protected readonly SitemapSettings _sitemapSettings;
-        protected readonly SitemapXmlSettings _sitemapXmlSettings;
-        protected readonly StoreInformationSettings _storeInformationSettings;
-        protected readonly VendorSettings _vendorSettings;
-        protected readonly IEmailAccountService _emailAccountService;
-        protected readonly EmailAccountSettings _emailAccountSettings;
+        private readonly BlogSettings _blogSettings;
+        private readonly CaptchaSettings _captchaSettings;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly CommonSettings _commonSettings;
+        private readonly CustomerSettings _customerSettings;
+        private readonly DisplayDefaultFooterItemSettings _displayDefaultFooterItemSettings;
+        private readonly ForumSettings _forumSettings;
+        private readonly ICurrencyService _currencyService;
+        private readonly ICustomerService _customerService;
+        private readonly IForumService _forumService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
+        private readonly INopFileProvider _fileProvider;
+        private readonly INopHtmlHelper _nopHtmlHelper;
+        private readonly IPermissionService _permissionService;
+        private readonly IPictureService _pictureService;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly IStoreContext _storeContext;
+        private readonly IThemeContext _themeContext;
+        private readonly IThemeProvider _themeProvider;
+        private readonly ITopicService _topicService;
+        private readonly IUrlRecordService _urlRecordService;
+        private readonly IWebHelper _webHelper;
+        private readonly IWorkContext _workContext;
+        private readonly LocalizationSettings _localizationSettings;
+        private readonly MediaSettings _mediaSettings;
+        private readonly NewsSettings _newsSettings;
+        private readonly RobotsTxtSettings _robotsTxtSettings;
+        private readonly SitemapSettings _sitemapSettings;
+        private readonly SitemapXmlSettings _sitemapXmlSettings;
+        private readonly StoreInformationSettings _storeInformationSettings;
+        private readonly VendorSettings _vendorSettings;
 
         #endregion
 
@@ -119,9 +119,7 @@ namespace Nop.Web.Factories
             SitemapSettings sitemapSettings,
             SitemapXmlSettings sitemapXmlSettings,
             StoreInformationSettings storeInformationSettings,
-            VendorSettings vendorSettings,
-            IEmailAccountService emailAccountService,
-            EmailAccountSettings emailAccountSettings)
+            VendorSettings vendorSettings)
         {
             _blogSettings = blogSettings;
             _captchaSettings = captchaSettings;
@@ -158,8 +156,6 @@ namespace Nop.Web.Factories
             _sitemapXmlSettings = sitemapXmlSettings;
             _storeInformationSettings = storeInformationSettings;
             _vendorSettings = vendorSettings;
-            _emailAccountService = emailAccountService;
-            _emailAccountSettings = emailAccountSettings;
         }
 
         #endregion
@@ -497,30 +493,12 @@ namespace Nop.Web.Factories
             if (!excludeProperties)
             {
                 var customer = await _workContext.GetCurrentCustomerAsync();
-
-                if (await _customerService.IsRegisteredAsync(customer))
-                {
-                    model.Email = customer.Email;
-                    model.FullName = await _customerService.GetCustomerFullNameAsync(customer);
-                    model.PhoneNumber = customer.Phone;
-                }
+                model.Email = customer.Email;
+                model.FullName = await _customerService.GetCustomerFullNameAsync(customer);
             }
 
             model.SubjectEnabled = _commonSettings.SubjectFieldOnContactUsForm;
             model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnContactUsPage;
-
-            model.TwitterLink = _storeInformationSettings.TwitterLink;
-            model.FacebookLink = _storeInformationSettings.FacebookLink;
-            model.LinkedinLink = _storeInformationSettings.LinkedinLink;
-            model.TelegramLink = _storeInformationSettings.TelegramLink;
-            model.DiscordLink = _storeInformationSettings.DiscordLink;
-
-            var store = await _storeContext.GetCurrentStoreAsync();
-            model.StoreName = store.Name;
-            model.StoreEmail = store.StoreEmailAddress;
-            model.StoreCompanyName = store.CompanyName;
-            model.CompanyPhoneNumber = store.CompanyPhoneNumber;
-            model.CompanyAddress = store.CompanyAddress;
 
             return model;
         }
@@ -626,7 +604,7 @@ namespace Nop.Web.Factories
                 sb.AppendLine("User-agent: *");
 
                 //sitemap
-                if (_sitemapXmlSettings.SitemapXmlEnabled && _robotsTxtSettings.AllowSitemapXml)
+                if (_sitemapXmlSettings.SitemapXmlEnabled && _robotsTxtSettings.AllowSitemapXml) 
                     sb.AppendLine($"Sitemap: {_webHelper.GetStoreLocation()}sitemap.xml");
                 else
                     sb.AppendLine("Disallow: /sitemap.xml");
@@ -635,7 +613,7 @@ namespace Nop.Web.Factories
                 sb.AppendLine($"Host: {_webHelper.GetStoreLocation()}");
 
                 //usual paths
-                foreach (var path in _robotsTxtSettings.DisallowPaths)
+                foreach (var path in _robotsTxtSettings.DisallowPaths) 
                     sb.AppendLine($"Disallow: {path}");
 
                 //localizable paths (without SEO code)

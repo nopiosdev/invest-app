@@ -1,4 +1,6 @@
-﻿using FluentMigrator.Runner;
+﻿using System;
+using System.Collections.Generic;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 
 namespace Nop.Data.Migrations
@@ -17,24 +19,24 @@ namespace Nop.Data.Migrations
 
             var defaultConventionSet = new DefaultConventionSet();
 
-            ForeignKeyConventions = new List<IForeignKeyConvention>()
+            ForeignKeyConventions = new List<IForeignKeyConvention>() 
             {
                 new NopForeignKeyConvention(dataProvider),
                 defaultConventionSet.SchemaConvention,
             };
 
-            IndexConventions = new List<IIndexConvention>()
+            IndexConventions = new List<IIndexConvention>() 
             {
                 new NopIndexConvention(dataProvider),
                 defaultConventionSet.SchemaConvention
             };
 
-            ColumnsConventions = new List<IColumnsConvention>()
+            ColumnsConventions = new List<IColumnsConvention>() 
             {
                 new NopColumnsConvention(),
                 new DefaultPrimaryKeyNameConvention()
             };
-
+            
             ConstraintConventions = defaultConventionSet.ConstraintConventions;
 
             SequenceConventions = defaultConventionSet.SequenceConventions;

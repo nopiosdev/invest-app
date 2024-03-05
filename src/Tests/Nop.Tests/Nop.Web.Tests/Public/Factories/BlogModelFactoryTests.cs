@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Domain.Blogs;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Media;
@@ -136,7 +139,7 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
         public async Task CanPrepareBlogPostListModel()
         {
             var model = await _blogModelFactory.PrepareBlogPostListModelAsync(new BlogPagingFilteringModel());
-
+            
             model.PagingFilteringContext.FirstItem.Should().Be(1);
             model.PagingFilteringContext.HasNextPage.Should().BeFalse();
             model.PagingFilteringContext.HasPreviousPage.Should().BeFalse();

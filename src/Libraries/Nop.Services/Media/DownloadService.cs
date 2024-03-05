@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Nop.Core.Domain.Media;
 using Nop.Data;
 
@@ -11,7 +15,7 @@ namespace Nop.Services.Media
     {
         #region Fields
 
-        protected readonly IRepository<Download> _downloadRepository;
+        private readonly IRepository<Download> _downloadRepository;
 
         #endregion
 

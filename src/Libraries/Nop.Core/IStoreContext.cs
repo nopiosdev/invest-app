@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Stores;
+﻿using System.Threading.Tasks;
+using Nop.Core.Domain.Stores;
 
 namespace Nop.Core
 {

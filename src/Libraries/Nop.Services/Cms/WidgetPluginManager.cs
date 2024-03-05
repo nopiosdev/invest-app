@@ -1,4 +1,8 @@
-﻿using Nop.Core.Domain.Cms;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Cms;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
@@ -12,7 +16,7 @@ namespace Nop.Services.Cms
     {
         #region Fields
 
-        protected readonly WidgetSettings _widgetSettings;
+        private readonly WidgetSettings _widgetSettings;
 
         #endregion
 

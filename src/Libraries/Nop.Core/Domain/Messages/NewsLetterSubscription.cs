@@ -1,10 +1,12 @@
-﻿namespace Nop.Core.Domain.Messages
+﻿using System;
+
+namespace Nop.Core.Domain.Messages
 {
     /// <summary>
     /// Represents NewsLetterSubscription entity
     /// </summary>
     public partial class NewsLetterSubscription : BaseEntity
-    {
+    {       
         /// <summary>
         /// Gets or sets the newsletter subscription GUID
         /// </summary>

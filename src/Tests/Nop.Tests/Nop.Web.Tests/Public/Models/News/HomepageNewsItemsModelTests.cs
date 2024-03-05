@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Nop.Web.Models.News;
 using NUnit.Framework;
 
@@ -9,7 +10,7 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Models.News
     {
         [Test]
         public void CanClone()
-        {
+        { 
             //create
             var model1 = new HomepageNewsItemsModel
             {

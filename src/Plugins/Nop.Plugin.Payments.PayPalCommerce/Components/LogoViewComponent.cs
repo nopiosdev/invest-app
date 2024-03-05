@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Nop.Core;
@@ -16,10 +17,10 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Components
     {
         #region Fields
 
-        protected readonly IPaymentPluginManager _paymentPluginManager;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IWorkContext _workContext;
-        protected readonly PayPalCommerceSettings _settings;
+        private readonly IPaymentPluginManager _paymentPluginManager;
+        private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
+        private readonly PayPalCommerceSettings _settings;
 
         #endregion
 

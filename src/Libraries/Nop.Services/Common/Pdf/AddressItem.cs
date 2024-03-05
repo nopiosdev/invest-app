@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Nop.Services.Common.Pdf
 {
@@ -56,35 +57,14 @@ namespace Nop.Services.Common.Pdf
         public string Address2 { get; set; }
 
         /// <summary>
-        /// Gets or sets address in line
+        /// Gets or sets arbitrary text for the address
         /// </summary>
-        [DisplayName("Pdf.AddressLine")]
         public string AddressLine { get; set; }
 
         /// <summary>
         /// Gets or sets the county
         /// </summary>
-        public string County { get; set; }
-
-        /// <summary>
-        /// Gets or sets the country
-        /// </summary>
         public string Country { get; set; }
-
-        /// <summary>
-        /// Gets or sets the city
-        /// </summary>
-        public string City { get; set; }
-
-        /// <summary>
-        /// Gets or sets the State Province Name
-        /// </summary>
-        public string StateProvinceName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Zip postal code
-        /// </summary>
-        public string ZipPostalCode { get; set; }
 
         /// <summary>
         /// Gets or sets the vat number

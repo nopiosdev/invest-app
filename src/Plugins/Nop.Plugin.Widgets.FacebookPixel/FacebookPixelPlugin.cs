@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Nop.Core.Domain.Cms;
@@ -19,12 +22,12 @@ namespace Nop.Plugin.Widgets.FacebookPixel
     {
         #region Fields
 
-        protected readonly FacebookPixelService _facebookPixelService;
-        protected readonly IActionContextAccessor _actionContextAccessor;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ISettingService _settingService;
-        protected readonly IUrlHelperFactory _urlHelperFactory;
-        protected readonly WidgetSettings _widgetSettings;
+        private readonly FacebookPixelService _facebookPixelService;
+        private readonly IActionContextAccessor _actionContextAccessor;
+        private readonly ILocalizationService _localizationService;
+        private readonly ISettingService _settingService;
+        private readonly IUrlHelperFactory _urlHelperFactory;
+        private readonly WidgetSettings _widgetSettings;
 
         #endregion
 
@@ -68,7 +71,7 @@ namespace Nop.Plugin.Widgets.FacebookPixel
         {
             var widgetZones = new List<string> { PublicWidgetZones.HeadHtmlTag };
             widgetZones.AddRange(await _facebookPixelService.GetCustomEventsWidgetZonesAsync());
-
+            
             return widgetZones;
         }
 

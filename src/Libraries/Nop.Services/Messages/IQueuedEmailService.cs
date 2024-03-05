@@ -1,4 +1,7 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Messages;
 
 namespace Nop.Services.Messages
@@ -74,7 +77,7 @@ namespace Nop.Services.Messages
         /// The task result contains the queued emails
         /// </returns>
         Task<IPagedList<QueuedEmail>> SearchEmailsAsync(string fromEmail,
-            string toEmail, DateTime? createdFromUtc, DateTime? createdToUtc,
+            string toEmail, DateTime? createdFromUtc, DateTime? createdToUtc, 
             bool loadNotSentItemsOnly, bool loadOnlyItemsToBeSent, int maxSendTries,
             bool loadNewest, int pageIndex = 0, int pageSize = int.MaxValue);
 

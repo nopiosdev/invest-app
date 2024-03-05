@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Tax;
 using Nop.Services.Common;
@@ -12,10 +13,10 @@ namespace Nop.Plugin.Tax.Avalara.Controllers
     {
         #region Fields
 
-        protected readonly IAddressService _addressService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IWorkContext _workContext;
-        protected readonly TaxSettings _taxSettings;
+        private readonly IAddressService _addressService;
+        private readonly ICustomerService _customerService;
+        private readonly IWorkContext _workContext;
+        private readonly TaxSettings _taxSettings;
 
         #endregion
 
@@ -45,8 +46,7 @@ namespace Nop.Plugin.Tax.Avalara.Controllers
             {
                 var customer = await _workContext.GetCurrentCustomerAsync();
                 //add address to customer collection if it's a new
-                if (isNewAddress)
-                    await _customerService.InsertCustomerAddressAsync(customer, address);
+                if (isNewAddress) await _customerService.InsertCustomerAddressAsync(customer, address);
 
                 //and update appropriate customer address
                 if (_taxSettings.TaxBasedOn == TaxBasedOn.BillingAddress)

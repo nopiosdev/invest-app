@@ -28,8 +28,8 @@ using Nop.Data.Extensions;
 
 namespace Nop.Data.Migrations.Installation
 {
-    [NopSchemaMigration("2020/01/31 11:24:16:2551771", "Nop.Data base schema", MigrationProcessType.Installation)]
-    public class SchemaMigration : ForwardOnlyMigration
+    [NopMigration("2020/01/31 11:24:16:2551771", "Nop.Data base schema", MigrationProcessType.Installation)]
+    public class SchemaMigration : AutoReversingMigration
     {
         /// <summary>
         /// Collect the UP migration expressions
@@ -76,10 +76,8 @@ namespace Nop.Data.Migrations.Installation
             Create.TableFor<SpecificationAttributeGroup>();
             Create.TableFor<SpecificationAttribute>();
             Create.TableFor<ProductAttributeCombination>();
-            Create.TableFor<ProductAttributeCombinationPicture>();
             Create.TableFor<ProductAttributeMapping>();
             Create.TableFor<ProductAttributeValue>();
-            Create.TableFor<ProductAttributeValuePicture>();
             Create.TableFor<Order>();
             Create.TableFor<OrderItem>();
             Create.TableFor<RewardPointsHistory>();

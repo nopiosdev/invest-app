@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Customers;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Orders;
 
@@ -141,7 +143,7 @@ namespace Nop.Services.Orders
         /// The task result contains the converted value
         /// </returns>
         Task<decimal> ConvertRewardPointsToAmountAsync(int rewardPoints);
-
+        
         /// <summary>
         /// Gets a value indicating whether a customer has minimum amount of reward points to use (if enabled)
         /// </summary>

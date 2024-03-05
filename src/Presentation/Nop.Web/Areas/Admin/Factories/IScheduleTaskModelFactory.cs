@@ -1,4 +1,5 @@
-﻿using Nop.Web.Areas.Admin.Models.Tasks;
+﻿using System.Threading.Tasks;
+using Nop.Web.Areas.Admin.Models.Tasks;
 
 namespace Nop.Web.Areas.Admin.Factories
 {

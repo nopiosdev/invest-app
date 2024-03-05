@@ -1,4 +1,5 @@
-﻿using Nop.Services.Plugins;
+﻿using System.Threading.Tasks;
+using Nop.Services.Plugins;
 
 namespace Nop.Services.Discounts
 {

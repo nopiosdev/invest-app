@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Common;
+﻿using System.Threading.Tasks;
+using Nop.Core.Domain.Common;
 using Nop.Services.Configuration;
 using Nop.Services.ScheduleTasks;
 
@@ -11,7 +12,7 @@ namespace Nop.Services.Common
     {
         #region Fields
 
-        protected readonly ISettingService _settingService;
+        private readonly ISettingService _settingService;
 
         #endregion
 

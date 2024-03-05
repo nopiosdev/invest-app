@@ -1,7 +1,11 @@
-﻿using Nop.Core;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Data;
 using Nop.Plugin.Misc.Zettle.Domain;
+using Nop.Services.Catalog;
 
 namespace Nop.Plugin.Misc.Zettle.Services
 {
@@ -12,12 +16,12 @@ namespace Nop.Plugin.Misc.Zettle.Services
     {
         #region Fields
 
-        protected readonly IRepository<Category> _categoryRepository;
-        protected readonly IRepository<ProductAttributeCombination> _productAttributeCombinationRepository;
-        protected readonly IRepository<ProductCategory> _productCategoryRepository;
-        protected readonly IRepository<Product> _productRepository;
-        protected readonly IRepository<ZettleRecord> _repository;
-        protected readonly ZettleSettings _zettleSettings;
+        private readonly IRepository<Category> _categoryRepository;
+        private readonly IRepository<ProductAttributeCombination> _productAttributeCombinationRepository;
+        private readonly IRepository<ProductCategory> _productCategoryRepository;
+        private readonly IRepository<Product> _productRepository;
+        private readonly IRepository<ZettleRecord> _repository;
+        private readonly ZettleSettings _zettleSettings;
 
         #endregion
 
@@ -50,7 +54,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the prepared records; the number of products that were not added
         /// </returns>
-        protected async Task<(List<ZettleRecord> Records, int InvalidProducts)> PrepareRecordsToAddAsync(List<int> productIds)
+        private async Task<(List<ZettleRecord> Records, int InvalidProducts)> PrepareRecordsToAddAsync(List<int> productIds)
         {
             var products = await _productRepository.GetByIdsAsync(productIds, null, false);
             var productsWithSku = products.Where(product => !string.IsNullOrEmpty(product.Sku)).ToList();
@@ -249,13 +253,14 @@ namespace Nop.Plugin.Misc.Zettle.Services
                 if (!_zettleSettings.AutoAddRecordsEnabled)
                     return;
 
-                if (attributeCombinationId == 0 || _repository.Table.FirstOrDefault(record => record.ProductId == productId) is not ZettleRecord productRecord)
+                if (attributeCombinationId == 0)
                 {
                     var (records, _) = await PrepareRecordsToAddAsync(new List<int> { productId });
                     await InsertRecordsAsync(records);
                 }
                 else
                 {
+                    var productRecord = _repository.Table.FirstOrDefault(record => record.ProductId == productId);
                     await InsertRecordAsync(new()
                     {
                         Active = _zettleSettings.SyncEnabled,
@@ -358,7 +363,6 @@ namespace Nop.Plugin.Misc.Zettle.Services
                     Sku = item.Product.Sku,
                     Description = item.Product.ShortDescription,
                     Price = item.Product.Price,
-                    ProductCost = item.Product.ProductCost,
                     CategoryName = item.Category.Name,
                     ImageUrl = item.Record.ImageUrl,
                     ImageSyncEnabled = item.Record.ImageSyncEnabled,
@@ -376,7 +380,6 @@ namespace Nop.Plugin.Misc.Zettle.Services
                     Sku = group.FirstOrDefault().Sku,
                     Description = group.FirstOrDefault().Description,
                     Price = group.FirstOrDefault().Price,
-                    ProductCost = group.FirstOrDefault().ProductCost,
                     CategoryName = group
                         .OrderBy(item => item.ProductCategoryDisplayOrder)
                         .ThenBy(item => item.ProductCategoryId)

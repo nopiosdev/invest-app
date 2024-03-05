@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Nop.Services.Authentication.External;
 using Nop.Services.Customers;
 using Nop.Services.Events;
@@ -12,7 +14,7 @@ namespace Nop.Plugin.ExternalAuth.Facebook.Infrastructure
     {
         #region Fields
 
-        protected readonly ICustomerService _customerService;
+        private readonly ICustomerService _customerService;
 
         #endregion
 

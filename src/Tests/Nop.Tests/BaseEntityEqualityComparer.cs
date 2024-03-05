@@ -1,4 +1,5 @@
-﻿using Nop.Core;
+﻿using System.Collections.Generic;
+using Nop.Core;
 
 namespace Nop.Tests
 {

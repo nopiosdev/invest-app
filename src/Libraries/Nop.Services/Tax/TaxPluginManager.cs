@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Customers;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Tax;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
@@ -12,7 +14,7 @@ namespace Nop.Services.Tax
     {
         #region Fields
 
-        protected readonly TaxSettings _taxSettings;
+        private readonly TaxSettings _taxSettings;
 
         #endregion
 

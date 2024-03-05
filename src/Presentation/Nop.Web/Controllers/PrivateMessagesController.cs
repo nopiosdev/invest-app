@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
@@ -17,14 +20,14 @@ namespace Nop.Web.Controllers
     {
         #region Fields
 
-        protected readonly ForumSettings _forumSettings;
-        protected readonly ICustomerActivityService _customerActivityService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IForumService _forumService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IPrivateMessagesModelFactory _privateMessagesModelFactory;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IWorkContext _workContext;
+        private readonly ForumSettings _forumSettings;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly ICustomerService _customerService;
+        private readonly IForumService _forumService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IPrivateMessagesModelFactory _privateMessagesModelFactory;
+        private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -50,7 +53,7 @@ namespace Nop.Web.Controllers
         }
 
         #endregion
-
+        
         #region Methods
 
         public virtual async Task<IActionResult> Index(int? pageNumber, string tab)
@@ -68,7 +71,7 @@ namespace Nop.Web.Controllers
             var model = await _privateMessagesModelFactory.PreparePrivateMessageIndexModelAsync(pageNumber, tab);
             return View(model);
         }
-
+        
         [HttpPost, FormValueRequired("delete-inbox"), ActionName("InboxUpdate")]
         public virtual async Task<IActionResult> DeleteInboxPM(IFormCollection formCollection)
         {
@@ -154,7 +157,7 @@ namespace Nop.Web.Controllers
                     }
                 }
             }
-            return RedirectToRoute("PrivateMessages", new { tab = "sent" });
+            return RedirectToRoute("PrivateMessages", new {tab = "sent"});
         }
 
         public virtual async Task<IActionResult> SendPM(int toCustomerId, int? replyToMessageId)

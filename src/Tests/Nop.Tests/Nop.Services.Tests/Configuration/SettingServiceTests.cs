@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Configuration;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Configuration;
@@ -31,9 +34,7 @@ namespace Nop.Tests.Nop.Services.Tests.Configuration
 
             var updateSettings = new Setting
             {
-                Name = "SettingServiceTests.TestCrud",
-                Value = "TestCrud updated",
-                StoreId = 1
+                Name = "SettingServiceTests.TestCrud", Value = "TestCrud updated", StoreId = 1
             };
 
             await TestCrud(newSettings,

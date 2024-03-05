@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Common;
+﻿using System;
+using Nop.Core.Domain.Common;
 using Nop.Services.ScheduleTasks;
 
 namespace Nop.Services.Logging
@@ -10,8 +11,8 @@ namespace Nop.Services.Logging
     {
         #region Fields
 
-        protected readonly CommonSettings _commonSettings;
-        protected readonly ILogger _logger;
+        private readonly CommonSettings _commonSettings;
+        private readonly ILogger _logger;
 
         #endregion
 
@@ -34,7 +35,7 @@ namespace Nop.Services.Logging
         public virtual async System.Threading.Tasks.Task ExecuteAsync()
         {
             var utcNow = DateTime.UtcNow;
-
+            
             await _logger.ClearLogAsync(_commonSettings.ClearLogOlderThanDays == 0 ? null : utcNow.AddDays(-_commonSettings.ClearLogOlderThanDays));
         }
 

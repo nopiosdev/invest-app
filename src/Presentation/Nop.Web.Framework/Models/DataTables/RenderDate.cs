@@ -11,7 +11,7 @@
         /// Default date format
         /// </summary>
         /// <remarks>For example english culture: [MM/DD/YYYY h:mm:ss PM/AM] [09/04/1986 8:30:25 PM]</remarks>
-        protected const string DEFAULT_DATE_FORMAT = "L LTS";
+        private string DEFAULT_DATE_FORMAT = "L LTS";
 
         #endregion
 
@@ -21,12 +21,6 @@
         {
             //set default values
             Format = DEFAULT_DATE_FORMAT;
-        }
-        
-        public RenderDate(string format)
-        {
-            //set default values
-            Format = format;
         }
 
         #endregion

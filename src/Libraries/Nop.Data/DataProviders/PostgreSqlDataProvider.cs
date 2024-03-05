@@ -1,12 +1,18 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Data.Common;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using LinqToDB;
 using LinqToDB.Common;
 using LinqToDB.Data;
 using LinqToDB.DataProvider;
 using LinqToDB.SqlQuery;
 using Nop.Core;
+using Nop.Core.Infrastructure;
 using Nop.Data.DataProviders.LinqToDB;
+using Nop.Data.Migrations;
 using Npgsql;
 
 namespace Nop.Data.DataProviders
@@ -15,11 +21,11 @@ namespace Nop.Data.DataProviders
     {
         #region Fields
 
-        protected static readonly Lazy<IDataProvider> _dataProvider = new(() => new LinqToDBPostgreSQLDataProvider(), true);
+        private static readonly Lazy<IDataProvider> _dataProvider = new(() => new LinqToDBPostgreSQLDataProvider(), true);
 
         #endregion
 
-        #region Utilities
+        #region Utils
 
         /// <summary>
         /// Creates the database connection by the current data configuration
@@ -34,10 +40,6 @@ namespace Nop.Data.DataProviders
             return dataContext;
         }
 
-        /// <summary>
-        /// Gets the connection string builder
-        /// </summary>
-        /// <returns>The connection string builder</returns>
         protected static NpgsqlConnectionStringBuilder GetConnectionStringBuilder()
         {
             return new NpgsqlConnectionStringBuilder(GetCurrentConnectionString());
@@ -62,7 +64,7 @@ namespace Nop.Data.DataProviders
         /// <param name="dataConnection">A database connection object</param>
         /// <typeparam name="TEntity">Entity type</typeparam>
         /// <returns>Returns the name of the sequence, or NULL if no sequence is associated with the column</returns>
-        protected virtual string GetSequenceName<TEntity>(DataConnection dataConnection) where TEntity : BaseEntity
+        private string GetSequenceName<TEntity>(DataConnection dataConnection) where TEntity : BaseEntity
         {
             if (dataConnection is null)
                 throw new ArgumentNullException(nameof(dataConnection));
@@ -193,7 +195,7 @@ namespace Nop.Data.DataProviders
                 return false;
             }
         }
-
+        
         /// <summary>
         /// Get the current identity value
         /// </summary>
@@ -256,7 +258,7 @@ namespace Nop.Data.DataProviders
                 entity.Id = dataContext.InsertWithInt32Identity(entity);
             }
             // Ignore when we try insert foreign entity via InsertWithInt32IdentityAsync method
-            catch (SqlException ex) when (ex.Message.StartsWith("Identity field must be defined for"))
+            catch (global::LinqToDB.SqlQuery.SqlException ex) when (ex.Message.StartsWith("Identity field must be defined for"))
             {
                 dataContext.Insert(entity);
             }
@@ -281,7 +283,7 @@ namespace Nop.Data.DataProviders
                 entity.Id = await dataContext.InsertWithInt32IdentityAsync(entity);
             }
             // Ignore when we try insert foreign entity via InsertWithInt32IdentityAsync method
-            catch (SqlException ex) when (ex.Message.StartsWith("Identity field must be defined for"))
+            catch (global::LinqToDB.SqlQuery.SqlException ex) when (ex.Message.StartsWith("Identity field must be defined for"))
             {
                 await dataContext.InsertAsync(entity);
             }

@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Configuration;
@@ -17,7 +20,7 @@ namespace Nop.Data
         /// <summary>
         /// Gets a cached value indicating whether the database is installed. We need this value invariable during installation process
         /// </summary>
-        protected static bool? _databaseIsInstalled;
+        private static bool? _databaseIsInstalled;
 
         #endregion
 

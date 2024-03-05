@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Factories;
 using Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Models;
 using Nop.Web.Framework.Components;
@@ -12,7 +13,7 @@ namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Components
     {
         #region Fields
 
-        protected readonly AuthenticationModelFactory _authenticationModelFactory;
+        private readonly AuthenticationModelFactory _authenticationModelFactory;
 
         #endregion
 

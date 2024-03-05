@@ -1,5 +1,11 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Nop.Core;
 using Nop.Core.Domain;
@@ -54,36 +60,36 @@ namespace Nop.Services.Installation
     {
         #region Fields
 
-        protected readonly INopDataProvider _dataProvider;
-        protected readonly INopFileProvider _fileProvider;
-        protected readonly IRepository<ActivityLogType> _activityLogTypeRepository;
-        protected readonly IRepository<Address> _addressRepository;
-        protected readonly IRepository<Category> _categoryRepository;
-        protected readonly IRepository<CategoryTemplate> _categoryTemplateRepository;
-        protected readonly IRepository<Country> _countryRepository;
-        protected readonly IRepository<Currency> _currencyRepository;
-        protected readonly IRepository<Customer> _customerRepository;
-        protected readonly IRepository<CustomerRole> _customerRoleRepository;
-        protected readonly IRepository<DeliveryDate> _deliveryDateRepository;
-        protected readonly IRepository<EmailAccount> _emailAccountRepository;
-        protected readonly IRepository<Language> _languageRepository;
-        protected readonly IRepository<Manufacturer> _manufacturerRepository;
-        protected readonly IRepository<ManufacturerTemplate> _manufacturerTemplateRepository;
-        protected readonly IRepository<MeasureDimension> _measureDimensionRepository;
-        protected readonly IRepository<MeasureWeight> _measureWeightRepository;
-        protected readonly IRepository<Product> _productRepository;
-        protected readonly IRepository<ProductAttribute> _productAttributeRepository;
-        protected readonly IRepository<ProductAvailabilityRange> _productAvailabilityRangeRepository;
-        protected readonly IRepository<ProductTag> _productTagRepository;
-        protected readonly IRepository<ProductTemplate> _productTemplateRepository;
-        protected readonly IRepository<SpecificationAttribute> _specificationAttributeRepository;
-        protected readonly IRepository<SpecificationAttributeOption> _specificationAttributeOptionRepository;
-        protected readonly IRepository<StateProvince> _stateProvinceRepository;
-        protected readonly IRepository<Store> _storeRepository;
-        protected readonly IRepository<TaxCategory> _taxCategoryRepository;
-        protected readonly IRepository<TopicTemplate> _topicTemplateRepository;
-        protected readonly IRepository<UrlRecord> _urlRecordRepository;
-        protected readonly IWebHelper _webHelper;
+        private readonly INopDataProvider _dataProvider;
+        private readonly INopFileProvider _fileProvider;
+        private readonly IRepository<ActivityLogType> _activityLogTypeRepository;
+        private readonly IRepository<Address> _addressRepository;
+        private readonly IRepository<Category> _categoryRepository;
+        private readonly IRepository<CategoryTemplate> _categoryTemplateRepository;
+        private readonly IRepository<Country> _countryRepository;
+        private readonly IRepository<Currency> _currencyRepository;
+        private readonly IRepository<Customer> _customerRepository;
+        private readonly IRepository<CustomerRole> _customerRoleRepository;
+        private readonly IRepository<DeliveryDate> _deliveryDateRepository;
+        private readonly IRepository<EmailAccount> _emailAccountRepository;
+        private readonly IRepository<Language> _languageRepository;
+        private readonly IRepository<Manufacturer> _manufacturerRepository;
+        private readonly IRepository<ManufacturerTemplate> _manufacturerTemplateRepository;
+        private readonly IRepository<MeasureDimension> _measureDimensionRepository;
+        private readonly IRepository<MeasureWeight> _measureWeightRepository;
+        private readonly IRepository<Product> _productRepository;
+        private readonly IRepository<ProductAttribute> _productAttributeRepository;
+        private readonly IRepository<ProductAvailabilityRange> _productAvailabilityRangeRepository;
+        private readonly IRepository<ProductTag> _productTagRepository;
+        private readonly IRepository<ProductTemplate> _productTemplateRepository;
+        private readonly IRepository<SpecificationAttribute> _specificationAttributeRepository;
+        private readonly IRepository<SpecificationAttributeOption> _specificationAttributeOptionRepository;
+        private readonly IRepository<StateProvince> _stateProvinceRepository;
+        private readonly IRepository<Store> _storeRepository;
+        private readonly IRepository<TaxCategory> _taxCategoryRepository;
+        private readonly IRepository<TopicTemplate> _topicTemplateRepository;
+        private readonly IRepository<UrlRecord> _urlRecordRepository;
+        private readonly IWebHelper _webHelper;
 
         #endregion
 
@@ -2340,7 +2346,7 @@ namespace Nop.Services.Installation
                 {
                     Name = MessageTemplateSystemNames.ShipmentDeliveredCustomerNotification,
                     Subject = "Your order from %Store.Name% has been %if (!%Order.IsCompletelyDelivered%) partially endif%delivered.",
-                    Body = $"<p>{Environment.NewLine}<a href=\"%Store.URL%\"> %Store.Name%</a>{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Hello %Order.CustomerFullName%,{Environment.NewLine}<br />{Environment.NewLine}Good news! Your order has been %if (!%Order.IsCompletelyDelivered%) partially endif%delivered.{Environment.NewLine}<br />{Environment.NewLine}Order Number: %Order.OrderNumber%{Environment.NewLine}<br />{Environment.NewLine}Order Details: <a href=\"%Order.OrderURLForCustomer%\" target=\"_blank\">%Order.OrderURLForCustomer%</a>{Environment.NewLine}<br />{Environment.NewLine}Date Ordered: %Order.CreatedOn%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Billing Address{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingFirstName% %Order.BillingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingCity% %Order.BillingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingStateProvince% %Order.BillingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%if (%Order.Shippable%) Shipping Address{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingFirstName% %Order.ShippingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingCity% %Order.ShippingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingStateProvince% %Order.ShippingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Shipping Method: %Order.ShippingMethod%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine} endif% Delivered Products:{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%Shipment.Product(s)%{Environment.NewLine}</p>{Environment.NewLine}",
+                    Body = $"<p>{Environment.NewLine}<a href=\"%Store.URL%\"> %Store.Name%</a>{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Hello %Order.CustomerFullName%,{Environment.NewLine}<br />{Environment.NewLine}Good news! You order has been %if (!%Order.IsCompletelyDelivered%) partially endif%delivered.{Environment.NewLine}<br />{Environment.NewLine}Order Number: %Order.OrderNumber%{Environment.NewLine}<br />{Environment.NewLine}Order Details: <a href=\"%Order.OrderURLForCustomer%\" target=\"_blank\">%Order.OrderURLForCustomer%</a>{Environment.NewLine}<br />{Environment.NewLine}Date Ordered: %Order.CreatedOn%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Billing Address{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingFirstName% %Order.BillingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingCity% %Order.BillingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingStateProvince% %Order.BillingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%if (%Order.Shippable%) Shipping Address{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingFirstName% %Order.ShippingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingCity% %Order.ShippingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingStateProvince% %Order.ShippingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Shipping Method: %Order.ShippingMethod%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine} endif% Delivered Products:{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%Shipment.Product(s)%{Environment.NewLine}</p>{Environment.NewLine}",
                     IsActive = true,
                     EmailAccountId = eaGeneral.Id
                 },
@@ -2364,7 +2370,7 @@ namespace Nop.Services.Installation
                 {
                     Name = MessageTemplateSystemNames.ShipmentSentCustomerNotification,
                     Subject = "Your order from %Store.Name% has been %if (!%Order.IsCompletelyShipped%) partially endif%shipped.",
-                    Body = $"<p>{Environment.NewLine}<a href=\"%Store.URL%\"> %Store.Name%</a>{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Hello %Order.CustomerFullName%!,{Environment.NewLine}<br />{Environment.NewLine}Good news! Your order has been %if (!%Order.IsCompletelyShipped%) partially endif%shipped.{Environment.NewLine}<br />{Environment.NewLine}Order Number: %Order.OrderNumber%{Environment.NewLine}<br />{Environment.NewLine}Order Details: <a href=\"%Order.OrderURLForCustomer%\" target=\"_blank\">%Order.OrderURLForCustomer%</a>{Environment.NewLine}<br />{Environment.NewLine}Date Ordered: %Order.CreatedOn%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Billing Address{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingFirstName% %Order.BillingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingCity% %Order.BillingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingStateProvince% %Order.BillingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%if (%Order.Shippable%) Shipping Address{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingFirstName% %Order.ShippingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingCity% %Order.ShippingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingStateProvince% %Order.ShippingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Shipping Method: %Order.ShippingMethod%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine} endif% Shipped Products:{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%Shipment.Product(s)%{Environment.NewLine}</p>{Environment.NewLine}",
+                    Body = $"<p>{Environment.NewLine}<a href=\"%Store.URL%\"> %Store.Name%</a>{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Hello %Order.CustomerFullName%!,{Environment.NewLine}<br />{Environment.NewLine}Good news! You order has been %if (!%Order.IsCompletelyShipped%) partially endif%shipped.{Environment.NewLine}<br />{Environment.NewLine}Order Number: %Order.OrderNumber%{Environment.NewLine}<br />{Environment.NewLine}Order Details: <a href=\"%Order.OrderURLForCustomer%\" target=\"_blank\">%Order.OrderURLForCustomer%</a>{Environment.NewLine}<br />{Environment.NewLine}Date Ordered: %Order.CreatedOn%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Billing Address{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingFirstName% %Order.BillingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingCity% %Order.BillingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingStateProvince% %Order.BillingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%if (%Order.Shippable%) Shipping Address{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingFirstName% %Order.ShippingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingCity% %Order.ShippingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingStateProvince% %Order.ShippingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Shipping Method: %Order.ShippingMethod%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine} endif% Shipped Products:{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%Shipment.Product(s)%{Environment.NewLine}</p>{Environment.NewLine}",
                     IsActive = true,
                     EmailAccountId = eaGeneral.Id
                 },
@@ -2372,7 +2378,7 @@ namespace Nop.Services.Installation
                 {
                     Name = MessageTemplateSystemNames.ShipmentReadyForPickupCustomerNotification,
                     Subject = "Your order from %Store.Name% has been %if (!%Order.IsCompletelyReadyForPickup%) partially endif%ready for pickup.",
-                    Body = $"<p>{Environment.NewLine}<a href=\"%Store.URL%\"> %Store.Name%</a>{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Hello %Order.CustomerFullName%!,{Environment.NewLine}<br />{Environment.NewLine}Good news! Your order has been %if (!%Order.IsCompletelyReadyForPickup%) partially endif%ready for pickup.{Environment.NewLine}<br />{Environment.NewLine}Order Number: %Order.OrderNumber%{Environment.NewLine}<br />{Environment.NewLine}Order Details: <a href=\"%Order.OrderURLForCustomer%\" target=\"_blank\">%Order.OrderURLForCustomer%</a>{Environment.NewLine}<br />{Environment.NewLine}Date Ordered: %Order.CreatedOn%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Billing Address{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingFirstName% %Order.BillingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingCity% %Order.BillingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingStateProvince% %Order.BillingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%if (%Order.Shippable%) Shipping Address{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingFirstName% %Order.ShippingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingCity% %Order.ShippingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingStateProvince% %Order.ShippingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Shipping Method: %Order.ShippingMethod%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine} endif% Products ready for pickup:{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%Shipment.Product(s)%{Environment.NewLine}</p>{Environment.NewLine}",
+                    Body = $"<p>{Environment.NewLine}<a href=\"%Store.URL%\"> %Store.Name%</a>{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Hello %Order.CustomerFullName%!,{Environment.NewLine}<br />{Environment.NewLine}Good news! You order has been %if (!%Order.IsCompletelyReadyForPickup%) partially endif%ready for pickup.{Environment.NewLine}<br />{Environment.NewLine}Order Number: %Order.OrderNumber%{Environment.NewLine}<br />{Environment.NewLine}Order Details: <a href=\"%Order.OrderURLForCustomer%\" target=\"_blank\">%Order.OrderURLForCustomer%</a>{Environment.NewLine}<br />{Environment.NewLine}Date Ordered: %Order.CreatedOn%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Billing Address{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingFirstName% %Order.BillingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingCity% %Order.BillingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingStateProvince% %Order.BillingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%if (%Order.Shippable%) Shipping Address{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingFirstName% %Order.ShippingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingCity% %Order.ShippingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingStateProvince% %Order.ShippingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Shipping Method: %Order.ShippingMethod%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine} endif% Products ready for pickup:{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%Shipment.Product(s)%{Environment.NewLine}</p>{Environment.NewLine}",
                     IsActive = true,
                     EmailAccountId = eaGeneral.Id
                 },
@@ -2991,7 +2997,6 @@ namespace Nop.Services.Installation
                 DefaultPasswordFormat = PasswordFormat.Hashed,
                 HashedPasswordFormat = NopCustomerServicesDefaults.DefaultHashedPasswordFormat,
                 PasswordMinLength = 6,
-                PasswordMaxLength = 64,
                 PasswordRequireDigit = false,
                 PasswordRequireLowercase = false,
                 PasswordRequireNonAlphanumeric = false,
@@ -3001,7 +3006,6 @@ namespace Nop.Services.Installation
                 PasswordLifetime = 90,
                 FailedPasswordAllowedAttempts = 0,
                 FailedPasswordLockoutMinutes = 30,
-                RequiredReLoginAfterPasswordChange = false,
                 UserRegistrationType = UserRegistrationType.Standard,
                 AllowCustomersToUploadAvatars = false,
                 AvatarMaximumSizeBytes = 20000,
@@ -3019,8 +3023,7 @@ namespace Nop.Services.Installation
                 LastNameEnabled = true,
                 LastNameRequired = true,
                 GenderEnabled = true,
-                NeutralGenderEnabled = false,
-                DateOfBirthEnabled = false,
+                DateOfBirthEnabled = true,
                 DateOfBirthRequired = false,
                 DateOfBirthMinimumAge = null,
                 CompanyEnabled = true,
@@ -3052,8 +3055,7 @@ namespace Nop.Services.Installation
                 DeleteGuestTaskOlderThanMinutes = 1440,
                 PhoneNumberValidationEnabled = false,
                 PhoneNumberValidationUseRegex = false,
-                PhoneNumberValidationRule = "^[0-9]{1,14}?$",
-                DefaultCountryId = _countryRepository.Table.FirstOrDefault(c => c.ThreeLetterIsoCode == regionInfo.ThreeLetterISORegionName)?.Id
+                PhoneNumberValidationRule = "^[0-9]{1,14}?$"
             });
 
             await settingService.SaveSettingAsync(new MultiFactorAuthenticationSettings
@@ -3077,8 +3079,7 @@ namespace Nop.Services.Installation
                 StateProvinceEnabled = true,
                 PhoneEnabled = true,
                 PhoneRequired = true,
-                FaxEnabled = true,
-                DefaultCountryId = _countryRepository.Table.FirstOrDefault(c => c.ThreeLetterIsoCode == regionInfo.ThreeLetterISORegionName)?.Id
+                FaxEnabled = true
             });
 
             await settingService.SaveSettingAsync(new MediaSettings
@@ -3247,9 +3248,7 @@ namespace Nop.Services.Installation
                 AdminAreaAllowedIpAddresses = null,
                 HoneypotEnabled = false,
                 HoneypotInputName = "hpinput",
-                AllowNonAsciiCharactersInHeaders = true,
-                UseAesEncryptionAlgorithm = true,
-                AllowStoreOwnerExportImportCustomersWithHashedPassword = true
+                AllowNonAsciiCharactersInHeaders = true
             });
 
             await settingService.SaveSettingAsync(new ShippingSettings
@@ -3275,7 +3274,7 @@ namespace Nop.Services.Installation
                 BypassShippingMethodSelectionIfOnlyOne = false,
                 UseCubeRootMethod = true,
                 ConsiderAssociatedProductsDimensions = true,
-                ShipSeparatelyOneItemEach = false,
+                ShipSeparatelyOneItemEach = true,
                 RequestDelay = 300,
                 ShippingSorting = ShippingSortingEnum.Position,
             });
@@ -3301,7 +3300,6 @@ namespace Nop.Services.Installation
                 DisplayTaxSuffix = false,
                 DisplayTaxRates = false,
                 PricesIncludeTax = false,
-                AutomaticallyDetectCountry = true,
                 AllowCustomersToSelectTaxDisplayType = false,
                 ForceTaxExclusionFromOrderSubtotal = false,
                 DefaultTaxCategoryId = 0,
@@ -3468,7 +3466,6 @@ namespace Nop.Services.Installation
                 ShowOnForum = false,
                 ShowOnLoginPage = false,
                 ShowOnNewsCommentPage = false,
-                ShowOnNewsletterPage = false,
                 ShowOnProductReviewPage = false,
                 ShowOnRegistrationPage = false,
                 ShowOnCheckoutPageForGuests = false,
@@ -3502,38 +3499,10 @@ namespace Nop.Services.Installation
                     "/bin/",
                     "/files/",
                     "/files/exportimport/",
+                    "/country/getstatesbycountryid",
                     "/install",
-                    "/*?*returnUrl=",
-                    //AJAX urls
-                    "/cart/estimateshipping",
-                    "/cart/selectshippingoption",
-                    "/customer/addressdelete",
-                    "/customer/removeexternalassociation",
-                    "/customer/checkusernameavailability",
-                    "/catalog/searchtermautocomplete",
-                    "/catalog/getcatalogroot",
-                    "/addproducttocart/catalog/*",
-                    "/addproducttocart/details/*",
-                    "/compareproducts/add/*",
-                    "/backinstocksubscribe/*",
-                    "/subscribenewsletter",
-                    "/t-popup/*",
                     "/setproductreviewhelpfulness",
-                    "/poll/vote",
-                    "/country/getstatesbycountryid/",
-                    "/eucookielawaccept",
-                    "/topic/authenticate",
-                    "/category/products/",
-                    "/product/combinations",
-                    "/uploadfileproductattribute/*",
-                    "/shoppingcart/productdetails_attributechange/*",
-                    "/uploadfilereturnrequest",
-                    "/boards/topicwatch/*",
-                    "/boards/forumwatch/*",
-                    "/install/restartapplication",
-                    "/boards/postvote",
-                    "/product/estimateshipping/*",
-                    "/shoppingcart/checkoutattributechange/*"
+                    "/*?*returnUrl="
                 },
                 LocalizableDisallowPaths = new List<string>
                 {
@@ -3623,14 +3592,14 @@ namespace Nop.Services.Installation
                     PriceAdjustment = 0,
                     DisplayOrder = 1,
                     IsPreSelected = true,
-                    AttributeId = ca1.Id
+                    CheckoutAttributeId = ca1.Id
                 },
                 new CheckoutAttributeValue
                 {
                     Name = "Yes",
                     PriceAdjustment = 10,
                     DisplayOrder = 2,
-                    AttributeId = ca1.Id
+                    CheckoutAttributeId = ca1.Id
                 });
         }
 
@@ -4499,7 +4468,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Digital Storm VANQUISH Custom Performance PC",
+                Name = "Digital Storm VANQUISH 3 Custom Performance PC",
                 Sku = "DS_VA3_PC",
                 ShortDescription = "Digital Storm Vanquish 3 Desktop PC",
                 FullDescription = "<p>Blow the doors off today’s most demanding games with maximum detail, speed, and power for an immersive gaming experience without breaking the bank.</p><p>Stay ahead of the competition, VANQUISH 3 is fully equipped to easily handle future upgrades, keeping your system on the cutting edge for years to come.</p><p>Each system is put through an extensive stress test, ensuring you experience zero bottlenecks and get the maximum performance from your hardware.</p>",
@@ -4553,7 +4522,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Lenovo IdeaCentre",
+                Name = "Lenovo IdeaCentre 600 All-in-One PC",
                 Sku = "LE_IC_600",
                 ShortDescription = string.Empty,
                 FullDescription = "<p>The A600 features a 21.5in screen, DVD or optional Blu-Ray drive, support for the full beans 1920 x 1080 HD, Dolby Home Cinema certification and an optional hybrid analogue/digital TV tuner.</p><p>Connectivity is handled by 802.11a/b/g - 802.11n is optional - and an ethernet port. You also get four USB ports, a Firewire slot, a six-in-one card reader and a 1.3- or two-megapixel webcam.</p>",
@@ -4607,7 +4576,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Apple MacBook Pro",
+                Name = "Apple MacBook Pro 13-inch",
                 Sku = "AP_MBP_13",
                 ShortDescription = "A groundbreaking Retina display. A new force-sensing trackpad. All-flash architecture. Powerful dual-core and quad-core Intel processors. Together, these features take the notebook to a new level of performance. And they will do the same for you in everything you create.",
                 FullDescription = "<p>With fifth-generation Intel Core processors, the latest graphics, and faster flash storage, the incredibly advanced MacBook Pro with Retina display moves even further ahead in performance and battery life.* *Compared with the previous generation.</p><p>Retina display with 2560-by-1600 resolution</p><p>Fifth-generation dual-core Intel Core i5 processor</p><p>Intel Iris Graphics</p><p>Up to 9 hours of battery life1</p><p>Faster flash storage2</p><p>802.11ac Wi-Fi</p><p>Two Thunderbolt 2 ports for connecting high-performance devices and transferring data at lightning speed</p><p>Two USB 3 ports (compatible with USB 2 devices) and HDMI</p><p>FaceTime HD camera</p><p>Pages, Numbers, Keynote, iPhoto, iMovie, GarageBand included</p><p>OS X, the world's most advanced desktop operating system</p>",
@@ -4703,7 +4672,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Asus Laptop",
+                Name = "Asus N551JK-XO076H Laptop",
                 Sku = "AS_551_LP",
                 ShortDescription = "Laptop Asus N551JK Intel Core i7-4710HQ 2.5 GHz, RAM 16GB, HDD 1TB, Video NVidia GTX 850M 4GB, BluRay, 15.6, Full HD, Win 8.1",
                 FullDescription = "<p>The ASUS N550JX combines cutting-edge audio and visual technology to deliver an unsurpassed multimedia experience. A full HD wide-view IPS panel is tailor-made for watching movies and the intuitive touchscreen makes for easy, seamless navigation. ASUS has paired the N550JX’s impressive display with SonicMaster Premium, co-developed with Bang & Olufsen ICEpower® audio experts, for true surround sound. A quad-speaker array and external subwoofer combine for distinct vocals and a low bass that you can feel.</p>",
@@ -4793,7 +4762,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Samsung Premium Ultrabook",
+                Name = "Samsung Series 9 NP900X4C Premium Ultrabook",
                 Sku = "SM_900_PU",
                 ShortDescription = "Samsung Series 9 NP900X4C-A06US 15-Inch Ultrabook (1.70 GHz Intel Core i5-3317U Processor, 8GB DDR3, 128GB SSD, Windows 8) Ash Black",
                 FullDescription = "<p>Designed with mobility in mind, Samsung's durable, ultra premium, lightweight Series 9 laptop (model NP900X4C-A01US) offers mobile professionals and power users a sophisticated laptop equally suited for work and entertainment. Featuring a minimalist look that is both simple and sophisticated, its polished aluminum uni-body design offers an iconic look and feel that pushes the envelope with an edge just 0.58 inches thin. This Series 9 laptop also includes a brilliant 15-inch SuperBright Plus display with HD+ technology, 128 GB Solid State Drive (SSD), 8 GB of system memory, and up to 10 hours of battery life.</p>",
@@ -4985,7 +4954,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "HP Envy 15.6-Inch Sleekbook",
+                Name = "HP Envy 6-1180ca 15.6-Inch Sleekbook",
                 Sku = "HP_ESB_15",
                 ShortDescription = "HP ENVY 6-1202ea Ultrabook Beats Audio, 3rd generation Intel® CoreTM i7-3517U processor, 8GB RAM, 500GB HDD, Microsoft Windows 8, AMD Radeon HD 8750M (2 GB DDR3 dedicated)",
                 FullDescription = "The UltrabookTM that's up for anything. Thin and light, the HP ENVY is the large screen UltrabookTM with Beats AudioTM. With a soft-touch base that makes it easy to grab and go, it's a laptop that's up for anything.<br /><br /><b>Features</b><br /><br />- Windows 8 or other operating systems available<br /><br /><b>Top performance. Stylish design. Take notice.</b><br /><br />- At just 19.8 mm (0.78 in) thin, the HP ENVY UltrabookTM is slim and light enough to take anywhere. It's the laptop that gets you noticed with the power to get it done.<br />- With an eye-catching metal design, it's a laptop that you want to carry with you. The soft-touch, slip-resistant base gives you the confidence to carry it with ease.<br /><br /><b>More entertaining. More gaming. More fun.</b><br /><br />- Own the UltrabookTM with Beats AudioTM, dual speakers, a subwoofer, and an awesome display. Your music, movies and photo slideshows will always look and sound their best.<br />- Tons of video memory let you experience incredible gaming and multimedia without slowing down. Create and edit videos in a flash. And enjoy more of what you love to the fullest.<br />- The HP ENVY UltrabookTM is loaded with the ports you'd expect on a world-class laptop, but on a Sleekbook instead. Like HDMI, USB, RJ-45, and a headphone jack. You get all the right connections without compromising size.<br /><br /><b>Only from HP.</b><br /><br />- Life heats up. That's why there's HP CoolSense technology, which automatically adjusts your notebook's temperature based on usage and conditions. It stays cool. You stay comfortable.<br />- With HP ProtectSmart, your notebook's data stays safe from accidental bumps and bruises. It senses motion and plans ahead, stopping your hard drive and protecting your entire digital life.<br />- Keep playing even in dimly lit rooms or on red eye flights. The optional backlit keyboard[1] is full-size so you don't compromise comfort. Backlit keyboard. Another bright idea.<br /><br />",
@@ -5081,7 +5050,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Lenovo Thinkpad Carbon Laptop",
+                Name = "Lenovo Thinkpad X1 Carbon Laptop",
                 Sku = "LE_TX1_CL",
                 ShortDescription = "Lenovo Thinkpad X1 Carbon Touch Intel Core i7 14 Ultrabook",
                 FullDescription = "<p>The X1 Carbon brings a new level of quality to the ThinkPad legacy of high standards and innovation. It starts with the durable, carbon fiber-reinforced roll cage, making for the best Ultrabook construction available, and adds a host of other new features on top of the old favorites. Because for 20 years, we haven't stopped innovating. And you shouldn't stop benefiting from that.</p>",
@@ -5154,7 +5123,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Adobe Photoshop",
+                Name = "Adobe Photoshop CS4",
                 Sku = "AD_CS4_PH",
                 ShortDescription = "Easily find and view all your photos",
                 FullDescription = "<p>Adobe Photoshop CS4 software combines power and simplicity so you can make ordinary photos extraordinary; tell engaging stories in beautiful, personalized creations for print and web; and easily find and view all your photos. New Photoshop.com membership* works with Photoshop CS4 so you can protect your photos with automatic online backup and 2 GB of storage; view your photos anywhere you are; and share your photos in fun, interactive ways with invitation-only Online Albums.</p>",
@@ -5201,7 +5170,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Microsoft Windows OS",
+                Name = "Windows 8 Pro",
                 Sku = "MS_WIN_8P",
                 ShortDescription = "Windows 8 is a Microsoft operating system that was released in 2012 as part of the company's Windows NT OS family. ",
                 FullDescription = "<p>Windows 8 Pro is comparable to Windows 7 Professional and Ultimate and is targeted towards enthusiasts and business users; it includes all the features of Windows 8. Additional features include the ability to receive Remote Desktop connections, the ability to participate in a Windows Server domain, Encrypting File System, Hyper-V, and Virtual Hard Disk Booting, Group Policy as well as BitLocker and BitLocker To Go. Windows Media Center functionality is available only for Windows 8 Pro as a separate software package.</p>",
@@ -5239,7 +5208,7 @@ namespace Nop.Services.Installation
                 DisplayOrder = 1
             });
 
-            await InsertProductPictureAsync(productWindows8Pro, "product_Windows.jpeg");
+            await InsertProductPictureAsync(productWindows8Pro, "product_Windows8.jpeg");
 
             await AddProductTagAsync(productWindows8Pro, "awesome");
             await AddProductTagAsync(productWindows8Pro, "computer");
@@ -5248,7 +5217,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Sound Forge Pro (recurring)",
+                Name = "Sound Forge Pro 11 (recurring)",
                 Sku = "SF_PRO_11",
                 ShortDescription = "Advanced audio waveform editor.",
                 FullDescription = "<p>Sound Forge™ Pro is the application of choice for a generation of creative and prolific artists, producers, and editors. Record audio quickly on a rock-solid platform, address sophisticated audio processing tasks with surgical precision, and render top-notch master files with ease. New features include one-touch recording, metering for the new critical standards, more repair and restoration tools, and exclusive round-trip interoperability with SpectraLayers Pro. Taken together, these enhancements make this edition of Sound Forge Pro the deepest and most advanced audio editing platform available.</p>",
@@ -5687,7 +5656,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "HTC smartphone",
+                Name = "HTC One M8 Android L 5.0 Lollipop",
                 Sku = "M8_HTC_5L",
                 ShortDescription = "HTC - One (M8) 4G LTE Cell Phone with 32GB Memory - Gunmetal (Sprint)",
                 FullDescription = "<p><b>HTC One (M8) Cell Phone for Sprint:</b> With its brushed-metal design and wrap-around unibody frame, the HTC One (M8) is designed to fit beautifully in your hand. It's fun to use with amped up sound and a large Full HD touch screen, and intuitive gesture controls make it seem like your phone almost knows what you need before you do. <br /><br />Sprint Easy Pay option available in store.</p>",
@@ -5835,7 +5804,7 @@ namespace Nop.Services.Installation
             {
                 ProductType = ProductType.SimpleProduct,
                 VisibleIndividually = true,
-                Name = "Beats Pill Wireless Speaker",
+                Name = "Beats Pill 2.0 Wireless Speaker",
                 Sku = "BP_20_WSP",
                 ShortDescription = "<b>Pill 2.0 Portable Bluetooth Speaker (1-Piece):</b> Watch your favorite movies and listen to music with striking sound quality. This lightweight, portable speaker is easy to take with you as you travel to any destination, keeping you entertained wherever you are. ",
                 FullDescription = "<ul><li>Pair and play with your Bluetooth® device with 30 foot range</li><li>Built-in speakerphone</li><li>7 hour rechargeable battery</li><li>Power your other devices with USB charge out</li><li>Tap two Beats Pills™ together for twice the sound with Beats Bond™</li></ul>",
@@ -6219,37 +6188,24 @@ namespace Nop.Services.Installation
                     IsRequired = true
                 });
 
-            var pavNatural = await InsertInstallationDataAsync(
+            await InsertInstallationDataAsync(
                 new ProductAttributeValue
                 {
                     ProductAttributeMappingId = pamPrint.Id,
+                    PictureId = picProductNikeFloralShoe1Id,
                     AttributeValueType = AttributeValueType.Simple,
                     Name = "Natural",
                     DisplayOrder = 1,
                     ImageSquaresPictureId = (await pictureService.InsertPictureAsync(await _fileProvider.ReadAllBytesAsync(_fileProvider.Combine(sampleImagesPath, "p_attribute_print_2.jpg")), MimeTypes.ImagePJpeg, await pictureService.GetPictureSeNameAsync("Natural Print"))).Id
-                });
-
-            await InsertInstallationDataAsync(new ProductAttributeValuePicture
-            {
-                PictureId = picProductNikeFloralShoe1Id,
-                ProductAttributeValueId = pavNatural.Id
-            });
-
-            var pavFresh = await InsertInstallationDataAsync(
+                },
                 new ProductAttributeValue
                 {
                     ProductAttributeMappingId = pamPrint.Id,
+                    PictureId = picProductNikeFloralShoe2Id,
                     AttributeValueType = AttributeValueType.Simple,
                     Name = "Fresh",
                     DisplayOrder = 2,
                     ImageSquaresPictureId = (await pictureService.InsertPictureAsync(await _fileProvider.ReadAllBytesAsync(_fileProvider.Combine(sampleImagesPath, "p_attribute_print_1.jpg")), MimeTypes.ImagePJpeg, await pictureService.GetPictureSeNameAsync("Fresh Print"))).Id
-                });
-
-            await InsertInstallationDataAsync(
-                new ProductAttributeValuePicture
-                {
-                    PictureId = picProductNikeFloralShoe2Id,
-                    ProductAttributeValueId = pavFresh.Id
                 });
 
             await AddProductTagAsync(productNikeFloral, "cool");
@@ -6379,55 +6335,34 @@ namespace Nop.Services.Installation
                     IsRequired = true
                 });
 
-            var pavRed = await InsertInstallationDataAsync(
+            await InsertInstallationDataAsync(
                 new ProductAttributeValue
                 {
                     ProductAttributeMappingId = pamAdidasColor.Id,
+                    PictureId = picProductAdidasId,
                     AttributeValueType = AttributeValueType.Simple,
                     Name = "Red",
                     IsPreSelected = true,
                     ColorSquaresRgb = "#663030",
                     DisplayOrder = 1
-                });
-
-            await InsertInstallationDataAsync(
-                new ProductAttributeValuePicture
-                {
-                    PictureId = picProductAdidasId,
-                    ProductAttributeValueId = pavRed.Id
-                });
-
-            var pavBlue = await InsertInstallationDataAsync(new ProductAttributeValue
+                },
+                new ProductAttributeValue
                 {
                     ProductAttributeMappingId = pamAdidasColor.Id,
+                    PictureId = picProductAdidas2Id,
                     AttributeValueType = AttributeValueType.Simple,
                     Name = "Blue",
                     ColorSquaresRgb = "#363656",
                     DisplayOrder = 2
-                });
-
-            await InsertInstallationDataAsync(
-                new ProductAttributeValuePicture
-                {
-                    PictureId = picProductAdidas2Id,
-                    ProductAttributeValueId = pavBlue.Id
-                });
-
-            var pavSilver = await InsertInstallationDataAsync(
+                },
                 new ProductAttributeValue
                 {
                     ProductAttributeMappingId = pamAdidasColor.Id,
+                    PictureId = picProductAdidas3Id,
                     AttributeValueType = AttributeValueType.Simple,
                     Name = "Silver",
                     ColorSquaresRgb = "#c5c5d5",
                     DisplayOrder = 3
-                });
-
-            await InsertInstallationDataAsync(
-                new ProductAttributeValuePicture
-                {
-                    PictureId = picProductAdidas3Id,
-                    ProductAttributeValueId = pavSilver.Id
                 });
 
             await AddProductTagAsync(productAdidas, "cool");
@@ -8976,12 +8911,6 @@ namespace Nop.Services.Installation
                 },
                 new ActivityLogType
                 {
-                    SystemKeyword = "ImportCustomers",
-                    Enabled = true,
-                    Name = "Customers were imported"
-                },
-                new ActivityLogType
-                {
                     SystemKeyword = "ImportNewsLetterSubscriptions",
                     Enabled = true,
                     Name = "Newsletter subscriptions were imported"
@@ -9045,12 +8974,6 @@ namespace Nop.Services.Installation
                     SystemKeyword = "UninstallPlugin",
                     Enabled = true,
                     Name = "Uninstall a plugin"
-                },
-                new ActivityLogType
-                {
-                    SystemKeyword = "UpdatePlugin",
-                    Enabled = true,
-                    Name = "Update a plugin"
                 },
                 //public store activities
                 new ActivityLogType
@@ -9526,7 +9449,7 @@ namespace Nop.Services.Installation
         }
 
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected virtual async Task AddProductTagAsync(Product product, string tag)
+        private async Task AddProductTagAsync(Product product, string tag)
         {
             var productTag = _productTagRepository.Table.FirstOrDefault(pt => pt.Name == tag);
 

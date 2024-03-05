@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Domain.Common;
@@ -8,28 +13,23 @@ using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
-using Nop.Core.Domain.Transaction;
 using Nop.Core.Http.Extensions;
-using Nop.Services.Attributes;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
-using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
 using Nop.Services.Shipping;
 using Nop.Services.Tax;
-using Nop.Services.Transactions;
 using Nop.Web.Extensions;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Models.Checkout;
 using Nop.Web.Models.Common;
-using ILogger = Nop.Services.Logging.ILogger;
 
 namespace Nop.Web.Controllers
 {
@@ -38,37 +38,34 @@ namespace Nop.Web.Controllers
     {
         #region Fields
 
-        protected readonly AddressSettings _addressSettings;
-        protected readonly CaptchaSettings _captchaSettings;
-        protected readonly CustomerSettings _customerSettings;
-        protected readonly IAddressModelFactory _addressModelFactory;
-        protected readonly IAddressService _addressService;
-        protected readonly IAttributeParser<AddressAttribute, AddressAttributeValue> _addressAttributeParser;
-        protected readonly ICheckoutModelFactory _checkoutModelFactory;
-        protected readonly ICountryService _countryService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ILogger _logger;
-        protected readonly IOrderProcessingService _orderProcessingService;
-        protected readonly IOrderService _orderService;
-        protected readonly IPaymentPluginManager _paymentPluginManager;
-        protected readonly IPaymentService _paymentService;
-        protected readonly IProductService _productService;
-        protected readonly IShippingService _shippingService;
-        protected readonly IShoppingCartService _shoppingCartService;
-        protected readonly IStoreContext _storeContext;
-        protected readonly ITaxService _taxService;
-        protected readonly IWebHelper _webHelper;
-        protected readonly IWorkContext _workContext;
-        protected readonly OrderSettings _orderSettings;
-        protected readonly PaymentSettings _paymentSettings;
-        protected readonly RewardPointsSettings _rewardPointsSettings;
-        protected readonly ShippingSettings _shippingSettings;
-        protected readonly TaxSettings _taxSettings;
-        protected readonly ITransactionService _transactionService;
-        protected readonly INotificationService _notificationService;
-        protected readonly ICustomerActivityService _customerActivityService;
+        private readonly AddressSettings _addressSettings;
+        private readonly CaptchaSettings _captchaSettings;
+        private readonly CustomerSettings _customerSettings;
+        private readonly IAddressAttributeParser _addressAttributeParser;        
+        private readonly IAddressModelFactory _addressModelFactory;
+        private readonly IAddressService _addressService;
+        private readonly ICheckoutModelFactory _checkoutModelFactory;
+        private readonly ICountryService _countryService;
+        private readonly ICustomerService _customerService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILogger _logger;
+        private readonly IOrderProcessingService _orderProcessingService;
+        private readonly IOrderService _orderService;
+        private readonly IPaymentPluginManager _paymentPluginManager;
+        private readonly IPaymentService _paymentService;
+        private readonly IProductService _productService;
+        private readonly IShippingService _shippingService;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IStoreContext _storeContext;
+        private readonly ITaxService _taxService;
+        private readonly IWebHelper _webHelper;
+        private readonly IWorkContext _workContext;
+        private readonly OrderSettings _orderSettings;
+        private readonly PaymentSettings _paymentSettings;
+        private readonly RewardPointsSettings _rewardPointsSettings;
+        private readonly ShippingSettings _shippingSettings;
+        private readonly TaxSettings _taxSettings;
 
         #endregion
 
@@ -77,9 +74,9 @@ namespace Nop.Web.Controllers
         public CheckoutController(AddressSettings addressSettings,
             CaptchaSettings captchaSettings,
             CustomerSettings customerSettings,
+            IAddressAttributeParser addressAttributeParser,
             IAddressModelFactory addressModelFactory,
             IAddressService addressService,
-            IAttributeParser<AddressAttribute, AddressAttributeValue> addressAttributeParser,
             ICheckoutModelFactory checkoutModelFactory,
             ICountryService countryService,
             ICustomerService customerService,
@@ -101,17 +98,14 @@ namespace Nop.Web.Controllers
             PaymentSettings paymentSettings,
             RewardPointsSettings rewardPointsSettings,
             ShippingSettings shippingSettings,
-            TaxSettings taxSettings,
-            ITransactionService transactionService,
-            INotificationService notificationService,
-            ICustomerActivityService customerActivityService)
+            TaxSettings taxSettings)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
             _customerSettings = customerSettings;
+            _addressAttributeParser = addressAttributeParser;
             _addressModelFactory = addressModelFactory;
             _addressService = addressService;
-            _addressAttributeParser = addressAttributeParser;
             _checkoutModelFactory = checkoutModelFactory;
             _countryService = countryService;
             _customerService = customerService;
@@ -134,9 +128,6 @@ namespace Nop.Web.Controllers
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
             _taxSettings = taxSettings;
-            _transactionService = transactionService;
-            _notificationService = notificationService;
-            _customerActivityService = customerActivityService;
         }
 
         #endregion
@@ -253,7 +244,7 @@ namespace Nop.Web.Controllers
             return string.Empty;
         }
 
-        protected virtual async Task<JsonResult> EditAddressAsync(AddressModel addressModel, IFormCollection form, Func<Customer, IList<ShoppingCartItem>, Address, Task<JsonResult>> getResult)
+        protected async Task<JsonResult> EditAddressAsync(AddressModel addressModel, IFormCollection form, Func<Customer, IList<ShoppingCartItem>, Address, Task<JsonResult>> getResult)
         {
             try
             {
@@ -264,7 +255,7 @@ namespace Nop.Web.Controllers
 
                     throw new Exception(errors);
                 }
-
+                
                 var customer = await _workContext.GetCurrentCustomerAsync();
                 var store = await _storeContext.GetCurrentStoreAsync();
                 var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
@@ -277,10 +268,10 @@ namespace Nop.Web.Controllers
                     throw new Exception("Address can't be loaded");
 
                 //custom address attributes
-                var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+                var customAttributes = await _addressAttributeParser.ParseCustomAddressAttributesAsync(form);
                 var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
 
-                if (customAttributeWarnings.Any())
+                if (customAttributeWarnings.Any()) 
                     return Json(new { error = 1, message = customAttributeWarnings });
 
                 address = addressModel.ToEntity(address);
@@ -297,7 +288,7 @@ namespace Nop.Web.Controllers
             }
         }
 
-        protected virtual async Task<JsonResult> DeleteAddressAsync(int addressId, Func<IList<ShoppingCartItem>, Task<JsonResult>> getResult)
+        protected async Task<JsonResult> DeleteAddressAsync(int addressId, Func<IList<ShoppingCartItem>, Task<JsonResult>> getResult)
         {
             try
             {
@@ -507,7 +498,7 @@ namespace Nop.Web.Controllers
         {
             return await DeleteAddressAsync(addressId, async (cart) =>
             {
-                if (!opc)
+                if (!opc) 
                     return Json(new { redirect = Url.RouteUrl("CheckoutBillingAddress") });
 
                 var billingAddressModel = await _checkoutModelFactory.PrepareBillingAddressModelAsync(cart);
@@ -535,7 +526,7 @@ namespace Nop.Web.Controllers
                     return Json(new { redirect = Url.RouteUrl("CheckoutShippingAddress") });
 
                 var shippingAddressModel = await _checkoutModelFactory.PrepareShippingAddressModelAsync(cart);
-
+                
                 return Json(new
                 {
                     update_section = new UpdateSectionJsonModel
@@ -578,7 +569,7 @@ namespace Nop.Web.Controllers
                 });
             });
         }
-
+        
         #endregion
 
         #region Methods (multistep checkout)
@@ -686,7 +677,7 @@ namespace Nop.Web.Controllers
             }
 
             //custom address attributes
-            var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+            var customAttributes = await _addressAttributeParser.ParseCustomAddressAttributesAsync(form);
             var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
             foreach (var error in customAttributeWarnings)
             {
@@ -844,7 +835,7 @@ namespace Nop.Web.Controllers
             }
 
             //custom address attributes
-            var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+            var customAttributes = await _addressAttributeParser.ParseCustomAddressAttributesAsync(form);
             var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
             foreach (var error in customAttributeWarnings)
             {
@@ -1174,7 +1165,7 @@ namespace Nop.Web.Controllers
                 var paymentInfo = new ProcessPaymentRequest();
 
                 //session save
-                await HttpContext.Session.SetAsync("OrderPaymentInfo", paymentInfo);
+                HttpContext.Session.Set("OrderPaymentInfo", paymentInfo);
 
                 return RedirectToRoute("CheckoutConfirm");
             }
@@ -1228,10 +1219,10 @@ namespace Nop.Web.Controllers
                 //get payment info
                 var paymentInfo = await paymentMethod.GetPaymentInfoAsync(form);
                 //set previous order GUID (if exists)
-                await _paymentService.GenerateOrderGuidAsync(paymentInfo);
+                _paymentService.GenerateOrderGuid(paymentInfo);
 
                 //session save
-                await HttpContext.Session.SetAsync("OrderPaymentInfo", paymentInfo);
+                HttpContext.Session.Set("OrderPaymentInfo", paymentInfo);
                 return RedirectToRoute("CheckoutConfirm");
             }
 
@@ -1306,7 +1297,7 @@ namespace Nop.Web.Controllers
                     throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
                 //place order
-                var processPaymentRequest = await HttpContext.Session.GetAsync<ProcessPaymentRequest>("OrderPaymentInfo");
+                var processPaymentRequest = HttpContext.Session.Get<ProcessPaymentRequest>("OrderPaymentInfo");
                 if (processPaymentRequest == null)
                 {
                     //Check whether payment workflow is required
@@ -1315,16 +1306,16 @@ namespace Nop.Web.Controllers
 
                     processPaymentRequest = new ProcessPaymentRequest();
                 }
-                await _paymentService.GenerateOrderGuidAsync(processPaymentRequest);
+                _paymentService.GenerateOrderGuid(processPaymentRequest);
                 processPaymentRequest.StoreId = store.Id;
                 processPaymentRequest.CustomerId = customer.Id;
                 processPaymentRequest.PaymentMethodSystemName = await _genericAttributeService.GetAttributeAsync<string>(customer,
                     NopCustomerDefaults.SelectedPaymentMethodAttribute, store.Id);
-                await HttpContext.Session.SetAsync("OrderPaymentInfo", processPaymentRequest);
+                HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", processPaymentRequest);
                 var placeOrderResult = await _orderProcessingService.PlaceOrderAsync(processPaymentRequest);
                 if (placeOrderResult.Success)
                 {
-                    await HttpContext.Session.SetAsync<ProcessPaymentRequest>("OrderPaymentInfo", null);
+                    HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", null);
                     var postProcessPaymentRequest = new PostProcessPaymentRequest
                     {
                         Order = placeOrderResult.PlacedOrder
@@ -1337,55 +1328,7 @@ namespace Nop.Web.Controllers
                         return Content(await _localizationService.GetResourceAsync("Checkout.RedirectMessage"));
                     }
 
-                    //MOVED THIS WORKING TO A FUNCTION TO USE THAT SAME WORKING SOMEWHERE ELSE
-                    ////if transaction is made then process the transaction and redirect to the invest page
-                    //var orderItems = await _orderService.GetOrderItemsAsync(orderId: placeOrderResult.PlacedOrder.Id);
-                    //if (orderItems.Any(x => x.ProductId.Equals(_customerSettings.TransactionProductId)))
-                    //{
-                    //    try
-                    //    {
-                    //        //payment method
-                    //        var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(placeOrderResult.PlacedOrder.PaymentMethodSystemName);
-                    //        var paymentMethodStr = paymentMethod != null
-                    //            ? await _localizationService.GetLocalizedFriendlyNameAsync(paymentMethod, (await _workContext.GetWorkingLanguageAsync()).Id)
-                    //            : placeOrderResult.PlacedOrder.PaymentMethodSystemName;
-
-                    //        var transaction = new Transaction()
-                    //        {
-                    //            CustomerId = customer.Id,
-                    //            TransactionAmount = placeOrderResult.PlacedOrder.OrderSubtotalExclTax,
-                    //            TransactionType = TransactionType.Credit,
-                    //            Status = Status.Pending,
-                    //            TransactionNote = "Deposit: " + paymentMethodStr,
-                    //            OrderId = placeOrderResult.PlacedOrder.Id,
-                    //        };
-                    //        await _transactionService.InsertTransactionAsync(transaction);
-
-                    //        await _customerActivityService.InsertActivityAsync("TransactionLog",
-                    //            string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Invest.Transaction.Pending"), transaction.TransactionAmount), transaction);
-
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        await _logger.ErrorAsync($"Error on invest: {ex.Message}", ex, customer);
-                    //    }
-                    //}
-                    var transaction = await _transactionService.MakeTransactionAfterOrderCreation(placeOrderResult.PlacedOrder, customer);
-                    if (transaction is not null)
-                    {
-                        await _customerActivityService.InsertActivityAsync("TransactionLog",
-                            string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Invest.Transaction.Pending"), transaction.TransactionAmount), transaction);
-
-                        _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));
-                    }
-                    else
-                    {
-                        _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Unsuccessfull"));
-
-                    }
-                    return RedirectToRoute("Invest");
-
-                    //return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
+                    return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
                 }
 
                 foreach (var error in placeOrderResult.Errors)
@@ -1509,7 +1452,7 @@ namespace Nop.Web.Controllers
                 var paymentInfo = new ProcessPaymentRequest();
 
                 //session save
-                await HttpContext.Session.SetAsync("OrderPaymentInfo", paymentInfo);
+                HttpContext.Session.Set("OrderPaymentInfo", paymentInfo);
 
                 var confirmOrderModel = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart);
                 return Json(new
@@ -1605,7 +1548,7 @@ namespace Nop.Web.Controllers
                     var newAddress = model.BillingNewAddress;
 
                     //custom address attributes
-                    var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+                    var customAttributes = await _addressAttributeParser.ParseCustomAddressAttributesAsync(form);
                     var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
                     foreach (var error in customAttributeWarnings)
                     {
@@ -1767,7 +1710,7 @@ namespace Nop.Web.Controllers
                     var newAddress = model.ShippingNewAddress;
 
                     //custom address attributes
-                    var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+                    var customAttributes = await _addressAttributeParser.ParseCustomAddressAttributesAsync(form);
                     var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
                     foreach (var error in customAttributeWarnings)
                     {
@@ -2019,10 +1962,10 @@ namespace Nop.Web.Controllers
                     //get payment info
                     var paymentInfo = await paymentMethod.GetPaymentInfoAsync(form);
                     //set previous order GUID (if exists)
-                    await _paymentService.GenerateOrderGuidAsync(paymentInfo);
+                    _paymentService.GenerateOrderGuid(paymentInfo);
 
                     //session save
-                    await HttpContext.Session.SetAsync("OrderPaymentInfo", paymentInfo);
+                    HttpContext.Session.Set("OrderPaymentInfo", paymentInfo);
 
                     var confirmOrderModel = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart);
                     return Json(new
@@ -2062,11 +2005,11 @@ namespace Nop.Web.Controllers
             {
                 var customer = await _workContext.GetCurrentCustomerAsync();
 
-                var isCaptchaSettingEnabled = await _customerService.IsGuestAsync(customer) &&
+                var isCaptchaSettingEnabled = await _customerService.IsGuestAsync(customer) && 
                     _captchaSettings.Enabled && _captchaSettings.ShowOnCheckoutPageForGuests;
 
                 var confirmOrderModel = new CheckoutConfirmModel()
-                {
+                { 
                     DisplayCaptcha = isCaptchaSettingEnabled
                 };
 
@@ -2094,7 +2037,7 @@ namespace Nop.Web.Controllers
                         throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
                     //place order
-                    var processPaymentRequest = await HttpContext.Session.GetAsync<ProcessPaymentRequest>("OrderPaymentInfo");
+                    var processPaymentRequest = HttpContext.Session.Get<ProcessPaymentRequest>("OrderPaymentInfo");
                     if (processPaymentRequest == null)
                     {
                         //Check whether payment workflow is required
@@ -2105,16 +2048,16 @@ namespace Nop.Web.Controllers
 
                         processPaymentRequest = new ProcessPaymentRequest();
                     }
-                    await _paymentService.GenerateOrderGuidAsync(processPaymentRequest);
+                    _paymentService.GenerateOrderGuid(processPaymentRequest);
                     processPaymentRequest.StoreId = store.Id;
                     processPaymentRequest.CustomerId = customer.Id;
                     processPaymentRequest.PaymentMethodSystemName = await _genericAttributeService.GetAttributeAsync<string>(customer,
                         NopCustomerDefaults.SelectedPaymentMethodAttribute, store.Id);
-                    await HttpContext.Session.SetAsync("OrderPaymentInfo", processPaymentRequest);
+                    HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", processPaymentRequest);
                     var placeOrderResult = await _orderProcessingService.PlaceOrderAsync(processPaymentRequest);
                     if (placeOrderResult.Success)
                     {
-                        await HttpContext.Session.SetAsync<ProcessPaymentRequest>("OrderPaymentInfo", null);
+                        HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", null);
                         var postProcessPaymentRequest = new PostProcessPaymentRequest
                         {
                             Order = placeOrderResult.PlacedOrder

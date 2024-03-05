@@ -1,5 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 
 namespace Nop.Core.ComponentModel
 {
@@ -62,7 +65,7 @@ namespace Nop.Core.ComponentModel
             var items = string.IsNullOrEmpty(input) ? Array.Empty<string>() : input.Split(';').Select(x => x.Trim()).ToArray();
 
             var result = new Dictionary<K, V>();
-            foreach (var item in items)
+            foreach(var item in items)
             {
                 var keyValueStr = string.IsNullOrEmpty(item) ? Array.Empty<string>() : item.Split(',').Select(x => x.Trim()).ToArray();
                 if (keyValueStr.Length != 2)

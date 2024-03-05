@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Tax;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Tax;
 
 namespace Nop.Services.Tax
 {

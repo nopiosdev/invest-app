@@ -1,4 +1,7 @@
-﻿using Nop.Core.Domain.Messages;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Messages;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Messages;
@@ -15,10 +18,10 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly IDateTimeHelper _dateTimeHelper;
-        protected readonly IEmailAccountService _emailAccountService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IQueuedEmailService _queuedEmailService;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IEmailAccountService _emailAccountService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IQueuedEmailService _queuedEmailService;
 
         #endregion
 

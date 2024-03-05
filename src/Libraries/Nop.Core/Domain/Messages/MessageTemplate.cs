@@ -49,11 +49,6 @@ namespace Nop.Core.Domain.Messages
         public int AttachedDownloadId { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether direct reply is allowed
-        /// </summary>
-        public bool AllowDirectReply { get; set; }
-
-        /// <summary>
         /// Gets or sets the used email account identifier
         /// </summary>
         public int EmailAccountId { get; set; }

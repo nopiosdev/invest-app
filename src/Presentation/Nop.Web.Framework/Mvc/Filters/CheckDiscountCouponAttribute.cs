@@ -1,4 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Primitives;
@@ -37,11 +41,11 @@ namespace Nop.Web.Framework.Mvc.Filters
         {
             #region Fields
 
-            protected readonly ICustomerService _customerService;
-            protected readonly IDiscountService _discountService;
-            protected readonly ILocalizationService _localizationService;
-            protected readonly INotificationService _notificationService;
-            protected readonly IWorkContext _workContext;
+            private readonly ICustomerService _customerService;
+            private readonly IDiscountService _discountService;
+            private readonly ILocalizationService _localizationService;
+            private readonly INotificationService _notificationService;
+            private readonly IWorkContext _workContext;
 
             #endregion
 

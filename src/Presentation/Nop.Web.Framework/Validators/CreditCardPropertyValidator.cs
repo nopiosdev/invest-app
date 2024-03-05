@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Linq;
+using FluentValidation;
 using FluentValidation.Validators;
 
 namespace Nop.Web.Framework.Validators

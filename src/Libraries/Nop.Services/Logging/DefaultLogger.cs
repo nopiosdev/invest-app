@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Logging;
@@ -13,10 +17,10 @@ namespace Nop.Services.Logging
     {
         #region Fields
 
-        protected readonly CommonSettings _commonSettings;
+        private readonly CommonSettings _commonSettings;
         
-        protected readonly IRepository<Log> _logRepository;
-        protected readonly IWebHelper _webHelper;
+        private readonly IRepository<Log> _logRepository;
+        private readonly IWebHelper _webHelper;
 
         #endregion
 
@@ -101,7 +105,7 @@ namespace Nop.Services.Logging
         /// <returns>A task that represents the asynchronous operation</returns>
         public virtual async Task ClearLogAsync(DateTime? olderThan = null)
         {
-            if (olderThan == null)
+            if(olderThan == null)
                 await _logRepository.TruncateAsync();
             else
                 await _logRepository.DeleteAsync(p => p.CreatedOnUtc < olderThan.Value);

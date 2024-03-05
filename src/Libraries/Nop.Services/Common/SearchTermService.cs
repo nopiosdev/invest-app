@@ -1,6 +1,9 @@
-﻿using Nop.Core;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Common;
 using Nop.Data;
+using Nop.Data.Extensions;
 
 namespace Nop.Services.Common
 {
@@ -11,7 +14,7 @@ namespace Nop.Services.Common
     {
         #region Fields
 
-        protected readonly IRepository<SearchTerm> _searchTermRepository;
+        private readonly IRepository<SearchTerm> _searchTermRepository;
 
         #endregion
 

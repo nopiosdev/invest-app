@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
-using Nop.Web.Framework.Factories;
 
 namespace Nop.Web.Components
 {
     public partial class WidgetViewComponent : NopViewComponent
     {
-        protected readonly IWidgetModelFactory _widgetModelFactory;
+        private readonly IWidgetModelFactory _widgetModelFactory;
 
         public WidgetViewComponent(IWidgetModelFactory widgetModelFactory)
         {

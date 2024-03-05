@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Nop.Core;
 
 namespace Nop.Web.Framework.Mvc.ModelBinding

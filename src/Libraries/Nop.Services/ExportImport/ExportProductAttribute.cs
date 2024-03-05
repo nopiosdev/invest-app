@@ -33,9 +33,9 @@
         public int AttributeDisplayOrder { get; set; }
 
         /// <summary>
-        /// Gets or sets the comma separated picture identifiers
+        /// Gets or sets the picture identifier
         /// </summary>
-        public string PictureIds { get; set; }
+        public int PictureId { get; set; }
 
         /// <summary>
         /// Gets or sets the attribute control type identifier

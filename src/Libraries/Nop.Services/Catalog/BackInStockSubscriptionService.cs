@@ -1,4 +1,7 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Data;
@@ -13,10 +16,10 @@ namespace Nop.Services.Catalog
     {
         #region Fields
 
-        protected readonly IRepository<BackInStockSubscription> _backInStockSubscriptionRepository;
-        protected readonly IRepository<Customer> _customerRepository;
-        protected readonly IRepository<Product> _productRepository;
-        protected readonly IWorkflowMessageService _workflowMessageService;
+        private readonly IRepository<BackInStockSubscription> _backInStockSubscriptionRepository;
+        private readonly IRepository<Customer> _customerRepository;
+        private readonly IRepository<Product> _productRepository;
+        private readonly IWorkflowMessageService _workflowMessageService;
 
         #endregion
 
@@ -72,9 +75,9 @@ namespace Nop.Services.Catalog
 
                 //product
                 query = from q in query
-                        join p in _productRepository.Table on q.ProductId equals p.Id
-                        where !p.Deleted
-                        select q;
+                    join p in _productRepository.Table on q.ProductId equals p.Id
+                    where !p.Deleted
+                    select q;
 
                 query = query.OrderByDescending(biss => biss.CreatedOnUtc);
 
@@ -179,9 +182,9 @@ namespace Nop.Services.Catalog
                     query = query.Where(biss => biss.StoreId == storeId);
                 //customer
                 query = from biss in query
-                        join c in _customerRepository.Table on biss.CustomerId equals c.Id
-                        where c.Active && !c.Deleted
-                        select biss;
+                    join c in _customerRepository.Table on biss.CustomerId equals c.Id
+                    where c.Active && !c.Deleted
+                    select biss;
 
                 query = query.OrderByDescending(biss => biss.CreatedOnUtc);
 

@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
-using Nop.Web.Areas.Admin.Models.Transactions;
-using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Customers
 {
@@ -37,10 +38,6 @@ namespace Nop.Web.Areas.Admin.Models.Customers
             CustomerActivityLogSearchModel = new CustomerActivityLogSearchModel();
             CustomerBackInStockSubscriptionSearchModel = new CustomerBackInStockSubscriptionSearchModel();
             CustomerAssociatedExternalAuthRecordsSearchModel = new CustomerAssociatedExternalAuthRecordsSearchModel();
-
-            TransactionSearchModel = new TransactionSearchModel();
-            CustomerCommissionSearchModel = new CustomerCommissionSearchModel();
-            CustomerWIthdrawalMethodSearchModel = new CustomerWIthdrawalMethodSearchModel();
         }
 
         #endregion
@@ -70,8 +67,6 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.Gender")]
         public string Gender { get; set; }
-
-        public bool NeutralGenderEnabled { get; set; }
 
         public bool FirstNameEnabled { get; set; }
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.FirstName")]
@@ -242,7 +237,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         //GDPR enabled
         public bool GdprEnabled { get; set; }
-
+        
         public string AvatarUrl { get; internal set; }
 
         public CustomerAddressSearchModel CustomerAddressSearchModel { get; set; }
@@ -256,26 +251,6 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         public CustomerBackInStockSubscriptionSearchModel CustomerBackInStockSubscriptionSearchModel { get; set; }
 
         public CustomerAssociatedExternalAuthRecordsSearchModel CustomerAssociatedExternalAuthRecordsSearchModel { get; set; }
-
-        //NCT back-end dev
-
-        [NopResourceDisplayName("Admin.Customers.Customers.Fields.Verified")]
-        public bool Verified { get; set; }
-        [NopResourceDisplayName("Admin.Customers.Customers.Fields.FormId")]
-        public Guid FormId { get; set; }
-        [NopResourceDisplayName("Admin.Customers.Customers.Fields.ProofOfAddress")]
-        public Guid ProofOfAddress { get; set; }
-        [NopResourceDisplayName("Admin.Customers.Customers.Fields.OtherDocument")]
-        public Guid OtherDocument { get; set; }
-
-        [NopResourceDisplayName("Admin.Customers.Customers.Fields.CommissionToHouse")]
-        public decimal CommissionToHouse { get; set; }
-        [NopResourceDisplayName("Admin.Customers.Customers.Fields.DontInvestAmount")]
-        public bool DontInvestAmount { get; set; }
-
-        public TransactionSearchModel TransactionSearchModel { get; set; }
-        public CustomerCommissionSearchModel CustomerCommissionSearchModel { get; set; }
-        public CustomerWIthdrawalMethodSearchModel CustomerWIthdrawalMethodSearchModel { get; set; }
 
         #endregion
 

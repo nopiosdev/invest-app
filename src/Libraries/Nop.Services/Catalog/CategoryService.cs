@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
@@ -19,17 +23,17 @@ namespace Nop.Services.Catalog
     {
         #region Fields
 
-        protected readonly IAclService _aclService;
-        protected readonly ICustomerService _customerService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IRepository<Category> _categoryRepository;
-        protected readonly IRepository<DiscountCategoryMapping> _discountCategoryMappingRepository;
-        protected readonly IRepository<Product> _productRepository;
-        protected readonly IRepository<ProductCategory> _productCategoryRepository;
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IStoreMappingService _storeMappingService;
-        protected readonly IWorkContext _workContext;
+        private readonly IAclService _aclService;
+        private readonly ICustomerService _customerService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IRepository<Category> _categoryRepository;
+        private readonly IRepository<DiscountCategoryMapping> _discountCategoryMappingRepository;
+        private readonly IRepository<Product> _productRepository;
+        private readonly IRepository<ProductCategory> _productCategoryRepository;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly IStoreContext _storeContext;
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -408,22 +412,15 @@ namespace Nop.Services.Catalog
                 //little hack for performance optimization
                 //there's no need to invoke "GetAllCategoriesByParentCategoryId" multiple times (extra SQL commands) to load childs
                 //so we load all categories at once (we know they are cached) and process them server-side
-                var lookup = await _staticCacheManager.GetAsync(
-                    _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ChildCategoryIdLookupCacheKey, storeId, showHidden),
-                    async () => (await GetAllCategoriesAsync(storeId: storeId, showHidden: showHidden))
-                        .ToGroupedDictionary(c => c.ParentCategoryId, x => x.Id));
+                var categoriesIds = new List<int>();
+                var categories = (await GetAllCategoriesAsync(storeId: storeId, showHidden: showHidden))
+                    .Where(c => c.ParentCategoryId == parentCategoryId)
+                    .Select(c => c.Id)
+                    .ToList();
+                categoriesIds.AddRange(categories);
+                categoriesIds.AddRange(await categories.SelectManyAwait(async cId => await GetChildCategoryIdsAsync(cId, storeId, showHidden)).ToListAsync());
 
-                var categoryIds = new List<int>();
-                if (lookup.TryGetValue(parentCategoryId, out var categories))
-                {
-                    categoryIds.AddRange(categories);
-                    var childCategoryIds = categories.SelectAwait(async cId => await GetChildCategoryIdsAsync(cId, storeId, showHidden));
-                    // avoid allocating a new list or blocking with ToEnumerable
-                    await foreach (var cIds in childCategoryIds)
-                        categoryIds.AddRange(cIds);
-                }
-
-                return categoryIds;
+                return categoriesIds;
             });
         }
 
@@ -654,7 +651,7 @@ namespace Nop.Services.Catalog
             if (categoryIdsNames == null)
                 throw new ArgumentNullException(nameof(categoryIdsNames));
 
-            var query = _categoryRepository.Table.Where(c => !c.Deleted);
+            var query = _categoryRepository.Table;
             var queryFilter = categoryIdsNames.Distinct().ToArray();
             //filtering by name
             var filter = await query.Select(c => c.Name)

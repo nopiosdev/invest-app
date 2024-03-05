@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Forums;
+﻿using System.Threading.Tasks;
+using Nop.Core.Domain.Forums;
 using Nop.Services.Caching;
 
 namespace Nop.Services.Forums.Caching

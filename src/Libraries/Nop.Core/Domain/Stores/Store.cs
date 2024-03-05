@@ -87,7 +87,5 @@ namespace Nop.Core.Domain.Stores
         /// Gets or sets a value indicating whether the entity has been deleted
         /// </summary>
         public bool Deleted { get; set; }
-
-        public string StoreEmailAddress { get; set; }
     }
 }

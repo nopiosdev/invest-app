@@ -1,4 +1,5 @@
-﻿using Nop.Web.Models.Newsletter;
+﻿using System.Threading.Tasks;
+using Nop.Web.Models.Newsletter;
 
 namespace Nop.Web.Factories
 {

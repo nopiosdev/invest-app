@@ -1,4 +1,7 @@
-﻿using Nop.Core.Domain.Messages;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Messages;
 using Nop.Services.Messages;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
@@ -13,8 +16,8 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly EmailAccountSettings _emailAccountSettings;
-        protected readonly IEmailAccountService _emailAccountService;
+        private readonly EmailAccountSettings _emailAccountSettings;
+        private readonly IEmailAccountService _emailAccountService;
 
         #endregion
 
@@ -28,7 +31,7 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         #endregion
-
+        
         #region Methods
 
         /// <summary>

@@ -1,4 +1,7 @@
-﻿﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
@@ -45,7 +48,6 @@ namespace Nop.Core.Infrastructure
             //otherwise, DbContext initializers won't run and a plugin installation won't work
             var instances = startupTasks
                 .Select(startupTask => (IStartupTask)Activator.CreateInstance(startupTask))
-                .Where(startupTask => startupTask != null)
                 .OrderBy(startupTask => startupTask.Order);
 
             //execute tasks
@@ -65,14 +67,15 @@ namespace Nop.Core.Infrastructure
             //create and sort instances of mapper configurations
             var instances = mapperConfigurations
                 .Select(mapperConfiguration => (IOrderedMapperProfile)Activator.CreateInstance(mapperConfiguration))
-                .Where(mapperConfiguration => mapperConfiguration != null)
                 .OrderBy(mapperConfiguration => mapperConfiguration.Order);
 
             //create AutoMapper configuration
             var config = new MapperConfiguration(cfg =>
             {
-                foreach (var instance in instances) 
+                foreach (var instance in instances)
+                {
                     cfg.AddProfile(instance.GetType());
+                }
             });
 
             //register
@@ -116,7 +119,6 @@ namespace Nop.Core.Infrastructure
             //create and sort instances of startup configurations
             var instances = startupConfigurations
                 .Select(startup => (INopStartup)Activator.CreateInstance(startup))
-                .Where(startup => startup != null)
                 .OrderBy(startup => startup.Order);
 
             //configure services
@@ -150,7 +152,6 @@ namespace Nop.Core.Infrastructure
             //create and sort instances of startup configurations
             var instances = startupConfigurations
                 .Select(startup => (INopStartup)Activator.CreateInstance(startup))
-                .Where(startup => startup != null)
                 .OrderBy(startup => startup.Order);
 
             //configure request pipeline
@@ -199,6 +200,7 @@ namespace Nop.Core.Infrastructure
         {
             Exception innerException = null;
             foreach (var constructor in type.GetConstructors())
+            {
                 try
                 {
                     //try to resolve constructor parameters
@@ -217,6 +219,7 @@ namespace Nop.Core.Infrastructure
                 {
                     innerException = ex;
                 }
+            }
 
             throw new NopException("No constructor was found that had all the dependencies satisfied.", innerException);
         }

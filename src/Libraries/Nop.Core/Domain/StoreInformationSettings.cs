@@ -57,8 +57,5 @@ namespace Nop.Core.Domain
         /// Gets or sets a value of Instagram account URL of the site
         /// </summary>
         public string InstagramLink { get; set; }
-        public string LinkedinLink { get; set; }
-        public string TelegramLink { get; set; }
-        public string DiscordLink { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FluentMigrator;
+﻿using System.Collections.Generic;
+using FluentMigrator;
 using Nop.Core.Infrastructure;
 using Nop.Data;
 using Nop.Data.Migrations;
@@ -7,7 +8,7 @@ using Nop.Web.Framework.Extensions;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo460
 {
-    [NopUpdateMigration("2023-07-26 14:00:10", "4.60", UpdateMigrationType.Localization)]
+    [NopMigration("2023-07-26 14:00:10", "4.60", UpdateMigrationType.Localization, MigrationProcessType.Update)]
     public class LocalizationMigration : MigrationBase
     {
         /// <summary>Collect the UP migration expressions</summary>
@@ -42,7 +43,7 @@ namespace Nop.Web.Framework.Migrations.UpgradeTo460
 
                 "Admin.Configuration.AppSettings.Common.SupportPreviousNopcommerceVersions",
                 "Admin.Configuration.AppSettings.Common.SupportPreviousNopcommerceVersions.Hint",
-            
+
 				//4622
                 "PDFInvoice.OrderDate",
                 "PDFInvoice.Company",

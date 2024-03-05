@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Http.Extensions;
 using Nop.Plugin.Payments.PayPalCommerce.Models;
@@ -17,12 +19,12 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Components
     {
         #region Fields
 
-        protected readonly ILocalizationService _localizationService;
-        protected readonly INotificationService _notificationService;
-        protected readonly IPaymentService _paymentService;
-        protected readonly OrderSettings _orderSettings;
-        protected readonly PayPalCommerceSettings _settings;
-        protected readonly ServiceManager _serviceManager;
+        private readonly ILocalizationService _localizationService;
+        private readonly INotificationService _notificationService;
+        private readonly IPaymentService _paymentService;
+        private readonly OrderSettings _orderSettings;
+        private readonly PayPalCommerceSettings _settings;
+        private readonly ServiceManager _serviceManager;
 
         #endregion
 
@@ -62,7 +64,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Components
 
             //prepare order GUID
             var paymentRequest = new ProcessPaymentRequest();
-            await _paymentService.GenerateOrderGuidAsync(paymentRequest);
+            _paymentService.GenerateOrderGuid(paymentRequest);
 
             //try to create an order
             var (order, error) = await _serviceManager.CreateOrderAsync(_settings, paymentRequest.OrderGuid);
@@ -84,7 +86,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Components
                     _notificationService.ErrorNotification(error);
             }
 
-            await HttpContext.Session.SetAsync(PayPalCommerceDefaults.PaymentRequestSessionKey, paymentRequest);
+            HttpContext.Session.Set(PayPalCommerceDefaults.PaymentRequestSessionKey, paymentRequest);
 
             return View("~/Plugins/Payments.PayPalCommerce/Views/PaymentInfo.cshtml", model);
         }

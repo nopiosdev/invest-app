@@ -1,4 +1,6 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Messages;
 
 namespace Nop.Services.Messages

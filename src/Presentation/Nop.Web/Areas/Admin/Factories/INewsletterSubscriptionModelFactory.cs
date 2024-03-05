@@ -1,4 +1,5 @@
-﻿using Nop.Web.Areas.Admin.Models.Messages;
+﻿using System.Threading.Tasks;
+using Nop.Web.Areas.Admin.Models.Messages;
 
 namespace Nop.Web.Areas.Admin.Factories
 {

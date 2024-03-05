@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Plugin.Payments.CyberSource.Domain;
 using Nop.Plugin.Payments.CyberSource.Models;
@@ -20,12 +22,12 @@ namespace Nop.Plugin.Payments.CyberSource.Controllers
     {
         #region Fields
 
-        protected readonly ILocalizationService _localizationService;
-        protected readonly INotificationService _notificationService;
-        protected readonly IPermissionService _permissionService;
-        protected readonly IScheduleTaskService _scheduleTaskService;
-        protected readonly ISettingService _settingService;
-        protected readonly IStoreContext _storeContext;
+        private readonly ILocalizationService _localizationService;
+        private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
+        private readonly IScheduleTaskService _scheduleTaskService;
+        private readonly ISettingService _settingService;
+        private readonly IStoreContext _storeContext;
 
         #endregion
 

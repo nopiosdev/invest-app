@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
@@ -17,13 +20,13 @@ namespace Nop.Web.Framework
     {
         #region Fields
 
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly IHttpContextAccessor _httpContextAccessor;
-        protected readonly IRepository<Store> _storeRepository;
-        protected readonly IStoreService _storeService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRepository<Store> _storeRepository;
+        private readonly IStoreService _storeService;
 
-        protected Store _cachedStore;
-        protected int? _cachedActiveStoreScopeConfiguration;
+        private Store _cachedStore;
+        private int? _cachedActiveStoreScopeConfiguration;
 
         #endregion
 
@@ -91,7 +94,7 @@ namespace Nop.Web.Framework
             {
                 return from s in query orderby s.DisplayOrder, s.Id select s;
             }, _ => default, includeDeleted: false);
-
+            
             var store = allStores.FirstOrDefault(s => _storeService.ContainsHostValue(s, host));
 
             if (store == null)

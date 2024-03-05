@@ -1,10 +1,9 @@
-﻿using System.Globalization;
-using System.Runtime.InteropServices;
-using DocumentFormat.OpenXml.EMMA;
-using DocumentFormat.OpenXml.Presentation;
-using DocumentFormat.OpenXml.Wordprocessing;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
@@ -15,10 +14,7 @@ using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
-using Nop.Core.Domain.Transaction;
 using Nop.Core.Domain.Vendors;
-using Nop.Core.Infrastructure;
-using Nop.Services.Attributes;
 using Nop.Services.Authentication.External;
 using Nop.Services.Authentication.MultiFactor;
 using Nop.Services.Catalog;
@@ -34,8 +30,6 @@ using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
-using Nop.Services.Transactions;
-using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Customer;
 
@@ -48,49 +42,44 @@ namespace Nop.Web.Factories
     {
         #region Fields
 
-        protected readonly AddressSettings _addressSettings;
-        protected readonly CaptchaSettings _captchaSettings;
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly CommonSettings _commonSettings;
-        protected readonly CustomerSettings _customerSettings;
-        protected readonly DateTimeSettings _dateTimeSettings;
-        protected readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
-        protected readonly ForumSettings _forumSettings;
-        protected readonly GdprSettings _gdprSettings;
-        protected readonly IAddressModelFactory _addressModelFactory;
-        protected readonly IAttributeParser<CustomerAttribute, CustomerAttributeValue> _customerAttributeParser;
-        protected readonly IAttributeService<CustomerAttribute, CustomerAttributeValue> _customerAttributeService;
-        protected readonly IAuthenticationPluginManager _authenticationPluginManager;
-        protected readonly ICountryService _countryService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IDateTimeHelper _dateTimeHelper;
-        protected readonly IExternalAuthenticationService _externalAuthenticationService;
-        protected readonly IGdprService _gdprService;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IMultiFactorAuthenticationPluginManager _multiFactorAuthenticationPluginManager;
-        protected readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
-        protected readonly IOrderService _orderService;
-        protected readonly IPermissionService _permissionService;
-        protected readonly IPictureService _pictureService;
-        protected readonly IProductService _productService;
-        protected readonly IReturnRequestService _returnRequestService;
-        protected readonly IStateProvinceService _stateProvinceService;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IStoreMappingService _storeMappingService;
-        protected readonly IUrlRecordService _urlRecordService;
-        protected readonly IWorkContext _workContext;
-        protected readonly MediaSettings _mediaSettings;
-        protected readonly OrderSettings _orderSettings;
-        protected readonly RewardPointsSettings _rewardPointsSettings;
-        protected readonly SecuritySettings _securitySettings;
-        protected readonly TaxSettings _taxSettings;
-        protected readonly VendorSettings _vendorSettings;
-
-        //NCT Back-end dev
-        protected readonly ITransactionService _transactionService;
-        protected readonly IWithdrawService _withdrawService;
-        protected readonly IPriceFormatter _priceFormatter;
+        private readonly AddressSettings _addressSettings;
+        private readonly CaptchaSettings _captchaSettings;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly CommonSettings _commonSettings;
+        private readonly CustomerSettings _customerSettings;
+        private readonly DateTimeSettings _dateTimeSettings;
+        private readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
+        private readonly ForumSettings _forumSettings;
+        private readonly GdprSettings _gdprSettings;
+        private readonly IAddressModelFactory _addressModelFactory;
+        private readonly IAuthenticationPluginManager _authenticationPluginManager;
+        private readonly ICountryService _countryService;
+        private readonly ICustomerAttributeParser _customerAttributeParser;
+        private readonly ICustomerAttributeService _customerAttributeService;
+        private readonly ICustomerService _customerService;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IExternalAuthenticationService _externalAuthenticationService;
+        private readonly IGdprService _gdprService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IMultiFactorAuthenticationPluginManager _multiFactorAuthenticationPluginManager;
+        private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
+        private readonly IOrderService _orderService;
+        private readonly IPermissionService _permissionService;
+        private readonly IPictureService _pictureService;
+        private readonly IProductService _productService;
+        private readonly IReturnRequestService _returnRequestService;
+        private readonly IStateProvinceService _stateProvinceService;
+        private readonly IStoreContext _storeContext;
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly IUrlRecordService _urlRecordService;
+        private readonly IWorkContext _workContext;
+        private readonly MediaSettings _mediaSettings;
+        private readonly OrderSettings _orderSettings;
+        private readonly RewardPointsSettings _rewardPointsSettings;
+        private readonly SecuritySettings _securitySettings;
+        private readonly TaxSettings _taxSettings;
+        private readonly VendorSettings _vendorSettings;
 
         #endregion
 
@@ -106,10 +95,10 @@ namespace Nop.Web.Factories
             ForumSettings forumSettings,
             GdprSettings gdprSettings,
             IAddressModelFactory addressModelFactory,
-            IAttributeParser<CustomerAttribute, CustomerAttributeValue> customerAttributeParser,
-            IAttributeService<CustomerAttribute, CustomerAttributeValue> customerAttributeService,
             IAuthenticationPluginManager authenticationPluginManager,
             ICountryService countryService,
+            ICustomerAttributeParser customerAttributeParser,
+            ICustomerAttributeService customerAttributeService,
             ICustomerService customerService,
             IDateTimeHelper dateTimeHelper,
             IExternalAuthenticationService externalAuthenticationService,
@@ -133,8 +122,7 @@ namespace Nop.Web.Factories
             RewardPointsSettings rewardPointsSettings,
             SecuritySettings securitySettings,
             TaxSettings taxSettings,
-            VendorSettings vendorSettings,
-            IPriceFormatter priceFormatter)
+            VendorSettings vendorSettings)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -147,10 +135,10 @@ namespace Nop.Web.Factories
             _forumSettings = forumSettings;
             _gdprSettings = gdprSettings;
             _addressModelFactory = addressModelFactory;
-            _customerAttributeParser = customerAttributeParser;
-            _customerAttributeService = customerAttributeService;
             _authenticationPluginManager = authenticationPluginManager;
             _countryService = countryService;
+            _customerAttributeParser = customerAttributeParser;
+            _customerAttributeService = customerAttributeService;
             _customerService = customerService;
             _dateTimeHelper = dateTimeHelper;
             _gdprService = gdprService;
@@ -174,9 +162,6 @@ namespace Nop.Web.Factories
             _securitySettings = securitySettings;
             _taxSettings = taxSettings;
             _vendorSettings = vendorSettings;
-            _transactionService = EngineContext.Current.Resolve<ITransactionService>();
-            _withdrawService = EngineContext.Current.Resolve<IWithdrawService>();
-            _priceFormatter = EngineContext.Current.Resolve<IPriceFormatter>();
         }
 
         #endregion
@@ -277,9 +262,6 @@ namespace Nop.Web.Factories
             //countries and states
             if (_customerSettings.CountryEnabled)
             {
-                if (model.CountryId == 0)
-                    model.CountryId = _customerSettings.DefaultCountryId ?? 0;
-
                 model.AvailableCountries.Add(new SelectListItem { Text = await _localizationService.GetResourceAsync("Address.SelectCountry"), Value = "0" });
                 foreach (var c in await _countryService.GetAllCountriesAsync(currentLanguage.Id))
                 {
@@ -325,7 +307,6 @@ namespace Nop.Web.Factories
             model.FirstNameRequired = _customerSettings.FirstNameRequired;
             model.LastNameRequired = _customerSettings.LastNameRequired;
             model.GenderEnabled = _customerSettings.GenderEnabled;
-            model.NeutralGenderEnabled = _customerSettings.NeutralGenderEnabled;
             model.DateOfBirthEnabled = _customerSettings.DateOfBirthEnabled;
             model.DateOfBirthRequired = _customerSettings.DateOfBirthRequired;
             model.CompanyEnabled = _customerSettings.CompanyEnabled;
@@ -393,69 +374,6 @@ namespace Nop.Web.Factories
                 }
             }
 
-            //NCT Back-end dev
-            model.AvailableGoal = new List<SelectListItem>()
-            {
-                new SelectListItem(){Text="Growth",Value="1" },
-                new SelectListItem(){Text="Investment",Value="2"},
-                new SelectListItem(){Text="Retirement",Value="3"},
-                new SelectListItem(){Text="Savings",Value="4"},
-                new SelectListItem(){Text="Income",Value="5"},
-                new SelectListItem(){Text="Something else",Value="6"},
-            };
-            model.AvailableTimeline = new List<SelectListItem>()
-            {
-                new SelectListItem(){Text="1-5 years",Value="1" },
-                new SelectListItem(){Text="5-10 years",Value="2"},
-                new SelectListItem(){Text="More than 10 years",Value="3"},
-            };
-            model.AvailableExperience = new List<SelectListItem>()
-            {
-                new SelectListItem(){Text="Not Much",Value="1"},
-                new SelectListItem(){Text="I'm okay",Value="2"},
-                new SelectListItem(){Text="I'm an expert",Value="3"},
-            };
-            model.AvailableRiskTolerance = new List<SelectListItem>()
-            {
-                new SelectListItem(){Text="High",Value="1"},
-                new SelectListItem(){Text="Medium",Value="2"},
-                new SelectListItem(){Text="Low",Value="3"},
-            };
-            model.AvailableInvestmentApproach = new List<SelectListItem>()
-            {
-                new SelectListItem(){Text="I do not like to lose money",Value="1"},
-                new SelectListItem(){Text="Willing to risk losing money in order to make more",Value="2"},
-                new SelectListItem(){Text="Not important to me",Value="3"},
-            };
-            foreach (PaymentTypeEnum enumValues in Enum.GetValues(typeof(PaymentTypeEnum)))
-            {
-                model.AvailablePaymentType.Add(new SelectListItem()
-                {
-                    Text = await _localizationService.GetLocalizedEnumAsync(enumValues),
-                    Value = $"{(int)enumValues}",
-                });
-            }
-            model.GoalId = customer.GoalId;
-            model.TimelineId = customer.TimelineId;
-            model.ExperienceId = customer.ExperienceId;
-            model.RiskToleranceId = customer.RiskToleranceId;
-            model.InvestmentApproachId = customer.InvestmentApproachId;
-            model.EmailAlert = customer.EmailAlert;
-            model.TextAlert = customer.TextAlert;
-            model.DefaultWithdrawalMethodId = customer.DefaultWithdrawalMethodId;
-            model.PaymentType = customer.PaymentTypeId;
-
-            await this.PrepareWithdrawalMethodCustomerInfoModelAsync(model.WithdrawalMethodModel, customer);
-
-            //find address (ensure that it belongs to the current customer)
-            var address = await _customerService.GetAddressesByCustomerIdAsync(customer.Id);
-            //prepare address model
-            await _addressModelFactory.PrepareAddressModelAsync(model.Address,
-                address: address.FirstOrDefault(),
-                excludeProperties: false,
-                addressSettings: _addressSettings,
-                loadCountries: async () => await _countryService.GetAllCountriesAsync((await _workContext.GetWorkingLanguageAsync()).Id));
-
             return model;
         }
 
@@ -493,7 +411,6 @@ namespace Nop.Web.Factories
             model.FirstNameRequired = _customerSettings.FirstNameRequired;
             model.LastNameRequired = _customerSettings.LastNameRequired;
             model.GenderEnabled = _customerSettings.GenderEnabled;
-            model.NeutralGenderEnabled = _customerSettings.NeutralGenderEnabled;
             model.DateOfBirthEnabled = _customerSettings.DateOfBirthEnabled;
             model.DateOfBirthRequired = _customerSettings.DateOfBirthRequired;
             model.CompanyEnabled = _customerSettings.CompanyEnabled;
@@ -534,7 +451,6 @@ namespace Nop.Web.Factories
             if (_customerSettings.CountryEnabled)
             {
                 model.AvailableCountries.Add(new SelectListItem { Text = await _localizationService.GetResourceAsync("Address.SelectCountry"), Value = "0" });
-                model.CountryId = _customerSettings.DefaultCountryId ?? 0;
                 var currentLanguage = await _workContext.GetWorkingLanguageAsync();
                 foreach (var c in await _countryService.GetAllCountriesAsync(currentLanguage.Id))
                 {
@@ -1066,7 +982,7 @@ namespace Nop.Web.Factories
 
             var result = new List<CustomerAttributeModel>();
 
-            var customerAttributes = await _customerAttributeService.GetAllAttributesAsync();
+            var customerAttributes = await _customerAttributeService.GetAllCustomerAttributesAsync();
             foreach (var attribute in customerAttributes)
             {
                 var attributeModel = new CustomerAttributeModel
@@ -1077,10 +993,10 @@ namespace Nop.Web.Factories
                     AttributeControlType = attribute.AttributeControlType,
                 };
 
-                if (attribute.ShouldHaveValues)
+                if (attribute.ShouldHaveValues())
                 {
                     //values
-                    var attributeValues = await _customerAttributeService.GetAttributeValuesAsync(attribute.Id);
+                    var attributeValues = await _customerAttributeService.GetCustomerAttributeValuesAsync(attribute.Id);
                     foreach (var attributeValue in attributeValues)
                     {
                         var valueModel = new CustomerAttributeValueModel
@@ -1113,7 +1029,7 @@ namespace Nop.Web.Factories
                                     item.IsPreSelected = false;
 
                                 //select new values
-                                var selectedValues = await _customerAttributeParser.ParseAttributeValuesAsync(selectedAttributesXml);
+                                var selectedValues = await _customerAttributeParser.ParseCustomerAttributeValuesAsync(selectedAttributesXml);
                                 foreach (var attributeValue in selectedValues)
                                     foreach (var item in attributeModel.Values)
                                         if (attributeValue.Id == item.Id)
@@ -1152,258 +1068,6 @@ namespace Nop.Web.Factories
 
             return result;
         }
-
-        public virtual async Task<TransactionModel> PrepareTransactionModelAsync(Customer customer, TransactionModel model = null)
-        {
-            model ??= new TransactionModel();
-            if (customer is null)
-                return model;
-
-            var transactions = await _transactionService.GetAllTransactionsAsync(customerId: customer.Id,
-                orderBy: 2);
-            model.RecentTransactions = await transactions
-                .Take(3)
-                .SelectAwait(async x => new TransactionModel()
-                {
-                    TransactionNote = x.TransactionNote,
-                    TransactionAmount = x.TransactionAmount,
-                    CreateOnUtc = x.CreatedOnUtc,
-                    FormattedTransactionAmount = await _priceFormatter.FormatPriceInCurrencyAsync(x.TransactionAmount),
-                })
-                .ToListAsync();
-
-            model.CurrencySymbol = await _priceFormatter.GetCurrentSymbolAsync();
-
-            return model;
-        }
-
-        public virtual async Task<WithdrawModel> PrepareWithdawModelModelAsync(Customer customer, WithdrawModel model = null)
-        {
-            model ??= new WithdrawModel();
-            if (customer is null)
-                return model;
-
-            var transactions = await _transactionService.GetAllTransactionsAsync(customerId: customer.Id,
-               orderBy: 2);
-            model.RecentTransactions = await transactions
-                .Take(3)
-                .SelectAwait(async x => new TransactionModel()
-                {
-                    TransactionNote = x.TransactionNote,
-                    TransactionAmount = x.TransactionAmount,
-                    CreateOnUtc = x.CreatedOnUtc,
-                    FormattedTransactionAmount = await _priceFormatter.FormatPriceInCurrencyAsync(x.TransactionAmount),
-                })
-                .ToListAsync();
-
-            foreach (WalletTypeEnum enumValues in Enum.GetValues(typeof(WalletTypeEnum)))
-            {
-                model.AvailableWalletType.Add(new SelectListItem
-                {
-                    Text = await _localizationService.GetLocalizedEnumAsync(enumValues),
-                    Value = $"{(int)enumValues}",
-                });
-            }
-
-            await this.PrepareWithdrawalMethodCustomerInfoModelAsync(model.WithdrawalMethodModel, customer);
-
-            model.CurrencySymbol = await _priceFormatter.GetCurrentSymbolAsync();
-
-            return model;
-        }
-
-        public virtual async Task<AnalyticsModel> PrepareAnalyticsModelAsync(Customer customer)
-        {
-            var transactions = (await _transactionService.GetAllTransactionsAsync(customerId: customer.Id,
-                transactionNote: "Return"))
-                .Where(x => !x.Status.Equals(Status.Removed));
-
-            var returnTransactions = await _transactionService.GetAllReturnTransactionsAsync(customerId: customer.Id);
-
-            //var groupedTransactions = transactions
-            //    .GroupBy(x => x.CreatedOnUtc.Year)
-            //    .Select(group => new
-            //    {
-            //        Year = group.Key,
-            //        Transactions = group.ToList(),
-            //        ReturnAverage = group.Any()
-            //            ? group.Average(x => x.ReturnPercentage.GetValueOrDefault())
-            //            : decimal.Zero
-            //    })
-            //    .ToList();
-
-            //var a = groupedTransactions
-            //    .Select(item => new
-            //    {
-            //        name = item.Year,
-            //        y = item.ReturnAverage,
-            //        drilldown = item.Year
-            //    })
-            //    .ToList();
-
-            var startYear = returnTransactions.Any()
-                ? returnTransactions.Min(x => x.ReturnDateOnUtc.Year)
-                : DateTime.Now.Year;
-            var groupedReturnTransactions = await Enumerable.Range(startYear, DateTime.Now.Year - startYear + 1)
-                .SelectAwait(async year =>
-                {
-                    var group1 = returnTransactions
-                         .Where(a => a.ReturnDateOnUtc.Year.Equals(year))
-                         //make a pair of year
-                         .GroupBy(x => x.ReturnDateOnUtc.Year)
-                         .FirstOrDefault();
-                    return new
-                    {
-                        name = year,
-                        data = await Enumerable.Range(1, 12)
-                             .SelectAwait(async month =>
-                             {
-                                 //get the data of the each month and if any month does not have any data then pass empty values
-                                 var group2 = group1
-                                     ?.Where(y => y.ReturnDateOnUtc.Month.Equals(month))
-                                     //make a pair of month
-                                     .GroupBy(y => y.ReturnDateOnUtc.Month)
-                                     .FirstOrDefault();
-
-                                 return new object[]
-                                 {
-                                    //month
-                                     new DateTime(year, group2?.Key ?? month ,1).ToString("MMMM"),
-                                    //month average
-                                    group2?.Any() ?? false
-                                        ? group2.Average(y => y.ReturnPercentage)
-                                        : decimal.Zero,
-                                    //sum of amount in that month
-                                    await _priceFormatter.FormatPriceInCurrencyAsync(group2?.Sum(y => y.ReturnAmount) ?? decimal.Zero, false)
-                                 };
-                             }).ToListAsync()
-                    };
-                })
-                .OrderByDescending(x => x.name)
-                .ToListAsync();
-            //returnTransactions
-            ////make a pair of year
-            //.GroupBy(x => x.ReturnDateOnUtc.Year)
-            //.Select(group1 => new
-            //{
-            //    name = group1.Key,
-            //    data = Enumerable.Range(1, 12)
-            //            .Select(month =>
-            //            {
-            //                //get the data of the each month and if any month does not have any data then pass empty values
-            //                var group2 = group1
-            //                    .Where(y => y.ReturnDateOnUtc.Month.Equals(month))
-            //                    .GroupBy(y => y.ReturnDateOnUtc.Month).FirstOrDefault();
-
-            //                return new object[]
-            //                {
-            //                    //month
-            //                     new DateTime(group1.Key, group2?.Key ?? month ,1).ToString("MMMM"),
-            //                    //month average
-            //                    group2?.Any() ?? false
-            //                        ? group2.Average(y => y.ReturnPercentage)
-            //                        : decimal.Zero,
-            //                    //sum of amount in that month
-            //                    group2?.Sum(y => y.ReturnAmount) ?? decimal.Zero
-            //                };
-            //            })
-            //})
-            //.ToList();
-
-            //var groupedTransactions = transactions
-            //    //make a pair of year
-            //    .GroupBy(x => x.CreatedOnUtc.Year)
-            //    .Select(group1 => new
-            //    {
-            //        name = group1.Key,
-            //                //send data of every month even if any month does not have any data but if in case pass empty values like zero
-            //        data = Enumerable.Range(1, 12)
-            //                .Select(month =>
-            //                {
-            //                    var previousMonth = (month - 1 + 12) % 12 + 1; // Calculate the previous month
-
-            //                    //get the data of the each month and if any month does not have any data then pass empty values
-            //                    var group2 = group1
-            //                        .Where(y => y.CreatedOnUtc.Month.Equals(month))
-            //                        .GroupBy(y => y.CreatedOnUtc.Month).FirstOrDefault();
-
-            //                    return new object[]
-            //                    {
-            //                        //month
-            //                         new DateTime(group1.Key, group2?.Key ?? month ,1).ToString("MMMM"),
-            //                        //month average
-            //                        group2?.Any() ?? false
-            //                            ? group2.Average(y => y.ReturnPercentage.GetValueOrDefault())
-            //                            : decimal.Zero,
-            //                        //sum of amount in that month
-            //                        group2?.Sum(y => y.TransactionAmount) ?? decimal.Zero
-            //                    };
-            //                })
-            //    })
-            //    .ToList();
-
-            var model = new AnalyticsModel()
-            {
-                //Year = JsonConvert.SerializeObject(a),
-                MonthsAndGain = JsonConvert.SerializeObject(new
-                {
-                    groupedReturnTransactions = groupedReturnTransactions,
-                    currenySymbol = await _priceFormatter.GetCurrentSymbolAsync()
-                })
-            };
-
-            return model;
-        }
-
-        public virtual async Task PrepareWithdrawalMethodCustomerInfoModelAsync(IList<WithdrawalMethodCustomerInfoModel> model, Customer customer)
-        {
-            foreach (WalletTypeEnum enumValues in Enum.GetValues(typeof(WalletTypeEnum)))
-            {
-                var tempModel = new WithdrawalMethodCustomerInfoModel()
-                {
-                    Id = (int)enumValues,
-                    Name = await _localizationService.GetLocalizedEnumAsync(enumValues),
-                };
-
-                var withdrawalMethods = await _withdrawService.GetAllWithdrawalMethodAsync(typeId: (int)enumValues,
-                    isEnabled: true);
-                if (!withdrawalMethods.Any())
-                    continue;
-
-                foreach (var withdrawalMethod in withdrawalMethods)
-                {
-                    var tempModel1 = new WithdrawalMethodCustomerInfoModel()
-                    {
-                        Id = withdrawalMethod.Id,
-                        Name = withdrawalMethod.Name,
-                    };
-
-                    var withdrawalMethodFields = await _withdrawService.GetAllWithdrawalMethodFieldAsync(withdrawalMethodId: withdrawalMethod.Id,
-                        isEnabled: true);
-                    if (!withdrawalMethodFields.Any())
-                        continue;
-
-                    foreach (var withdrawalMethodField in withdrawalMethodFields)
-                    {
-                        var customerWithdrawalMethod = (await _withdrawService.GetAllCustomerWithdrawalMethodAsync(customerId: customer.Id,
-                            withdrawalMethodFieldId: withdrawalMethodField.Id))
-                            .FirstOrDefault();
-
-                        tempModel1.Fields.Add(new WithdrawalMethodCustomerInfoModel()
-                        {
-                            Id = withdrawalMethodField.Id,
-                            Name = withdrawalMethodField.FieldName,
-                            Value = customerWithdrawalMethod?.Value
-                        });
-                    }
-
-                    tempModel.Fields.Add(tempModel1);
-                }
-
-                model.Add(tempModel);
-            }
-        }
-
 
         #endregion
     }

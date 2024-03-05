@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Catalog
+﻿using System;
+
+namespace Nop.Core.Domain.Catalog
 {
     /// <summary>
     /// Represents a tier price

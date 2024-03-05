@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Catalog;
 
 namespace Nop.Services.Catalog
 {

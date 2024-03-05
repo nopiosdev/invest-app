@@ -1,4 +1,7 @@
-﻿using Nop.Core;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Services.Authentication.External;
 using Nop.Web.Models.Customer;
 
@@ -11,9 +14,9 @@ namespace Nop.Web.Factories
     {
         #region Fields
 
-        protected readonly IAuthenticationPluginManager _authenticationPluginManager;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IWorkContext _workContext;
+        private readonly IAuthenticationPluginManager _authenticationPluginManager;
+        private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
 
         #endregion
 

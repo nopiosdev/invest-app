@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Common;
+﻿using System.Threading.Tasks;
+using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Web.Areas.Admin.Models.Customers;
 
@@ -162,10 +163,5 @@ namespace Nop.Web.Areas.Admin.Factories
         /// The task result contains the gDPR request list model
         /// </returns>
         Task<GdprLogListModel> PrepareGdprLogListModelAsync(GdprLogSearchModel searchModel);
-
-        Task<CustomerCommissionSearchModel> PrepareCustomerCommissionSearchModelAsync(CustomerCommissionSearchModel searchModel);
-        Task<CustomerCommissionListModel> PrepareCustomerCommissionListModelAsync(CustomerCommissionSearchModel searchModel);
-        Task<CustomerWithdrawalMethodListModel> PrepareCustomerWithdrawalMethodListModelAsync(CustomerWIthdrawalMethodSearchModel searchModel);
-
     }
 }

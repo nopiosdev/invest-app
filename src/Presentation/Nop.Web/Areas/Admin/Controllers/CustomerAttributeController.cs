@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Customers;
-using Nop.Services.Attributes;
+using Nop.Services.Customers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
@@ -17,29 +19,29 @@ namespace Nop.Web.Areas.Admin.Controllers
     {
         #region Fields
 
-        protected readonly IAttributeService<CustomerAttribute, CustomerAttributeValue> _customerAttributeService;
-        protected readonly ICustomerActivityService _customerActivityService;
-        protected readonly ICustomerAttributeModelFactory _customerAttributeModelFactory;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ILocalizedEntityService _localizedEntityService;
-        protected readonly INotificationService _notificationService;
-        protected readonly IPermissionService _permissionService;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly ICustomerAttributeModelFactory _customerAttributeModelFactory;
+        private readonly ICustomerAttributeService _customerAttributeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedEntityService _localizedEntityService;
+        private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
 
         #endregion
 
         #region Ctor
 
-        public CustomerAttributeController(IAttributeService<CustomerAttribute, CustomerAttributeValue> customerAttributeService,
-            ICustomerActivityService customerActivityService,
+        public CustomerAttributeController(ICustomerActivityService customerActivityService,
             ICustomerAttributeModelFactory customerAttributeModelFactory,
+            ICustomerAttributeService customerAttributeService,
             ILocalizationService localizationService,
             ILocalizedEntityService localizedEntityService,
             INotificationService notificationService,
             IPermissionService permissionService)
         {
-            _customerAttributeService = customerAttributeService;
             _customerActivityService = customerActivityService;
             _customerAttributeModelFactory = customerAttributeModelFactory;
+            _customerAttributeService = customerAttributeService;
             _localizationService = localizationService;
             _localizedEntityService = localizedEntityService;
             _notificationService = notificationService;
@@ -125,7 +127,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var customerAttribute = model.ToEntity<CustomerAttribute>();
-                await _customerAttributeService.InsertAttributeAsync(customerAttribute);
+                await _customerAttributeService.InsertCustomerAttributeAsync(customerAttribute);
 
                 //activity log
                 await _customerActivityService.InsertActivityAsync("AddNewCustomerAttribute",
@@ -139,10 +141,10 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 if (!continueEditing)
                     return RedirectToAction("List");
-
+                
                 return RedirectToAction("Edit", new { id = customerAttribute.Id });
             }
-
+            
             //prepare model
             model = await _customerAttributeModelFactory.PrepareCustomerAttributeModelAsync(model, null, true);
 
@@ -156,7 +158,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             //try to get a customer attribute with the specified id
-            var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(id);
+            var customerAttribute = await _customerAttributeService.GetCustomerAttributeByIdAsync(id);
             if (customerAttribute == null)
                 return RedirectToAction("List");
 
@@ -172,7 +174,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageSettings))
                 return AccessDeniedView();
 
-            var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(model.Id);
+            var customerAttribute = await _customerAttributeService.GetCustomerAttributeByIdAsync(model.Id);
             if (customerAttribute == null)
                 //no customer attribute found with the specified id
                 return RedirectToAction("List");
@@ -182,7 +184,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return View(model);
 
             customerAttribute = model.ToEntity(customerAttribute);
-            await _customerAttributeService.UpdateAttributeAsync(customerAttribute);
+            await _customerAttributeService.UpdateCustomerAttributeAsync(customerAttribute);
 
             //activity log
             await _customerActivityService.InsertActivityAsync("EditCustomerAttribute",
@@ -196,7 +198,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             if (!continueEditing)
                 return RedirectToAction("List");
-
+            
             return RedirectToAction("Edit", new { id = customerAttribute.Id });
         }
 
@@ -206,8 +208,8 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageSettings))
                 return AccessDeniedView();
 
-            var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(id);
-            await _customerAttributeService.DeleteAttributeAsync(customerAttribute);
+            var customerAttribute = await _customerAttributeService.GetCustomerAttributeByIdAsync(id);
+            await _customerAttributeService.DeleteCustomerAttributeAsync(customerAttribute);
 
             //activity log
             await _customerActivityService.InsertActivityAsync("DeleteCustomerAttribute",
@@ -229,7 +231,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return await AccessDeniedDataTablesJson();
 
             //try to get a customer attribute with the specified id
-            var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(searchModel.CustomerAttributeId)
+            var customerAttribute = await _customerAttributeService.GetCustomerAttributeByIdAsync(searchModel.CustomerAttributeId)
                 ?? throw new ArgumentException("No customer attribute found with the specified id");
 
             //prepare model
@@ -244,7 +246,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             //try to get a customer attribute with the specified id
-            var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(customerAttributeId);
+            var customerAttribute = await _customerAttributeService.GetCustomerAttributeByIdAsync(customerAttributeId);
             if (customerAttribute == null)
                 return RedirectToAction("List");
 
@@ -262,14 +264,14 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             //try to get a customer attribute with the specified id
-            var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(model.AttributeId);
+            var customerAttribute = await _customerAttributeService.GetCustomerAttributeByIdAsync(model.CustomerAttributeId);
             if (customerAttribute == null)
                 return RedirectToAction("List");
 
             if (ModelState.IsValid)
             {
                 var cav = model.ToEntity<CustomerAttributeValue>();
-                await _customerAttributeService.InsertAttributeValueAsync(cav);
+                await _customerAttributeService.InsertCustomerAttributeValueAsync(cav);
 
                 //activity log
                 await _customerActivityService.InsertActivityAsync("AddNewCustomerAttributeValue",
@@ -295,12 +297,12 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             //try to get a customer attribute value with the specified id
-            var customerAttributeValue = await _customerAttributeService.GetAttributeValueByIdAsync(id);
+            var customerAttributeValue = await _customerAttributeService.GetCustomerAttributeValueByIdAsync(id);
             if (customerAttributeValue == null)
                 return RedirectToAction("List");
 
             //try to get a customer attribute with the specified id
-            var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(customerAttributeValue.AttributeId);
+            var customerAttribute = await _customerAttributeService.GetCustomerAttributeByIdAsync(customerAttributeValue.CustomerAttributeId);
             if (customerAttribute == null)
                 return RedirectToAction("List");
 
@@ -317,19 +319,19 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             //try to get a customer attribute value with the specified id
-            var customerAttributeValue = await _customerAttributeService.GetAttributeValueByIdAsync(model.Id);
+            var customerAttributeValue = await _customerAttributeService.GetCustomerAttributeValueByIdAsync(model.Id);
             if (customerAttributeValue == null)
                 return RedirectToAction("List");
 
             //try to get a customer attribute with the specified id
-            var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(customerAttributeValue.AttributeId);
+            var customerAttribute = await _customerAttributeService.GetCustomerAttributeByIdAsync(customerAttributeValue.CustomerAttributeId);
             if (customerAttribute == null)
                 return RedirectToAction("List");
 
             if (ModelState.IsValid)
             {
                 customerAttributeValue = model.ToEntity(customerAttributeValue);
-                await _customerAttributeService.UpdateAttributeValueAsync(customerAttributeValue);
+                await _customerAttributeService.UpdateCustomerAttributeValueAsync(customerAttributeValue);
 
                 //activity log
                 await _customerActivityService.InsertActivityAsync("EditCustomerAttributeValue",
@@ -357,10 +359,10 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             //try to get a customer attribute value with the specified id
-            var customerAttributeValue = await _customerAttributeService.GetAttributeValueByIdAsync(id)
+            var customerAttributeValue = await _customerAttributeService.GetCustomerAttributeValueByIdAsync(id)
                 ?? throw new ArgumentException("No customer attribute value found with the specified id", nameof(id));
 
-            await _customerAttributeService.DeleteAttributeValueAsync(customerAttributeValue);
+            await _customerAttributeService.DeleteCustomerAttributeValueAsync(customerAttributeValue);
 
             //activity log
             await _customerActivityService.InsertActivityAsync("DeleteCustomerAttributeValue",

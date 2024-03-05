@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Messages
+﻿using System.Collections.Generic;
+
+namespace Nop.Core.Domain.Messages
 {
     /// <summary>
     /// Event for "Additional tokens added"

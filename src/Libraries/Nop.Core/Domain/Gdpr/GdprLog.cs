@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Gdpr
+﻿using System;
+
+namespace Nop.Core.Domain.Gdpr
 {
     /// <summary>
     /// Represents a GDPR log

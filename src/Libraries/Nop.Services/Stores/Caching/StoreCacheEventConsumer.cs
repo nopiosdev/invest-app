@@ -3,6 +3,7 @@ using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Stores;
 using Nop.Services.Caching;
 using Nop.Services.Localization;
+using System.Threading.Tasks;
 
 namespace Nop.Services.Stores.Caching
 {

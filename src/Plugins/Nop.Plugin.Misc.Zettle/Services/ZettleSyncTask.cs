@@ -1,4 +1,5 @@
-﻿using Nop.Services.ScheduleTasks;
+﻿using System.Threading.Tasks;
+using Nop.Services.ScheduleTasks;
 
 namespace Nop.Plugin.Misc.Zettle.Services
 {
@@ -9,8 +10,8 @@ namespace Nop.Plugin.Misc.Zettle.Services
     {
         #region Fields
 
-        protected readonly ZettleService _zettleService;
-        protected readonly ZettleSettings _zettleSettings;
+        private readonly ZettleService _zettleService;
+        private readonly ZettleSettings _zettleSettings;
 
         #endregion
 

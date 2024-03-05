@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using System;
+using System.Collections.Generic;
+using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Orders

@@ -1,8 +1,15 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Avalara.AvaTax.RestClient;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Nop.Core;
 using Nop.Core.Caching;
+using Nop.Core.Domain.Cms;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
@@ -11,11 +18,12 @@ using Nop.Core.Domain.Tax;
 using Nop.Core.Infrastructure;
 using Nop.Data;
 using Nop.Plugin.Tax.Avalara.Domain;
-using Nop.Services.Attributes;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
+using Nop.Services.Configuration;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
+using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
@@ -30,47 +38,56 @@ namespace Nop.Plugin.Tax.Avalara.Services
     {
         #region Fields
 
-        protected readonly AvalaraTaxSettings _avalaraTaxSettings;
-        protected readonly IAddressService _addressService;
-        protected readonly IAttributeParser<CheckoutAttribute, CheckoutAttributeValue> _checkoutAttributeParser;
-        protected readonly IAttributeService<CheckoutAttribute, CheckoutAttributeValue> _checkoutAttributeService;
-        protected readonly ICountryService _countryService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly IGeoLookupService _geoLookupService;
-        protected readonly ILogger _logger;
-        protected readonly INopFileProvider _fileProvider;
-        protected readonly IOrderService _orderService;
-        protected readonly IOrderTotalCalculationService _orderTotalCalculationService;
-        protected readonly IPaymentService _paymentService;
-        protected readonly IProductAttributeService _productAttributeService;
-        protected readonly IProductService _productService;
-        protected readonly IRepository<GenericAttribute> _genericAttributeRepository;
-        protected readonly IRepository<TaxCategory> _taxCategoryRepository;
-        protected readonly IShoppingCartService _shoppingCartService;
-        protected readonly IStateProvinceService _stateProvinceService;
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly ITaxCategoryService _taxCategoryService;
-        protected readonly IWorkContext _workContext;
-        protected readonly ShippingSettings _shippingSettings;
-        protected readonly TaxSettings _taxSettings;
-        protected readonly TaxTransactionLogService _taxTransactionLogService;
+        private readonly AvalaraTaxSettings _avalaraTaxSettings;
+        private readonly IActionContextAccessor _actionContextAccessor;
+        private readonly IAddressService _addressService;
+        private readonly ICheckoutAttributeParser _checkoutAttributeParser;
+        private readonly ICheckoutAttributeService _checkoutAttributeService;
+        private readonly ICountryService _countryService;
+        private readonly ICustomerService _customerService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IGeoLookupService _geoLookupService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILogger _logger;
+        private readonly INopFileProvider _fileProvider;
+        private readonly IOrderService _orderService;
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly IPaymentService _paymentService;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductService _productService;
+        private readonly IRepository<GenericAttribute> _genericAttributeRepository;
+        private readonly IRepository<TaxCategory> _taxCategoryRepository;
+        private readonly ISettingService _settingService;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IStateProvinceService _stateProvinceService;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly ITaxCategoryService _taxCategoryService;
+        private readonly ITaxPluginManager _taxPluginManager;
+        private readonly IUrlHelperFactory _urlHelperFactory;
+        private readonly IWebHelper _webHelper;
+        private readonly IWorkContext _workContext;
+        private readonly ShippingSettings _shippingSettings;
+        private readonly TaxSettings _taxSettings;
+        private readonly TaxTransactionLogService _taxTransactionLogService;
+        private readonly WidgetSettings _widgetSettings;
 
-        protected AvaTaxClient _serviceClient;
-        protected bool _disposed;
+        private AvaTaxClient _serviceClient;
+        private bool _disposed;
 
         #endregion
 
         #region Ctor
 
         public AvalaraTaxManager(AvalaraTaxSettings avalaraTaxSettings,
+            IActionContextAccessor actionContextAccessor,
             IAddressService addressService,
-            IAttributeParser<CheckoutAttribute, CheckoutAttributeValue> checkoutAttributeParser,
-            IAttributeService<CheckoutAttribute, CheckoutAttributeValue> checkoutAttributeService,
+            ICheckoutAttributeParser checkoutAttributeParser,
+            ICheckoutAttributeService checkoutAttributeService,
             ICountryService countryService,
             ICustomerService customerService,
             IGenericAttributeService genericAttributeService,
             IGeoLookupService geoLookupService,
+            ILocalizationService localizationService,
             ILogger logger,
             INopFileProvider fileProvider,
             IOrderService orderService,
@@ -80,22 +97,30 @@ namespace Nop.Plugin.Tax.Avalara.Services
             IProductService productService,
             IRepository<GenericAttribute> genericAttributeRepository,
             IRepository<TaxCategory> taxCategoryRepository,
+            ISettingService settingService,
             IShoppingCartService shoppingCartService,
             IStateProvinceService stateProvinceService,
             IStaticCacheManager staticCacheManager,
             ITaxCategoryService taxCategoryService,
+            ITaxPluginManager taxPluginManager,
+            IUrlHelperFactory urlHelperFactory,
+            IWebHelper webHelper,
             IWorkContext workContext,
             ShippingSettings shippingSettings,
             TaxSettings taxSettings,
-            TaxTransactionLogService taxTransactionLogService)
+            TaxTransactionLogService taxTransactionLogService,
+            WidgetSettings widgetSettings)
         {
             _avalaraTaxSettings = avalaraTaxSettings;
+            _actionContextAccessor = actionContextAccessor;
             _addressService = addressService;
             _checkoutAttributeParser = checkoutAttributeParser;
+            _checkoutAttributeService = checkoutAttributeService;
             _countryService = countryService;
             _customerService = customerService;
             _genericAttributeService = genericAttributeService;
             _geoLookupService = geoLookupService;
+            _localizationService = localizationService;
             _logger = logger;
             _fileProvider = fileProvider;
             _orderService = orderService;
@@ -105,14 +130,47 @@ namespace Nop.Plugin.Tax.Avalara.Services
             _productService = productService;
             _genericAttributeRepository = genericAttributeRepository;
             _taxCategoryRepository = taxCategoryRepository;
+            _settingService = settingService;
             _shoppingCartService = shoppingCartService;
             _stateProvinceService = stateProvinceService;
             _staticCacheManager = staticCacheManager;
             _taxCategoryService = taxCategoryService;
+            _taxPluginManager = taxPluginManager;
+            _urlHelperFactory = urlHelperFactory;
+            _webHelper = webHelper;
             _workContext = workContext;
             _shippingSettings = shippingSettings;
             _taxSettings = taxSettings;
             _taxTransactionLogService = taxTransactionLogService;
+            _widgetSettings = widgetSettings;
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets client that connects to Avalara services
+        /// </summary>
+        private AvaTaxClient ServiceClient
+        {
+            get
+            {
+                if (_serviceClient == null)
+                {
+                    //create a client with credentials
+                    _serviceClient = new AvaTaxClient(AvalaraTaxDefaults.ApplicationName,
+                        AvalaraTaxDefaults.ApplicationVersion, Environment.MachineName,
+                        _avalaraTaxSettings.UseSandbox ? AvaTaxEnvironment.Sandbox : AvaTaxEnvironment.Production)
+                        .WithSecurity(_avalaraTaxSettings.AccountId, _avalaraTaxSettings.LicenseKey);
+
+                    //invoke method after each request to services completed
+                    if (_avalaraTaxSettings.EnableLogging)
+                        _serviceClient.CallCompleted += OnCallCompleted;
+                }
+
+                return _serviceClient;
+            }
         }
 
         #endregion
@@ -126,7 +184,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// </summary>
         /// <param name="sender">Sender</param>
         /// <param name="args">Event args</param>
-        protected async void OnCallCompleted(object sender, EventArgs args)
+        private async void OnCallCompleted(object sender, EventArgs args)
         {
             if (args is not AvaTaxCallEventArgs avaTaxCallEventArgs)
                 return;
@@ -149,7 +207,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// Check that tax provider is configured
         /// </summary>
         /// <returns>True if it's configured; otherwise false</returns>
-        protected bool IsConfigured()
+        private bool IsConfigured()
         {
             return !string.IsNullOrEmpty(_avalaraTaxSettings.AccountId)
                 && !string.IsNullOrEmpty(_avalaraTaxSettings.LicenseKey);
@@ -164,7 +222,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the result
         /// </returns>
-        protected async Task<TResult> HandleFunctionAsync<TResult>(Func<Task<TResult>> function)
+        private async Task<TResult> HandleFunctionAsync<TResult>(Func<Task<TResult>> function)
         {
             try
             {
@@ -208,7 +266,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// </summary>
         /// <param name="model">Transaction details</param>
         /// <returns>Created transaction</returns>
-        protected TransactionModel CreateTransaction(CreateTransactionModel model)
+        private TransactionModel CreateTransaction(CreateTransactionModel model)
         {
             var transaction = ServiceClient.CreateTransaction(null, model)
                 ?? throw new NopException("No response from the service");
@@ -233,7 +291,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the model
         /// </returns>
-        protected async Task<CreateTransactionModel> PrepareTransactionModelAsync(Address address, string customerCode, DocumentType documentType)
+        private async Task<CreateTransactionModel> PrepareTransactionModelAsync(Address address, string customerCode, DocumentType documentType)
         {
             var model = new CreateTransactionModel
             {
@@ -277,7 +335,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// <param name="order">Order</param>
         /// <param name="storeId">Store id</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task PrepareOrderAddressesAsync(Customer customer, Order order, int storeId)
+        private async Task PrepareOrderAddressesAsync(Customer customer, Order order, int storeId)
         {
             order.BillingAddressId = customer.BillingAddressId ?? 0;
             order.ShippingAddressId = customer.ShippingAddressId;
@@ -312,7 +370,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the address
         /// </returns>
-        protected async Task<Address> GetTaxAddressAsync(Order order)
+        private async Task<Address> GetTaxAddressAsync(Order order)
         {
             Address address = null;
 
@@ -354,7 +412,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the address model
         /// </returns>
-        protected async Task<AddressLocationInfo> MapAddressAsync(Address address)
+        private async Task<AddressLocationInfo> MapAddressAsync(Address address)
         {
             return address == null ? null : new AddressLocationInfo
             {
@@ -376,7 +434,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the list of item lines
         /// </returns>
-        protected async Task<List<LineItemModel>> GetItemLinesAsync(Order order, IList<OrderItem> orderItems)
+        private async Task<List<LineItemModel>> GetItemLinesAsync(Order order, IList<OrderItem> orderItems)
         {
             //get purchased products details
             var items = await CreateLinesForOrderItemsAsync(order, orderItems);
@@ -405,7 +463,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the collection of item lines
         /// </returns>
-        protected async Task<List<LineItemModel>> CreateLinesForOrderItemsAsync(Order order, IList<OrderItem> orderItems)
+        private async Task<List<LineItemModel>> CreateLinesForOrderItemsAsync(Order order, IList<OrderItem> orderItems)
         {
             return await orderItems.SelectAwait(async orderItem =>
             {
@@ -432,7 +490,27 @@ namespace Nop.Plugin.Tax.Avalara.Services
                         : string.Empty,
 
                     quantity = orderItem.Quantity
-                };                
+                };
+
+                //force to use billing address as the tax address one in the accordance with EU VAT rules (if enabled)
+                if (_taxSettings.EuVatEnabled)
+                {
+                    var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+                    var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+                    var useEuVatRules = (product?.IsTelecommunicationsOrBroadcastingOrElectronicServices ?? false)
+                        && ((await _countryService.GetCountryByAddressAsync(billingAddress)
+                            ?? await _countryService.GetCountryByIdAsync(customer.CountryId)
+                            ?? await _countryService.GetCountryByTwoLetterIsoCodeAsync(_geoLookupService.LookupCountryIsoCode(customer.LastIpAddress)))
+                            ?.SubjectToVat ?? false)
+                        && customer.VatNumberStatusId != (int)VatNumberStatus.Valid;
+
+                    if (useEuVatRules)
+                    {
+                        var address = await MapAddressAsync(billingAddress);
+                        if (address != null)
+                            item.addresses = new AddressesModel { singleLocation = address };
+                    }
+                }
 
                 //set tax code
                 var productTaxCategory = await _taxCategoryService.GetTaxCategoryByIdAsync(product?.TaxCategoryId ?? 0);
@@ -456,7 +534,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the item line
         /// </returns>
-        protected async Task<LineItemModel> CreateLineForPaymentMethodAsync(Order order)
+        private async Task<LineItemModel> CreateLineForPaymentMethodAsync(Order order)
         {
             var paymentItem = new LineItemModel
             {
@@ -495,7 +573,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the item line
         /// </returns>
-        protected async Task<LineItemModel> CreateLineForShippingAsync(Order order)
+        private async Task<LineItemModel> CreateLineForShippingAsync(Order order)
         {
             var shippingItem = new LineItemModel
             {
@@ -534,10 +612,10 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the collection of item lines
         /// </returns>
-        protected async Task<IEnumerable<LineItemModel>> CreateLinesForCheckoutAttributesAsync(Order order)
+        private async Task<IEnumerable<LineItemModel>> CreateLinesForCheckoutAttributesAsync(Order order)
         {
             //get checkout attributes values
-            var attributeValues = _checkoutAttributeParser.ParseAttributeValues(order.CheckoutAttributesXml);
+            var attributeValues = _checkoutAttributeParser.ParseCheckoutAttributeValues(order.CheckoutAttributesXml);
             return await attributeValues.SelectManyAwait(async attributeWithValues =>
             {
                 var attribute = attributeWithValues.attribute;
@@ -588,7 +666,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the model
         /// </returns>
-        protected async Task<CreateTransactionModel> PrepareModelTaxExemptionAsync(CreateTransactionModel model, Customer customer)
+        private async Task<CreateTransactionModel> PrepareModelTaxExemptionAsync(CreateTransactionModel model, Customer customer)
         {
             if (customer.IsTaxExempt)
                 model.exemptionNo = CommonHelper.EnsureMaximumLength($"Exempt-customer-#{customer.Id}", 25);
@@ -620,7 +698,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the tax rates list
         /// </returns>
-        protected async Task<List<TaxRate>> GetTaxRatesFromFileAsync()
+        private async Task<List<TaxRate>> GetTaxRatesFromFileAsync()
         {
             //try to create file if doesn't exist
             var filePath = _fileProvider.MapPath(AvalaraTaxDefaults.TaxRatesFilePath);
@@ -682,7 +760,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the customer details
         /// </returns>
-        protected async Task<CustomerModel> CreateOrUpdateCustomerAsync(Customer customer, int companyId, bool customerExists)
+        private async Task<CustomerModel> CreateOrUpdateCustomerAsync(Customer customer, int companyId, bool customerExists)
         {
             var defaultAddress = new Address
             {
@@ -1633,34 +1711,6 @@ namespace Nop.Plugin.Tax.Avalara.Services
             }
 
             _disposed = true;
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets client that connects to Avalara services
-        /// </summary>
-        protected AvaTaxClient ServiceClient
-        {
-            get
-            {
-                if (_serviceClient == null)
-                {
-                    //create a client with credentials
-                    _serviceClient = new AvaTaxClient(AvalaraTaxDefaults.ApplicationName,
-                            AvalaraTaxDefaults.ApplicationVersion, Environment.MachineName,
-                            _avalaraTaxSettings.UseSandbox ? AvaTaxEnvironment.Sandbox : AvaTaxEnvironment.Production)
-                        .WithSecurity(_avalaraTaxSettings.AccountId, _avalaraTaxSettings.LicenseKey);
-
-                    //invoke method after each request to services completed
-                    if (_avalaraTaxSettings.EnableLogging)
-                        _serviceClient.CallCompleted += OnCallCompleted;
-                }
-
-                return _serviceClient;
-            }
         }
 
         #endregion

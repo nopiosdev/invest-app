@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Nop.Core;
 using Nop.Core.Caching;
@@ -10,7 +15,6 @@ using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Infrastructure;
-using Nop.Services.Attributes;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -25,7 +29,6 @@ using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Shipping;
-using Nop.Services.Stores;
 using Nop.Services.Tax;
 using Nop.Web.Components;
 using Nop.Web.Factories;
@@ -44,43 +47,42 @@ namespace Nop.Web.Controllers
     {
         #region Fields
 
-        protected readonly CaptchaSettings _captchaSettings;
-        protected readonly CustomerSettings _customerSettings;
-        protected readonly IAttributeParser<CheckoutAttribute, CheckoutAttributeValue> _checkoutAttributeParser;
-        protected readonly IAttributeService<CheckoutAttribute, CheckoutAttributeValue> _checkoutAttributeService;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly ICustomerActivityService _customerActivityService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IDiscountService _discountService;
-        protected readonly IDownloadService _downloadService;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly IGiftCardService _giftCardService;
-        protected readonly IHtmlFormatter _htmlFormatter;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly INopFileProvider _fileProvider;
-        protected readonly INopUrlHelper _nopUrlHelper;
-        protected readonly INotificationService _notificationService;
-        protected readonly IPermissionService _permissionService;
-        protected readonly IPictureService _pictureService;
-        protected readonly IPriceFormatter _priceFormatter;
-        protected readonly IProductAttributeParser _productAttributeParser;
-        protected readonly IProductAttributeService _productAttributeService;
-        protected readonly IProductService _productService;
-        protected readonly IShippingService _shippingService;
-        protected readonly IShoppingCartModelFactory _shoppingCartModelFactory;
-        protected readonly IShoppingCartService _shoppingCartService;
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IStoreMappingService _storeMappingService;
-        protected readonly ITaxService _taxService;
-        protected readonly IUrlRecordService _urlRecordService;
-        protected readonly IWebHelper _webHelper;
-        protected readonly IWorkContext _workContext;
-        protected readonly IWorkflowMessageService _workflowMessageService;
-        protected readonly MediaSettings _mediaSettings;
-        protected readonly OrderSettings _orderSettings;
-        protected readonly ShoppingCartSettings _shoppingCartSettings;
-        protected readonly ShippingSettings _shippingSettings;
+        private readonly CaptchaSettings _captchaSettings;
+        private readonly CustomerSettings _customerSettings;
+        private readonly ICheckoutAttributeParser _checkoutAttributeParser;
+        private readonly ICheckoutAttributeService _checkoutAttributeService;
+        private readonly ICurrencyService _currencyService;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly ICustomerService _customerService;
+        private readonly IDiscountService _discountService;
+        private readonly IDownloadService _downloadService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IGiftCardService _giftCardService;
+        private readonly IHtmlFormatter _htmlFormatter;
+        private readonly ILocalizationService _localizationService;
+        private readonly INopFileProvider _fileProvider;
+        private readonly INopUrlHelper _nopUrlHelper;
+        private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
+        private readonly IPictureService _pictureService;
+        private readonly IPriceFormatter _priceFormatter;
+        private readonly IProductAttributeParser _productAttributeParser;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductService _productService;
+        private readonly IShippingService _shippingService;
+        private readonly IShoppingCartModelFactory _shoppingCartModelFactory;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly IStoreContext _storeContext;
+        private readonly ITaxService _taxService;
+        private readonly IUrlRecordService _urlRecordService;
+        private readonly IWebHelper _webHelper;
+        private readonly IWorkContext _workContext;
+        private readonly IWorkflowMessageService _workflowMessageService;
+        private readonly MediaSettings _mediaSettings;
+        private readonly OrderSettings _orderSettings;
+        private readonly ShoppingCartSettings _shoppingCartSettings;
+        private readonly ShippingSettings _shippingSettings;
 
         #endregion
 
@@ -88,8 +90,8 @@ namespace Nop.Web.Controllers
 
         public ShoppingCartController(CaptchaSettings captchaSettings,
             CustomerSettings customerSettings,
-            IAttributeParser<CheckoutAttribute, CheckoutAttributeValue> checkoutAttributeParser,
-            IAttributeService<CheckoutAttribute, CheckoutAttributeValue> checkoutAttributeService,
+            ICheckoutAttributeParser checkoutAttributeParser,
+            ICheckoutAttributeService checkoutAttributeService,
             ICurrencyService currencyService,
             ICustomerActivityService customerActivityService,
             ICustomerService customerService,
@@ -113,7 +115,6 @@ namespace Nop.Web.Controllers
             IShoppingCartService shoppingCartService,
             IStaticCacheManager staticCacheManager,
             IStoreContext storeContext,
-            IStoreMappingService storeMappingService,
             ITaxService taxService,
             IUrlRecordService urlRecordService,
             IWebHelper webHelper,
@@ -151,7 +152,6 @@ namespace Nop.Web.Controllers
             _shoppingCartService = shoppingCartService;
             _staticCacheManager = staticCacheManager;
             _storeContext = storeContext;
-            _storeMappingService = storeMappingService;
             _taxService = taxService;
             _urlRecordService = urlRecordService;
             _webHelper = webHelper;
@@ -178,7 +178,7 @@ namespace Nop.Web.Controllers
             var attributesXml = string.Empty;
             var excludeShippableAttributes = !await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart);
             var store = await _storeContext.GetCurrentStoreAsync();
-            var checkoutAttributes = await _checkoutAttributeService.GetAllAttributesAsync(_staticCacheManager, _storeMappingService, store.Id, excludeShippableAttributes);
+            var checkoutAttributes = await _checkoutAttributeService.GetAllCheckoutAttributesAsync(store.Id, excludeShippableAttributes);
             foreach (var attribute in checkoutAttributes)
             {
                 var controlId = $"checkout_attribute_{attribute.Id}";
@@ -194,7 +194,7 @@ namespace Nop.Web.Controllers
                             {
                                 var selectedAttributeId = int.Parse(ctrlAttributes);
                                 if (selectedAttributeId > 0)
-                                    attributesXml = _checkoutAttributeParser.AddAttribute(attributesXml,
+                                    attributesXml = _checkoutAttributeParser.AddCheckoutAttribute(attributesXml,
                                         attribute, selectedAttributeId.ToString());
                             }
                         }
@@ -209,7 +209,7 @@ namespace Nop.Web.Controllers
                                 {
                                     var selectedAttributeId = int.Parse(item);
                                     if (selectedAttributeId > 0)
-                                        attributesXml = _checkoutAttributeParser.AddAttribute(attributesXml,
+                                        attributesXml = _checkoutAttributeParser.AddCheckoutAttribute(attributesXml,
                                             attribute, selectedAttributeId.ToString());
                                 }
                             }
@@ -219,13 +219,13 @@ namespace Nop.Web.Controllers
                     case AttributeControlType.ReadonlyCheckboxes:
                         {
                             //load read-only (already server-side selected) values
-                            var attributeValues = await _checkoutAttributeService.GetAttributeValuesAsync(attribute.Id);
+                            var attributeValues = await _checkoutAttributeService.GetCheckoutAttributeValuesAsync(attribute.Id);
                             foreach (var selectedAttributeId in attributeValues
                                 .Where(v => v.IsPreSelected)
                                 .Select(v => v.Id)
                                 .ToList())
                             {
-                                attributesXml = _checkoutAttributeParser.AddAttribute(attributesXml,
+                                attributesXml = _checkoutAttributeParser.AddCheckoutAttribute(attributesXml,
                                             attribute, selectedAttributeId.ToString());
                             }
                         }
@@ -238,7 +238,7 @@ namespace Nop.Web.Controllers
                             if (!StringValues.IsNullOrEmpty(ctrlAttributes))
                             {
                                 var enteredText = ctrlAttributes.ToString().Trim();
-                                attributesXml = _checkoutAttributeParser.AddAttribute(attributesXml,
+                                attributesXml = _checkoutAttributeParser.AddCheckoutAttribute(attributesXml,
                                     attribute, enteredText);
                             }
                         }
@@ -260,7 +260,7 @@ namespace Nop.Web.Controllers
                             }
 
                             if (selectedDate.HasValue)
-                                attributesXml = _checkoutAttributeParser.AddAttribute(attributesXml,
+                                attributesXml = _checkoutAttributeParser.AddCheckoutAttribute(attributesXml,
                                     attribute, selectedDate.Value.ToString("D"));
                         }
 
@@ -271,7 +271,7 @@ namespace Nop.Web.Controllers
                             var download = await _downloadService.GetDownloadByGuidAsync(downloadGuid);
                             if (download != null)
                             {
-                                attributesXml = _checkoutAttributeParser.AddAttribute(attributesXml,
+                                attributesXml = _checkoutAttributeParser.AddCheckoutAttribute(attributesXml,
                                            attribute, download.DownloadGuid.ToString());
                             }
                         }
@@ -285,9 +285,9 @@ namespace Nop.Web.Controllers
             //validate conditional attributes (if specified)
             foreach (var attribute in checkoutAttributes)
             {
-                var conditionMet = await _checkoutAttributeParser.IsConditionMetAsync(attribute.ConditionAttributeXml, attributesXml);
+                var conditionMet = await _checkoutAttributeParser.IsConditionMetAsync(attribute, attributesXml);
                 if (conditionMet.HasValue && !conditionMet.Value)
-                    attributesXml = _checkoutAttributeParser.RemoveAttribute(attributesXml, attribute.Id);
+                    attributesXml = _checkoutAttributeParser.RemoveCheckoutAttribute(attributesXml, attribute);
             }
 
             //save checkout attributes
@@ -831,7 +831,7 @@ namespace Nop.Web.Controllers
             {
                 var currentStore = await _storeContext.GetCurrentStoreAsync();
                 var currentCustomer = await _workContext.GetCurrentCustomerAsync();
-
+                
                 //we do not calculate price of "customer enters price" option is enabled
                 var (finalPrice, _, _) = await _shoppingCartService.GetUnitPriceAsync(product,
                     currentCustomer,
@@ -870,27 +870,16 @@ namespace Nop.Web.Controllers
             //picture. used when we want to override a default product picture when some attribute is selected
             var pictureFullSizeUrl = string.Empty;
             var pictureDefaultSizeUrl = string.Empty;
-            var pictureIds = new List<int>();
             if (loadPicture)
             {
                 //first, try to get product attribute combination picture
-                var pictureId = 0;
-                var combination = await _productAttributeParser.FindProductAttributeCombinationAsync(product, attributeXml);
-                if (combination != null)
-                {
-                    var combinationPictures = await _productAttributeService.GetProductAttributeCombinationPicturesAsync(combination.Id);
-                    pictureIds = combinationPictures.Select(cp => cp.PictureId).ToList();
-                    pictureId = combinationPictures.FirstOrDefault()?.PictureId ?? 0;
-                }
+                var pictureId = (await _productAttributeParser.FindProductAttributeCombinationAsync(product, attributeXml))?.PictureId ?? 0;
 
                 //then, let's see whether we have attribute values with pictures
                 if (pictureId == 0)
                 {
-                    var valuePictures = await (await _productAttributeParser.ParseProductAttributeValuesAsync(attributeXml))
-                        .SelectManyAwait(async attributeValue => await _productAttributeService.GetProductAttributeValuePicturesAsync(attributeValue.Id))
-                        .ToListAsync();
-                    pictureIds = valuePictures.Select(vp => vp.PictureId).ToList();
-                    pictureId = valuePictures.FirstOrDefault()?.PictureId ?? 0;
+                    pictureId = (await _productAttributeParser.ParseProductAttributeValuesAsync(attributeXml))
+                        .FirstOrDefault(attributeValue => attributeValue.PictureId > 0)?.PictureId ?? 0;
                 }
 
                 if (pictureId > 0)
@@ -938,7 +927,6 @@ namespace Nop.Web.Controllers
                 disabledattributemappingids = disabledAttributeMappingIds.ToArray(),
                 pictureFullSizeUrl,
                 pictureDefaultSizeUrl,
-                pictureIds,
                 isFreeShipping,
                 message = errors.Any() ? errors.ToArray() : null
             });
@@ -960,10 +948,10 @@ namespace Nop.Web.Controllers
             var enabledAttributeIds = new List<int>();
             var disabledAttributeIds = new List<int>();
             var excludeShippableAttributes = !await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart);
-            var attributes = await _checkoutAttributeService.GetAllAttributesAsync(_staticCacheManager, _storeMappingService, store.Id, excludeShippableAttributes);
+            var attributes = await _checkoutAttributeService.GetAllCheckoutAttributesAsync(store.Id, excludeShippableAttributes);
             foreach (var attribute in attributes)
             {
-                var conditionMet = await _checkoutAttributeParser.IsConditionMetAsync(attribute.ConditionAttributeXml, attributeXml);
+                var conditionMet = await _checkoutAttributeParser.IsConditionMetAsync(attribute, attributeXml);
                 if (conditionMet.HasValue)
                 {
                     if (conditionMet.Value)
@@ -1063,7 +1051,7 @@ namespace Nop.Web.Controllers
             {
                 success = true,
                 message = await _localizationService.GetResourceAsync("ShoppingCart.FileUploaded"),
-                downloadUrl = Url.RouteUrl("DownloadGetFileUpload", new { downloadId = download.DownloadGuid }),
+                downloadUrl = Url.Action("GetFileUpload", "Download", new { downloadId = download.DownloadGuid }),
                 downloadGuid = download.DownloadGuid
             });
         }
@@ -1072,7 +1060,7 @@ namespace Nop.Web.Controllers
         [IgnoreAntiforgeryToken]
         public virtual async Task<IActionResult> UploadFileCheckoutAttribute(int attributeId)
         {
-            var attribute = await _checkoutAttributeService.GetAttributeByIdAsync(attributeId);
+            var attribute = await _checkoutAttributeService.GetCheckoutAttributeByIdAsync(attributeId);
             if (attribute == null || attribute.AttributeControlType != AttributeControlType.FileUpload)
             {
                 return Json(new
@@ -1145,7 +1133,7 @@ namespace Nop.Web.Controllers
             {
                 success = true,
                 message = await _localizationService.GetResourceAsync("ShoppingCart.FileUploaded"),
-                downloadUrl = Url.RouteUrl("DownloadGetFileUpload", new { downloadId = download.DownloadGuid }),
+                downloadUrl = Url.Action("GetFileUpload", "Download", new { downloadId = download.DownloadGuid }),
                 downloadGuid = download.DownloadGuid
             });
         }

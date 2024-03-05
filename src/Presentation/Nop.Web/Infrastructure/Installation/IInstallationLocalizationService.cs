@@ -1,4 +1,6 @@
-﻿namespace Nop.Web.Infrastructure.Installation
+﻿using System.Collections.Generic;
+
+namespace Nop.Web.Infrastructure.Installation
 {
     /// <summary>
     /// Localization service for installation process

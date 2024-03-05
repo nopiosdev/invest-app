@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain;
 using Nop.Core.Domain.Common;
@@ -28,26 +31,26 @@ namespace Nop.Web.Controllers
     {
         #region Fields
 
-        protected readonly CaptchaSettings _captchaSettings;
-        protected readonly CommonSettings _commonSettings;
-        protected readonly ICommonModelFactory _commonModelFactory;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly ICustomerActivityService _customerActivityService;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly IHtmlFormatter _htmlFormatter;
-        protected readonly ILanguageService _languageService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ISitemapModelFactory _sitemapModelFactory;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IThemeContext _themeContext;
-        protected readonly IVendorService _vendorService;
-        protected readonly IWorkContext _workContext;
-        protected readonly IWorkflowMessageService _workflowMessageService;
-        protected readonly LocalizationSettings _localizationSettings;
-        protected readonly SitemapSettings _sitemapSettings;
-        protected readonly SitemapXmlSettings _sitemapXmlSettings;
-        protected readonly StoreInformationSettings _storeInformationSettings;
-        protected readonly VendorSettings _vendorSettings;
+        private readonly CaptchaSettings _captchaSettings;
+        private readonly CommonSettings _commonSettings;
+        private readonly ICommonModelFactory _commonModelFactory;
+        private readonly ICurrencyService _currencyService;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IHtmlFormatter _htmlFormatter;
+        private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ISitemapModelFactory _sitemapModelFactory;
+        private readonly IStoreContext _storeContext;
+        private readonly IThemeContext _themeContext;
+        private readonly IVendorService _vendorService;
+        private readonly IWorkContext _workContext;
+        private readonly IWorkflowMessageService _workflowMessageService;
+        private readonly LocalizationSettings _localizationSettings;
+        private readonly SitemapSettings _sitemapSettings;
+        private readonly SitemapXmlSettings _sitemapXmlSettings;
+        private readonly StoreInformationSettings _storeInformationSettings;
+        private readonly VendorSettings _vendorSettings;
 
         #endregion
 
@@ -182,7 +185,7 @@ namespace Nop.Web.Controllers
 
         //contact us page
         //available even when a store is closed
-        //[CheckAccessClosedStore(ignore: true)]
+        [CheckAccessClosedStore(ignore: true)]
         public virtual async Task<IActionResult> ContactUs()
         {
             var model = new ContactUsModel();
@@ -194,7 +197,7 @@ namespace Nop.Web.Controllers
         [HttpPost, ActionName("ContactUs")]
         [ValidateCaptcha]
         //available even when a store is closed
-        //[CheckAccessClosedStore(ignore: true)]
+        [CheckAccessClosedStore(ignore: true)]
         public virtual async Task<IActionResult> ContactUsSend(ContactUsModel model, bool captchaValid)
         {
             //validate CAPTCHA
@@ -211,7 +214,7 @@ namespace Nop.Web.Controllers
                 var body = _htmlFormatter.FormatText(model.Enquiry, false, true, false, false, false, false);
 
                 await _workflowMessageService.SendContactUsMessageAsync((await _workContext.GetWorkingLanguageAsync()).Id,
-                    model.Email, model.FullName, subject, body, model.PhoneNumber);
+                    model.Email.Trim(), model.FullName, subject, body);
 
                 model.SuccessfullySent = true;
                 model.Result = await _localizationService.GetResourceAsync("ContactUs.YourEnquiryHasBeenSent");
@@ -267,7 +270,7 @@ namespace Nop.Web.Controllers
                 var body = _htmlFormatter.FormatText(model.Enquiry, false, true, false, false, false, false);
 
                 await _workflowMessageService.SendContactVendorMessageAsync(vendor, (await _workContext.GetWorkingLanguageAsync()).Id,
-                    model.Email, model.FullName, subject, body);
+                    model.Email.Trim(), model.FullName, subject, body);
 
                 model.SuccessfullySent = true;
                 model.Result = await _localizationService.GetResourceAsync("ContactVendor.YourEnquiryHasBeenSent");

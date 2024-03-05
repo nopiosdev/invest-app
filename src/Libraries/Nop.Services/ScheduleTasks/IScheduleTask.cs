@@ -1,4 +1,6 @@
-﻿namespace Nop.Services.ScheduleTasks
+﻿using System.Threading.Tasks;
+
+namespace Nop.Services.ScheduleTasks
 {
     /// <summary>
     /// Interface that should be implemented by each task

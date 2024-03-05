@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Core.Domain.Security;
@@ -120,12 +122,11 @@ namespace Nop.Web.Framework.Security.Captcha
         /// </summary>
         /// <param name="helper">HTML helper</param>
         /// <param name="captchaSettings">Captcha settings</param>
-        /// <param name="actionName">Action name</param>
         /// <returns>
         /// A task that represents the asynchronous operation
         /// The task result contains the result
         /// </returns>
-        public static async Task<IHtmlContent> GenerateReCaptchaV3Async(this IHtmlHelper helper, CaptchaSettings captchaSettings, string actionName = null)
+        public static async Task<IHtmlContent> GenerateReCaptchaV3Async(this IHtmlHelper helper, CaptchaSettings captchaSettings)
         {
             //prepare language
             var language = await GetReCaptchaLanguageAsync(captchaSettings);
@@ -137,9 +138,7 @@ namespace Nop.Web.Framework.Security.Captcha
             var publicKey = captchaSettings.ReCaptchaPublicKey ?? string.Empty;
 
             //prepare reCAPTCHA script
-            if (string.IsNullOrEmpty(actionName))
-                actionName = helper.ViewContext.RouteData.Values["action"].ToString();
-
+            var actionName = helper.ViewContext.RouteData.Values["action"].ToString();
             var scriptCallback = $@"
                 var onloadCallback{id} = function() {{
                     var form = $('input[id=""g-recaptcha-response_{id}""]').closest('form');

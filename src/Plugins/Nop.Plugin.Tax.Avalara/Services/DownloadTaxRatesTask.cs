@@ -1,4 +1,5 @@
-﻿using Nop.Services.ScheduleTasks;
+﻿using System.Threading.Tasks;
+using Nop.Services.ScheduleTasks;
 
 namespace Nop.Plugin.Tax.Avalara.Services
 {
@@ -9,7 +10,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
     {
         #region Fields
 
-        protected readonly AvalaraTaxManager _avalaraTaxManager;
+        private readonly AvalaraTaxManager _avalaraTaxManager;
 
         #endregion
 

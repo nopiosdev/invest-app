@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Domain
 {
@@ -9,7 +10,7 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Domain
         /// </summary>
         [JsonIgnore]
         public int Id { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the client ip address
         /// </summary>

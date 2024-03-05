@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Common
+﻿using System;
+
+namespace Nop.Core.Domain.Common
 {
     /// <summary>
     /// Represents a generic attribute
@@ -9,7 +11,7 @@
         /// Gets or sets the entity identifier
         /// </summary>
         public int EntityId { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the key group
         /// </summary>

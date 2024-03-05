@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Services.Payments;
@@ -9,7 +12,7 @@ namespace Nop.Tests.Nop.Services.Tests.Payments
     public class TestPaymentMethod : BasePlugin, IPaymentMethod
     {
         #region Methods
-
+        
         /// <summary>
         /// Refunds a payment
         /// </summary>
@@ -32,7 +35,7 @@ namespace Nop.Tests.Nop.Services.Tests.Payments
         {
             var result = new VoidPaymentResult();
             result.AddError("Void method not supported");
-
+            
             return Task.FromResult(result);
         }
 
@@ -45,7 +48,7 @@ namespace Nop.Tests.Nop.Services.Tests.Payments
         {
             var result = new ProcessPaymentResult();
             result.AddError("Recurring method not supported");
-
+            
             return Task.FromResult(result);
         }
 
@@ -58,10 +61,10 @@ namespace Nop.Tests.Nop.Services.Tests.Payments
         {
             var result = new CancelRecurringPaymentResult();
             result.AddError("Cancelling recurring orders not supported");
-
+            
             return Task.FromResult(result);
         }
-
+        
         /// <summary>
         /// Gets a value indicating whether customers can complete a payment after order is placed but not completed (for redirection payment methods)
         /// </summary>
@@ -152,7 +155,7 @@ namespace Nop.Tests.Nop.Services.Tests.Payments
 
             return Task.FromResult(result);
         }
-
+        
         /// <summary>
         /// Gets a type of a view component for displaying plugin in public store ("payment info" checkout step)
         /// </summary>

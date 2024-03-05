@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Threading.Tasks;
+using System.Xml;
 
 namespace Nop.Services.ExportImport
 {
@@ -47,7 +48,7 @@ namespace Nop.Services.ExportImport
         {
             await xmlWriter.WriteAttributeStringAsync(null, nodeName, null, nodeValue?.ToString() ?? defaulValue);
         }
-
+        
         /// <summary>
         /// Write element string async
         /// </summary>

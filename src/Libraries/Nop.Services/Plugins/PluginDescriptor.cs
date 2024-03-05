@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using Nop.Core;
@@ -123,7 +126,7 @@ namespace Nop.Services.Plugins
         /// </summary>
         [JsonProperty(PropertyName = "FriendlyName")]
         public virtual string FriendlyName { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the supported versions of nopCommerce
         /// </summary>
@@ -165,7 +168,7 @@ namespace Nop.Services.Plugins
         /// </summary>
         [JsonProperty(PropertyName = "LimitedToCustomerRoles")]
         public virtual IList<int> LimitedToCustomerRoles { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the list of plugins' system name that this plugin depends on
         /// </summary>

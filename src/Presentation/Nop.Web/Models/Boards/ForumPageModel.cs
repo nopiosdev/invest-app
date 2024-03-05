@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Boards
 {
@@ -22,7 +23,7 @@ namespace Nop.Web.Models.Boards
         public int TopicPageIndex { get; set; }
 
         public bool IsCustomerAllowedToSubscribe { get; set; }
-
+        
         public bool ForumFeedsEnabled { get; set; }
 
         public int PostsPageSize { get; set; }

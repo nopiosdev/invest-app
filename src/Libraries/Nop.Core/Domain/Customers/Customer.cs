@@ -1,6 +1,6 @@
-﻿using Nop.Core.Domain.Common;
+﻿using System;
+using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Tax;
-using Nop.Core.Domain.Transaction;
 
 namespace Nop.Core.Domain.Customers
 {
@@ -155,7 +155,7 @@ namespace Nop.Core.Domain.Customers
         public int AffiliateId { get; set; }
 
         /// <summary>
-        /// Gets or sets the vendor identifier with which this customer is associated (manager)
+        /// Gets or sets the vendor identifier with which this customer is associated (maganer)
         /// </summary>
         public int VendorId { get; set; }
 
@@ -164,7 +164,7 @@ namespace Nop.Core.Domain.Customers
         /// <remarks>The same as if we run ShoppingCartItems.Count > 0
         /// We use this property for performance optimization:
         /// if this property is set to false, then we do not need to load "ShoppingCartItems" navigation property for each page load
-        /// It's used only in a couple of places in the presentation layer
+        /// It's used only in a couple of places in the presenation layer
         /// </remarks>
         /// </summary>
         public bool HasShoppingCartItems { get; set; }
@@ -239,42 +239,6 @@ namespace Nop.Core.Domain.Customers
         /// </summary>
         public int? ShippingAddressId { get; set; }
 
-        //NCT Back-end dev
-
-        //Investment fields
-        public int GoalId { get; set; }
-        public int TimelineId { get; set; }
-        public int ExperienceId { get; set; }
-        public int RiskToleranceId { get; set; }
-        public int InvestmentApproachId { get; set; }
-        public bool DontInvestAmount { get; set; }
-
-        //Security fields
-        public bool Verified { get; set; }
-
-        //Alert fields
-        public bool EmailAlert { get; set; }
-        public bool TextAlert { get; set; }
-
-        //Identity Verification
-        public int IdentityVerificationId { get; set; }
-
-        //Transaction
-        public decimal InvestedAmount { get; set; }
-        public decimal CurrentBalance { get; set; }
-        public decimal ReturnAmountPercentagePerday { get; set; }
-        public decimal CommissionToHouse { get; set; }
-        public int PaymentTypeId { get; set; }
-        public PaymentTypeEnum PaymentType
-        {
-            get => (PaymentTypeEnum)this.PaymentTypeId;
-            set { this.PaymentTypeId = (int)value; }
-        }
-
-        public int DefaultWithdrawalMethodId { get; set; }
-        public DateTime? LastReturnDate { get; set; }
-
-
         #region Custom properties
 
         /// <summary>
@@ -291,7 +255,7 @@ namespace Nop.Core.Domain.Customers
         /// </summary>
         public TaxDisplayType? TaxDisplayType
         {
-            get => TaxDisplayTypeId.HasValue ? (TaxDisplayType)TaxDisplayTypeId : null;
+            get => TaxDisplayTypeId.HasValue ?(TaxDisplayType)TaxDisplayTypeId : null;
             set => TaxDisplayTypeId = value.HasValue ? (int)value : null;
         }
 

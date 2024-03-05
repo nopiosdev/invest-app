@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Vendors;
@@ -97,7 +100,7 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
             model.Topics.Any().Should().BeTrue();
             model.Topics.Count.Should().Be(1);
         }
-
+        
         [Test]
         public async Task CanPrepareCategoryModel()
         {
@@ -114,7 +117,7 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
             model.CategoryBreadcrumb.FirstOrDefault()?.Name.Should().Be("Computers");
             model.SubCategories.Count.Should().Be(3);
         }
-
+        
         [Test]
         public void PrepareCategoryModelShouldRaiseExceptionIfCategoryOrCommandIsNull()
         {
@@ -124,7 +127,7 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
             Assert.Throws<AggregateException>(() =>
                 _catalogModelFactory.PrepareCategoryModelAsync(_category, null).Wait());
         }
-
+        
         [Test]
         public async Task CanPrepareCategoryTemplateViewPath()
         {
@@ -158,16 +161,16 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
         public async Task CanPrepareHomepageCategoryModels()
         {
             var model = await _catalogModelFactory.PrepareHomepageCategoryModelsAsync();
-
+            
             model.Any().Should().BeTrue();
             model.Count.Should().Be(3);
-
+            
             var categories = new[] { "Electronics", "Apparel", "Digital downloads" };
 
             foreach (var categoryModel in model)
                 categoryModel.Name.Should().BeOneOf(categories);
         }
-
+        
         [Test]
         public async Task CanPrepareRootCategories()
         {
@@ -183,9 +186,9 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
             model.Any().Should().BeTrue();
             model.Count.Should().Be(3);
 
-            var categories = new[] { "Desktops", "Notebooks", "Software" };
+            var categories = new[] {"Desktops", "Notebooks", "Software"};
 
-            foreach (var categorySimpleModel in model)
+            foreach (var categorySimpleModel in model) 
                 categorySimpleModel.Name.Should().BeOneOf(categories);
         }
 
@@ -227,9 +230,9 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
             var model = await _catalogModelFactory.PrepareManufacturerAllModelsAsync();
             model.Any().Should().BeTrue();
             model.Count.Should().Be(3);
-            var manufacturers = new[] { "Apple", "HP", "Nike" };
+            var manufacturers = new[] {"Apple", "HP", "Nike"};
 
-            foreach (var manufacturerModel in model)
+            foreach (var manufacturerModel in model) 
                 manufacturerModel.Name.Should().BeOneOf(manufacturers);
         }
 

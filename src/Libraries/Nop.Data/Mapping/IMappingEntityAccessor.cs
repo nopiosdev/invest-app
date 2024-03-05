@@ -1,3 +1,4 @@
+using System;
 using LinqToDB.Mapping;
 
 namespace Nop.Data.Mapping

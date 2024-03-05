@@ -19,8 +19,8 @@ using Nop.Data.Mapping;
 
 namespace Nop.Data.Migrations.UpgradeTo460
 {
-    [NopSchemaMigration("2023-07-28 08:00:00", "Update datetime type precision")]
-    public class MySqlDateTimeWithPrecisionMigration : ForwardOnlyMigration
+    [NopMigration("2023-07-28 08:00:00", "Update datetime type precision", MigrationProcessType.Update)]
+    public class MySqlDateTimeWithPrecisionMigration : Migration
     {
         public override void Up()
         {
@@ -338,6 +338,11 @@ namespace Nop.Data.Migrations.UpgradeTo460
             Alter.Table(NameCompatibilityManager.GetTableName(typeof(VendorNote)))
                  .AlterColumn(NameCompatibilityManager.GetColumnName(typeof(VendorNote), nameof(VendorNote.CreatedOnUtc)))
                  .AsCustom("datetime(6)");
+        }
+
+        public override void Down()
+        {
+            //add the downgrade Logic if necessary 
         }
     }
 }

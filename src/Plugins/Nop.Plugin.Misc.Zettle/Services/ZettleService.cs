@@ -1,5 +1,10 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Domain.Directory;
@@ -29,22 +34,22 @@ namespace Nop.Plugin.Misc.Zettle.Services
     {
         #region Fields
 
-        protected readonly CurrencySettings _currencySettings;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly IDiscountService _discountService;
-        protected readonly ILogger _logger;
-        protected readonly IPictureService _pictureService;
-        protected readonly IProductAttributeParser _productAttributeParser;
-        protected readonly IProductAttributeService _productAttributeService;
-        protected readonly IProductService _productService;
-        protected readonly ISettingService _settingService;
-        protected readonly IWorkContext _workContext;
-        protected readonly MediaSettings _mediaSettings;
-        protected readonly ZettleHttpClient _zettleHttpClient;
-        protected readonly ZettleRecordService _zettleRecordService;
-        protected readonly ZettleSettings _zettleSettings;
+        private readonly CurrencySettings _currencySettings;
+        private readonly ICurrencyService _currencyService;
+        private readonly IDiscountService _discountService;
+        private readonly ILogger _logger;
+        private readonly IPictureService _pictureService;
+        private readonly IProductAttributeParser _productAttributeParser;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductService _productService;
+        private readonly ISettingService _settingService;
+        private readonly IWorkContext _workContext;
+        private readonly MediaSettings _mediaSettings;
+        private readonly ZettleHttpClient _zettleHttpClient;
+        private readonly ZettleRecordService _zettleRecordService;
+        private readonly ZettleSettings _zettleSettings;
 
-        protected Dictionary<string, string> _locations = new();
+        private Dictionary<string, string> _locations = new();
 
         #endregion
 
@@ -95,7 +100,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the result; error if exists
         /// </returns>
-        protected async Task<(TResult Result, string Error)> HandleFunctionAsync<TResult>(Func<Task<TResult>> function, bool logErrors = true)
+        private async Task<(TResult Result, string Error)> HandleFunctionAsync<TResult>(Func<Task<TResult>> function, bool logErrors = true)
         {
             try
             {
@@ -125,7 +130,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// </summary>
         /// <param name="log">Log message</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task ImportDiscountsAsync(StringBuilder log)
+        private async Task ImportDiscountsAsync(StringBuilder log)
         {
             //if enabled
             if (!_zettleSettings.DiscountSyncEnabled)
@@ -177,7 +182,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// </summary>
         /// <param name="log">Log message</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task ImportDeletedAsync(StringBuilder log)
+        private async Task ImportDeletedAsync(StringBuilder log)
         {
             log.AppendLine("Delete products...");
 
@@ -223,7 +228,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// </summary>
         /// <param name="log">Log message</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task ImportImageChangedAsync(StringBuilder log)
+        private async Task ImportImageChangedAsync(StringBuilder log)
         {
             log.AppendLine("Change images...");
 
@@ -281,7 +286,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// </summary>
         /// <param name="log">Log message</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task ImportInventoryTrackingAsync(StringBuilder log)
+        private async Task ImportInventoryTrackingAsync(StringBuilder log)
         {
             log.AppendLine("Update inventory tracking...");
 
@@ -338,7 +343,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// </summary>
         /// <param name="log">Log message</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task<Import> ImportCreatedOrUpdatedAsync(StringBuilder log)
+        private async Task<Import> ImportCreatedOrUpdatedAsync(StringBuilder log)
         {
             log.AppendLine("Create and update products...");
 
@@ -408,29 +413,24 @@ namespace Nop.Plugin.Misc.Zettle.Services
                     if (!combinationRecords.Any())
                     {
                         //a single variant
-                        var variant = new Product.ProductVariant
+                        request.Variants = new List<Product.ProductVariant>
                         {
-                            Uuid = product.VariantUuid,
-                            Name = product.Name,
-                            Sku = product.Sku,
-                            Description = product.Description
-                        };
+                            new Product.ProductVariant
+                            {
+                                Uuid = product.VariantUuid,
+                                Name = product.Name,
+                                Sku = product.Sku,
+                                Description = product.Description,
 
-                        //set the price if available
-                        if (product.PriceSyncEnabled && priceSyncAvailable)
-                        {
-                            variant.Price = new Product.ProductVariant.ProductPrice
-                            {
-                                Amount = preparePrice(product.Price),
-                                CurrencyId = accountInfo.Currency
-                            };
-                            variant.CostPrice = new Product.ProductVariant.ProductPrice
-                            {
-                                Amount = preparePrice(product.ProductCost),
-                                CurrencyId = accountInfo.Currency
-                            };
-                        }
-                        request.Variants = new() { variant };
+                                //set the price if available
+                                Price = product.PriceSyncEnabled && priceSyncAvailable
+                                    ? new Product.ProductVariant.ProductPrice
+                                    {
+                                        Amount = preparePrice(product.Price),
+                                        CurrencyId =  accountInfo.Currency
+                                    } : null
+                            }
+                        };
                     }
                     else
                     {
@@ -484,16 +484,6 @@ namespace Nop.Plugin.Misc.Zettle.Services
                                     Amount = preparePrice(combination.Combination.OverriddenPrice ?? product.Price),
                                     CurrencyId = accountInfo.Currency
                                 };
-
-                                var attributeValues = await _productAttributeParser.ParseProductAttributeValuesAsync(combination.Combination.AttributesXml);
-                                var attributesCost = attributeValues
-                                    .Where(value => value.AttributeValueType == Core.Domain.Catalog.AttributeValueType.Simple)
-                                    .Sum(value => value.Cost);
-                                variant.CostPrice = new Product.ProductVariant.ProductPrice
-                                {
-                                    Amount = preparePrice(product.ProductCost + attributesCost),
-                                    CurrencyId = accountInfo.Currency
-                                };
                             }
 
                             variant.Options = await (await _productAttributeParser.ParseProductAttributeMappingsAsync(combination.Combination.AttributesXml))
@@ -526,7 +516,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// <param name="update">Whether to update existing images</param>
         /// <param name="log">Log message</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task UploadImagesAsync(IList<ZettleRecord> records, bool update, StringBuilder log)
+        private async Task UploadImagesAsync(IList<ZettleRecord> records, bool update, StringBuilder log)
         {
             //ensure MediaSettings.UseAbsoluteImagePath is enabled (used for images uploading)
             if (!_mediaSettings.UseAbsoluteImagePath)
@@ -593,7 +583,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// A task that represents the asynchronous operation
         /// The task result contains list of balance changes
         /// </returns>
-        protected async Task<CreateTrackingRequest.ProductBalanceChange> PrepareInventoryBalanceChangeAsync(InventoryBalanceChangeType changeType,
+        private async Task<CreateTrackingRequest.ProductBalanceChange> PrepareInventoryBalanceChangeAsync(InventoryBalanceChangeType changeType,
             (ZettleRecord Record, int StockQuantity, int? QuantityAdjustment) productRecord,
             List<(ZettleRecord Record, int StockQuantity, int? QuantityAdjustment)> combinationRecords)
         {
@@ -678,7 +668,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// <param name="changeType">Inventory balance change type</param>
         /// <param name="productChanges">List of product changes</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task UpdateInventoryBalanceAsync(InventoryBalanceChangeType changeType, List<CreateTrackingRequest.ProductBalanceChange> productChanges)
+        private async Task UpdateInventoryBalanceAsync(InventoryBalanceChangeType changeType, List<CreateTrackingRequest.ProductBalanceChange> productChanges)
         {
             if (!productChanges.Any())
                 return;
@@ -706,7 +696,7 @@ namespace Nop.Plugin.Misc.Zettle.Services
         /// A task that represents the asynchronous operation
         /// The task result contains location UUID
         /// </returns>
-        protected async Task<string> GetLocationAsync(string type)
+        private async Task<string> GetLocationAsync(string type)
         {
             if (!_locations.TryGetValue(type, out var _))
             {

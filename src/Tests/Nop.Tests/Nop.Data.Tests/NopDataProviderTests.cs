@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
@@ -27,7 +31,7 @@ namespace Nop.Tests.Nop.Data.Tests
 
             SetDataProviderType(DataProviderType.Unknown);
         }
-
+        
         [Test]
         [TestCase(DataProviderType.Unknown)]
         [TestCase(DataProviderType.SqlServer)]
@@ -50,7 +54,7 @@ namespace Nop.Tests.Nop.Data.Tests
 
             switch (type)
             {
-
+                
                 case DataProviderType.SqlServer:
                 case DataProviderType.PostgreSQL:
                     foreignKeyName.Should()
@@ -123,7 +127,7 @@ namespace Nop.Tests.Nop.Data.Tests
 
             rez.Count.Should().Be(data.Count());
         }
-
+        
         [Test]
         [TestCase(DataProviderType.Unknown)]
         [TestCase(DataProviderType.SqlServer)]
@@ -169,7 +173,7 @@ namespace Nop.Tests.Nop.Data.Tests
                 Id = gdprConsent.Id,
                 Message = "Updated test tax category"
             });
-            var updatedGdprConsent = dataProvider.GetTable<GdprConsent>().FirstOrDefault(tc => tc.Id == gdprConsent.Id);
+            var updatedGdprConsent = dataProvider.GetTable<GdprConsent>().FirstOrDefault(tc=>tc.Id == gdprConsent.Id);
             await dataProvider.TruncateAsync<GdprConsent>();
 
             gdprConsent.Id.Should().BeGreaterThan(0);
@@ -192,7 +196,7 @@ namespace Nop.Tests.Nop.Data.Tests
             await dataProvider.TruncateAsync<GdprConsent>();
             dataProvider.GetTable<GdprConsent>().Count().Should().Be(0);
             dataProvider.InsertEntity(gdprConsent);
-            await dataProvider.UpdateEntitiesAsync(new[]
+            await dataProvider.UpdateEntitiesAsync(new []
             {
                 new GdprConsent
                 {
@@ -249,7 +253,7 @@ namespace Nop.Tests.Nop.Data.Tests
             dataProvider.GetTable<GdprConsent>().Count().Should().Be(0);
             dataProvider.InsertEntity(gdprConsent);
             dataProvider.GetTable<GdprConsent>().Count().Should().Be(1);
-            await dataProvider.BulkDeleteEntitiesAsync<GdprConsent>(_ => true);
+            await dataProvider.BulkDeleteEntitiesAsync<GdprConsent>( _ => true);
             dataProvider.GetTable<GdprConsent>().Count().Should().Be(0);
         }
 
@@ -273,7 +277,7 @@ namespace Nop.Tests.Nop.Data.Tests
             dataProvider.GetTable<GdprConsent>().Count().Should().Be(1);
             await dataProvider.TruncateAsync<GdprConsent>();
         }
-
+        
         [Test]
         [TestCase(DataProviderType.Unknown)]
         [TestCase(DataProviderType.SqlServer)]
@@ -367,7 +371,7 @@ namespace Nop.Tests.Nop.Data.Tests
                     break;
                 case DataProviderType.MySql:
                     connStr.Should()
-                        .Be(@"Server=127.0.0.1;User ID=test;Password=passwd;Database=test_db;Allow User Variables=True");
+                        .Be(@"Server=127.0.0.1;Database=test_db;Allow User Variables=True;User ID=test;Password=passwd");
                     break;
                 case DataProviderType.PostgreSQL:
                     connStr.Should()
@@ -409,7 +413,7 @@ namespace Nop.Tests.Nop.Data.Tests
 
             nextId.Should().Be(10);
         }
-
+        
         [Test]
         [TestCase(DataProviderType.Unknown)]
         [TestCase(DataProviderType.SqlServer)]

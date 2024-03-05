@@ -1,4 +1,8 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Domain.Blogs;
 using Nop.Services.Blogs;
 using NUnit.Framework;
@@ -6,7 +10,7 @@ using NUnit.Framework;
 namespace Nop.Tests.Nop.Services.Tests.Blogs
 {
     [TestFixture]
-    public class BlogServiceTests : ServiceTest
+    public class BlogServiceTests: ServiceTest
     {
         private IBlogService _blogService;
 
@@ -102,15 +106,15 @@ namespace Nop.Tests.Nop.Services.Tests.Blogs
         {
             var blogPosts = await _blogService.GetAllBlogPostsAsync();
             blogPosts.TotalCount.Should().Be(2);
-
-            blogPosts = await _blogService.GetAllBlogPostsAsync(showHidden: true);
+            
+            blogPosts = await _blogService.GetAllBlogPostsAsync(showHidden:true);
             blogPosts.TotalCount.Should().Be(2);
         }
 
         [Test]
         public async Task CanGetAllBlogPostsByTag()
         {
-            var blogPosts = await _blogService.GetAllBlogPostsByTagAsync(showHidden: true);
+            var blogPosts = await _blogService.GetAllBlogPostsByTagAsync(showHidden:true);
             blogPosts.TotalCount.Should().Be(0);
 
             blogPosts = await _blogService.GetAllBlogPostsByTagAsync();
@@ -160,12 +164,12 @@ namespace Nop.Tests.Nop.Services.Tests.Blogs
         {
             var comments = await _blogService.GetAllCommentsAsync();
             comments.Count.Should().Be(2);
-            comments = await _blogService.GetAllCommentsAsync(blogPostId: 1);
+            comments = await _blogService.GetAllCommentsAsync(blogPostId:1);
             comments.Count.Should().Be(1);
-            comments = await _blogService.GetAllCommentsAsync(blogPostId: 3);
+            comments = await _blogService.GetAllCommentsAsync(blogPostId:3);
             comments.Count.Should().Be(0);
         }
-
+        
         [Test]
         public async Task CanGetBlogCommentsCount()
         {
@@ -198,7 +202,7 @@ namespace Nop.Tests.Nop.Services.Tests.Blogs
             testPost.Body.Should().NotBeEmpty();
             testPost.Body.Should().BeEquivalentTo(post.Body);
 
-            var comment = new BlogComment { BlogPostId = postId, StoreId = 1, CustomerId = 1 };
+            var comment = new BlogComment {BlogPostId = postId, StoreId = 1, CustomerId = 1};
 
             await _blogService.InsertBlogCommentAsync(comment);
             var commentId = comment.Id;
@@ -215,7 +219,7 @@ namespace Nop.Tests.Nop.Services.Tests.Blogs
             await _blogService.DeleteBlogCommentAsync(comment);
             testComment = await _blogService.GetBlogCommentByIdAsync(commentId);
             testComment.Should().BeNull();
-
+            
             var comments = new List<BlogComment>
             {
                 new() {BlogPostId = postId, StoreId = 1, CustomerId = 1},
@@ -223,10 +227,10 @@ namespace Nop.Tests.Nop.Services.Tests.Blogs
                 new() {BlogPostId = postId, StoreId = 1, CustomerId = 1}
             } as IList<BlogComment>;
 
-            foreach (var blogComment in comments)
+            foreach (var blogComment in comments) 
                 await _blogService.InsertBlogCommentAsync(blogComment);
 
-            comments = await _blogService.GetBlogCommentsByIdsAsync(comments.Select(p => p.Id).ToArray());
+            comments = await _blogService.GetBlogCommentsByIdsAsync(comments.Select(p=>p.Id).ToArray());
             comments.Count.Should().Be(3);
 
             await _blogService.DeleteBlogCommentsAsync(comments);

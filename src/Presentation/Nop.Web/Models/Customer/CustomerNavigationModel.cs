@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Customer
 {
@@ -38,9 +39,6 @@ namespace Nop.Web.Models.Customer
         VendorInfo = 110,
         GdprTools = 120,
         CheckGiftCardBalance = 130,
-        MultiFactorAuthentication = 140,
-
-        //NCT Back-end dev
-        IdentityVerification = 150
+        MultiFactorAuthentication = 140
     }
 }

@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Domain.Customers;
 using Nop.Web.Framework.Validators;
 using NUnit.Framework;
@@ -10,7 +11,7 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Validators
     {
         private TestValidator _validator;
         private CustomerSettings _customerSettings;
-
+        
         [OneTimeSetUp]
         public void Setup()
         {

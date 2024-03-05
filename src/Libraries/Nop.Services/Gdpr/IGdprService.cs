@@ -1,4 +1,6 @@
-﻿using Nop.Core;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Gdpr;
 
@@ -82,7 +84,7 @@ namespace Nop.Services.Gdpr
         Task<IPagedList<GdprLog>> GetAllLogAsync(int customerId = 0, int consentId = 0,
             string customerInfo = "", GdprRequestType? requestType = null,
             int pageIndex = 0, int pageSize = int.MaxValue);
-
+        
         /// <summary>
         /// Insert a GDPR log
         /// </summary>

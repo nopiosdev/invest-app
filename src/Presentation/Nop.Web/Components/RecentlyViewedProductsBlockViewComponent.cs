@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Catalog;
 using Nop.Services.Catalog;
 using Nop.Services.Security;
@@ -11,12 +14,12 @@ namespace Nop.Web.Components
 {
     public partial class RecentlyViewedProductsBlockViewComponent : NopViewComponent
     {
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly IAclService _aclService;
-        protected readonly IProductModelFactory _productModelFactory;
-        protected readonly IProductService _productService;
-        protected readonly IRecentlyViewedProductsService _recentlyViewedProductsService;
-        protected readonly IStoreMappingService _storeMappingService;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly IAclService _aclService;
+        private readonly IProductModelFactory _productModelFactory;
+        private readonly IProductService _productService;
+        private readonly IRecentlyViewedProductsService _recentlyViewedProductsService;
+        private readonly IStoreMappingService _storeMappingService;
 
         public RecentlyViewedProductsBlockViewComponent(CatalogSettings catalogSettings,
             IAclService aclService,

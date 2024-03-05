@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Nop.Core;
-using Nop.Web.Framework.Models;
-using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Framework.Models;
+using Nop.Core;
 
 namespace Nop.Web.Models.Customer
 {
@@ -17,11 +18,11 @@ namespace Nop.Web.Models.Customer
             CustomerAttributes = new List<CustomerAttributeModel>();
             GdprConsents = new List<GdprConsentModel>();
         }
-
+        
         [DataType(DataType.EmailAddress)]
         [NopResourceDisplayName("Account.Fields.Email")]
         public string Email { get; set; }
-
+        
         public bool EnteringEmailTwice { get; set; }
         [DataType(DataType.EmailAddress)]
         [NopResourceDisplayName("Account.Fields.ConfirmEmail")]
@@ -33,12 +34,10 @@ namespace Nop.Web.Models.Customer
 
         public bool CheckUsernameAvailabilityEnabled { get; set; }
 
-        [NoTrim]
         [DataType(DataType.Password)]
         [NopResourceDisplayName("Account.Fields.Password")]
         public string Password { get; set; }
 
-        [NoTrim]
         [DataType(DataType.Password)]
         [NopResourceDisplayName("Account.Fields.ConfirmPassword")]
         public string ConfirmPassword { get; set; }
@@ -47,8 +46,6 @@ namespace Nop.Web.Models.Customer
         public bool GenderEnabled { get; set; }
         [NopResourceDisplayName("Account.Fields.Gender")]
         public string Gender { get; set; }
-
-        public bool NeutralGenderEnabled { get; set; }
 
         public bool FirstNameEnabled { get; set; }
         [NopResourceDisplayName("Account.Fields.FirstName")]
@@ -107,7 +104,7 @@ namespace Nop.Web.Models.Customer
         [NopResourceDisplayName("Account.Fields.Country")]
         public int CountryId { get; set; }
         public IList<SelectListItem> AvailableCountries { get; set; }
-        
+
         public bool StateProvinceEnabled { get; set; }
         public bool StateProvinceRequired { get; set; }
         [NopResourceDisplayName("Account.Fields.StateProvince")]
@@ -125,11 +122,11 @@ namespace Nop.Web.Models.Customer
         [DataType(DataType.PhoneNumber)]
         [NopResourceDisplayName("Account.Fields.Fax")]
         public string Fax { get; set; }
-
+        
         public bool NewsletterEnabled { get; set; }
         [NopResourceDisplayName("Account.Fields.Newsletter")]
         public bool Newsletter { get; set; }
-
+        
         public bool AcceptPrivacyPolicyEnabled { get; set; }
         public bool AcceptPrivacyPolicyPopup { get; set; }
 

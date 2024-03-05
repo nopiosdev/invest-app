@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Nop.Core.Domain.Customers;
-using Nop.Web.Framework.Models;
-using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Customer
 {
@@ -22,7 +21,6 @@ namespace Nop.Web.Models.Customer
         public string Username { get; set; }
 
         [DataType(DataType.Password)]
-        [NoTrim]
         [NopResourceDisplayName("Account.Login.Fields.Password")]
         public string Password { get; set; }
 

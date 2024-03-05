@@ -1,4 +1,5 @@
-﻿using Nop.Core;
+﻿using System;
+using Nop.Core;
 
 namespace Nop.Plugin.Misc.Zettle.Domain
 {

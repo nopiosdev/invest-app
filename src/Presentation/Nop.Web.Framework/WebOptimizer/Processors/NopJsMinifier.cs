@@ -1,4 +1,7 @@
-﻿using Nop.Core.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Infrastructure;
 using Nop.Services.Logging;
 using NUglify;
 using NUglify.JavaScript;

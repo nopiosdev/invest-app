@@ -25,7 +25,6 @@ using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Topics;
-using Nop.Core.Domain.Transaction;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Infrastructure.Mapper;
 using Nop.Data.Configuration;
@@ -64,12 +63,9 @@ using Nop.Web.Areas.Admin.Models.Tasks;
 using Nop.Web.Areas.Admin.Models.Tax;
 using Nop.Web.Areas.Admin.Models.Templates;
 using Nop.Web.Areas.Admin.Models.Topics;
-using Nop.Web.Areas.Admin.Models.Transactions;
 using Nop.Web.Areas.Admin.Models.Vendors;
-using Nop.Web.Areas.Admin.Models.WithdrawMethods;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.WebOptimizer;
-using Org.BouncyCastle.Asn1.Misc;
 
 namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
 {
@@ -114,9 +110,6 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
             CreateTopicsMaps();
             CreateVendorsMaps();
             CreateWarehouseMaps();
-
-            //NCT Back-end dev
-            CreateNewEntitiesMaps();
 
             //add some generic mapping rules
             this.Internal().ForAllMaps((mapConfiguration, map) =>
@@ -533,7 +526,7 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(model => model.AddVideoModel, options => options.Ignore())
                 .ForMember(model => model.ProductSpecificationAttributeSearchModel, options => options.Ignore())
                 .ForMember(model => model.ProductsTypesSupportedByProductTemplates, options => options.Ignore())
-                .ForMember(model => model.AvailableProductTags, options => options.Ignore())
+                .ForMember(model => model.ProductTags, options => options.Ignore())
                 .ForMember(model => model.ProductTypeName, options => options.Ignore())
                 .ForMember(model => model.ProductWarehouseInventoryModels, options => options.Ignore())
                 .ForMember(model => model.RelatedProductSearchModel, options => options.Ignore())
@@ -544,8 +537,7 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(model => model.StockQuantityHistorySearchModel, options => options.Ignore())
                 .ForMember(model => model.StockQuantityStr, options => options.Ignore())
                 .ForMember(model => model.TierPriceSearchModel, options => options.Ignore())
-                .ForMember(model => model.SelectedProductTags, options => options.Ignore())
-                .ForMember(model => model.AvailableProductTags, options => options.Ignore());
+                .ForMember(model => model.InitialProductTags, options => options.Ignore());
             CreateMap<ProductModel, Product>()
                 .ForMember(entity => entity.ApprovedRatingSum, options => options.Ignore())
                 .ForMember(entity => entity.ApprovedTotalReviews, options => options.Ignore())
@@ -578,13 +570,9 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                .ForMember(model => model.ProductAttributes, options => options.Ignore())
                .ForMember(model => model.ProductPictureModels, options => options.Ignore())
                .ForMember(model => model.PictureThumbnailUrl, options => options.Ignore())
-               .ForMember(model => model.Warnings, options => options.Ignore())
-               .ForMember(model => model.PictureIds, options => options.Ignore());
+               .ForMember(model => model.Warnings, options => options.Ignore());
             CreateMap<ProductAttributeCombinationModel, ProductAttributeCombination>()
-               .ForMember(entity => entity.AttributesXml, options => options.Ignore())
-#pragma warning disable CS0618
-               .ForMember(entity => entity.PictureId, options => options.Ignore());
-#pragma warning restore CS0618
+               .ForMember(entity => entity.AttributesXml, options => options.Ignore());
 
             CreateMap<ProductAttribute, ProductAttributeModel>()
                 .ForMember(model => model.PredefinedProductAttributeValueSearchModel, options => options.Ignore())
@@ -621,14 +609,10 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(model => model.WeightAdjustmentStr, options => options.Ignore())
                 .ForMember(model => model.DisplayColorSquaresRgb, options => options.Ignore())
                 .ForMember(model => model.DisplayImageSquaresPicture, options => options.Ignore())
-                .ForMember(model => model.ProductPictureModels, options => options.Ignore())
-                .ForMember(model => model.PictureIds, options => options.Ignore());
+                .ForMember(model => model.ProductPictureModels, options => options.Ignore());
             CreateMap<ProductAttributeValueModel, ProductAttributeValue>()
                .ForMember(entity => entity.AttributeValueType, options => options.Ignore())
-               .ForMember(entity => entity.Quantity, options => options.Ignore())
-#pragma warning disable CS0618
-               .ForMember(entity => entity.PictureId, options => options.Ignore());
-#pragma warning restore CS0618
+               .ForMember(entity => entity.Quantity, options => options.Ignore());
 
             CreateMap<ProductEditorSettings, ProductEditorSettingsModel>();
             CreateMap<ProductEditorSettingsModel, ProductEditorSettings>();
@@ -754,8 +738,7 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
             CreateMap<AddressAttributeValue, AddressAttributeValueModel>();
             CreateMap<AddressAttributeValueModel, AddressAttributeValue>();
 
-            CreateMap<AddressSettings, AddressSettingsModel>()
-                .ForMember(model => model.AvailableCountries, options => options.Ignore());
+            CreateMap<AddressSettings, AddressSettingsModel>();
             CreateMap<AddressSettingsModel, AddressSettings>()
                 .ForMember(settings => settings.PreselectCountryIfOnlyOne, options => options.Ignore());
 
@@ -783,8 +766,7 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(model => model.TaxDisplayTypeValues, options => options.Ignore());
             CreateMap<CustomerRoleModel, CustomerRole>();
 
-            CreateMap<CustomerSettings, CustomerSettingsModel>()
-                .ForMember(model => model.AvailableCountries, options => options.Ignore());
+            CreateMap<CustomerSettings, CustomerSettingsModel>();
             CreateMap<CustomerSettingsModel, CustomerSettings>()
                 .ForMember(settings => settings.AvatarMaximumSizeBytes, options => options.Ignore())
                 .ForMember(settings => settings.DeleteGuestTaskOlderThanMinutes, options => options.Ignore())
@@ -840,7 +822,6 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(model => model.Password, options => options.Ignore())
                 .ForMember(model => model.AvailableVendors, options => options.Ignore())
                 .ForMember(model => model.GenderEnabled, options => options.Ignore())
-                .ForMember(model => model.NeutralGenderEnabled, options => options.Ignore())
                 .ForMember(model => model.Gender, options => options.Ignore())
                 .ForMember(model => model.FirstNameEnabled, options => options.Ignore())
                 .ForMember(model => model.FirstName, options => options.Ignore())
@@ -1094,8 +1075,7 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
         {
             CreateMap<Language, LanguageModel>()
                 .ForMember(model => model.AvailableCurrencies, options => options.Ignore())
-                .ForMember(model => model.LocaleResourceSearchModel, options => options.Ignore())
-                .ForMember(model => model.AvailableFlagImages, options => options.Ignore());
+                .ForMember(model => model.LocaleResourceSearchModel, options => options.Ignore());
             CreateMap<LanguageModel, Language>();
 
             CreateMap<LocaleResourceModel, LocaleStringResource>()
@@ -1497,7 +1477,6 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(model => model.ShowOnEmailWishlistToFriendPage_OverrideForStore, options => options.Ignore())
                 .ForMember(model => model.ShowOnLoginPage_OverrideForStore, options => options.Ignore())
                 .ForMember(model => model.ShowOnNewsCommentPage_OverrideForStore, options => options.Ignore())
-                .ForMember(model => model.ShowOnNewsletterPage_OverrideForStore, options => options.Ignore())
                 .ForMember(model => model.ShowOnProductReviewPage_OverrideForStore, options => options.Ignore())
                 .ForMember(model => model.ShowOnRegistrationPage_OverrideForStore, options => options.Ignore())
                 .ForMember(model => model.ShowOnForgotPasswordPage_OverrideForStore, options => options.Ignore())
@@ -1632,7 +1611,6 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
 
             CreateMap<TaxSettings, TaxSettingsModel>()
                 .ForMember(model => model.AllowCustomersToSelectTaxDisplayType_OverrideForStore, options => options.Ignore())
-                .ForMember(model => model.AutomaticallyDetectCountry_OverrideForStore, options => options.Ignore())
                 .ForMember(model => model.DefaultTaxAddress, options => options.Ignore())
                 .ForMember(model => model.DefaultTaxAddress_OverrideForStore, options => options.Ignore())
                 .ForMember(model => model.DefaultTaxCategoryId_OverrideForStore, options => options.Ignore())
@@ -1739,28 +1717,6 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
             CreateMap<WarehouseModel, Warehouse>()
                 .ForMember(entity => entity.AddressId, options => options.Ignore());
         }
-
-        #region NCT Back-end dev
-
-        protected virtual void CreateNewEntitiesMaps()
-        {
-            CreateMap<Transaction, TransactionModel>();
-            CreateMap<TransactionModel, Transaction>();
-
-            CreateMap<Transaction, Nop.Web.Models.Customer.TransactionModel>();
-            CreateMap<Nop.Web.Models.Customer.TransactionModel, Transaction>();
-
-            CreateMap<WithdrawalMethodModel, WithdrawalMethod>();
-            CreateMap<WithdrawalMethod, WithdrawalMethodModel>();
-
-            CreateMap<WithdrawalMethodFieldModel, WithdrawalMethodField>();
-            CreateMap<WithdrawalMethodField, WithdrawalMethodFieldModel>();
-
-            CreateMap<ReturnTransaction, ReturnTransactionModel>();
-            CreateMap<ReturnTransactionModel, ReturnTransaction>();
-        }
-
-        #endregion
 
         #endregion
 

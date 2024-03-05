@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Nop.Core;
@@ -32,9 +34,9 @@ namespace Nop.Web.Framework.Mvc.Filters
         {
             #region Fields
 
-            protected readonly ICustomerService _customerService;
-            protected readonly IWebHelper _webHelper;
-            protected readonly IWorkContext _workContext;
+            private readonly ICustomerService _customerService;
+            private readonly IWebHelper _webHelper;
+            private readonly IWorkContext _workContext;
 
             #endregion
 

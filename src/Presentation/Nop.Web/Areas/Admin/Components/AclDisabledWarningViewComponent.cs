@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Catalog;
 using Nop.Services.Configuration;
 using Nop.Services.Stores;
@@ -8,9 +9,9 @@ namespace Nop.Web.Areas.Admin.Components
 {
     public partial class AclDisabledWarningViewComponent : NopViewComponent
     {
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly ISettingService _settingService;
-        protected readonly IStoreService _storeService;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly ISettingService _settingService;
+        private readonly IStoreService _storeService;
 
         public AclDisabledWarningViewComponent(CatalogSettings catalogSettings,
             ISettingService settingService,

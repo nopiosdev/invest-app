@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Nop.Core;
@@ -51,9 +54,9 @@ namespace Nop.Web.Framework.Mvc.Filters
         {
             #region Fields
 
-            protected readonly bool _ignoreFilter;
+            private readonly bool _ignoreFilter;
             private bool _persistForTheNextRequest;
-            protected readonly IWebHelper _webHelper;
+            private readonly IWebHelper _webHelper;
 
             #endregion
 

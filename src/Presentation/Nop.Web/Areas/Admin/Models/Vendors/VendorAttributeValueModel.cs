@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Web.Areas.Admin.Models.Vendors
@@ -19,7 +20,7 @@ namespace Nop.Web.Areas.Admin.Models.Vendors
 
         #region Properties
 
-        public int AttributeId { get; set; }
+        public int VendorAttributeId { get; set; }
 
         [NopResourceDisplayName("Admin.Vendors.VendorAttributes.Values.Fields.Name")]
         public string Name { get; set; }
@@ -28,7 +29,7 @@ namespace Nop.Web.Areas.Admin.Models.Vendors
         public bool IsPreSelected { get; set; }
 
         [NopResourceDisplayName("Admin.Vendors.VendorAttributes.Values.Fields.DisplayOrder")]
-        public int DisplayOrder { get; set; }
+        public int DisplayOrder {get;set;}
 
         public IList<VendorAttributeValueLocalizedModel> Locales { get; set; }
 

@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Nop.Core;
-using Nop.Web.Framework.Models;
-using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
-using Nop.Web.Models.Common;
+using Nop.Web.Framework.Models;
+using System.Globalization;
+using Nop.Core;
 
 namespace Nop.Web.Models.Customer
 {
@@ -19,18 +19,8 @@ namespace Nop.Web.Models.Customer
             AssociatedExternalAuthRecords = new List<AssociatedExternalAuthModel>();
             CustomerAttributes = new List<CustomerAttributeModel>();
             GdprConsents = new List<GdprConsentModel>();
-
-            AvailableGoal = new List<SelectListItem>();
-            AvailableTimeline = new List<SelectListItem>();
-            AvailableExperience = new List<SelectListItem>();
-            AvailableRiskTolerance = new List<SelectListItem>();
-            AvailableInvestmentApproach = new List<SelectListItem>();
-            AvailablePaymentType = new List<SelectListItem>();
-
-            WithdrawalMethodModel = new List<WithdrawalMethodCustomerInfoModel>();
-            Address = new AddressModel();
         }
-
+        
         [DataType(DataType.EmailAddress)]
         [NopResourceDisplayName("Account.Fields.Email")]
         public string Email { get; set; }
@@ -48,8 +38,6 @@ namespace Nop.Web.Models.Customer
         public bool GenderEnabled { get; set; }
         [NopResourceDisplayName("Account.Fields.Gender")]
         public string Gender { get; set; }
-
-        public bool NeutralGenderEnabled { get; set; }
 
         public bool FirstNameEnabled { get; set; }
         [NopResourceDisplayName("Account.Fields.FirstName")]
@@ -77,6 +65,7 @@ namespace Nop.Web.Models.Customer
         public bool CompanyRequired { get; set; }
         [NopResourceDisplayName("Account.Fields.Company")]
         public string Company { get; set; }
+
         public bool StreetAddressEnabled { get; set; }
         public bool StreetAddressRequired { get; set; }
         [NopResourceDisplayName("Account.Fields.StreetAddress")]
@@ -157,55 +146,6 @@ namespace Nop.Web.Models.Customer
 
         public IList<GdprConsentModel> GdprConsents { get; set; }
 
-
-        [NopResourceDisplayName("Account.Goal")]
-        public int GoalId { get; set; }
-        public IList<SelectListItem> AvailableGoal { get; set; }
-
-        [NopResourceDisplayName("Account.Timeline")]
-        public int TimelineId { get; set; }
-        public IList<SelectListItem> AvailableTimeline { get; set; }
-
-        [NopResourceDisplayName("Account.Experience")]
-        public int ExperienceId { get; set; }
-        public IList<SelectListItem> AvailableExperience { get; set; }
-
-        [NopResourceDisplayName("Account.RiskTolerance")]
-        public int RiskToleranceId { get; set; }
-        public IList<SelectListItem> AvailableRiskTolerance { get; set; }
-
-        [NopResourceDisplayName("Account.InvestmentApproach")]
-        public int InvestmentApproachId { get; set; }
-        public IList<SelectListItem> AvailableInvestmentApproach { get; set; }
-
-        [NopResourceDisplayName("Account.TwoFactorAuthentication")]
-        public bool TwoFactorAuthentication { get; set; }
-
-        [NopResourceDisplayName("Account.EmailAlert")]
-        public bool EmailAlert { get; set; }
-
-        [NopResourceDisplayName("Account.TextAlert")]
-        public bool TextAlert { get; set; }
-
-        [NopResourceDisplayName("Account.PaymentType")]
-        public int PaymentType { get; set; }
-        public IList<SelectListItem> AvailablePaymentType { get; set; }
-
-        [NopResourceDisplayName("account.document.Fields.FormId")]
-        public IFormFile FormId { get; set; }
-
-        [NopResourceDisplayName("account.document.Fields.ProofOfAddress")]
-        public IFormFile ProofOfAddress { get; set; }
-
-        [NopResourceDisplayName("account.document.Fields.Document")]
-        public IFormFile Document { get; set; }
-
-        public IList<WithdrawalMethodCustomerInfoModel> WithdrawalMethodModel { get; set; }
-        public int DefaultWithdrawalMethodId { get; set; }
-
-        public AddressModel Address { get; set; }
-        public ChangePasswordModel ChangePasswordModel { get; set; }
-
         #region Nested classes
 
         public partial record AssociatedExternalAuthModel : BaseNopEntityModel
@@ -216,8 +156,7 @@ namespace Nop.Web.Models.Customer
 
             public string AuthMethodName { get; set; }
         }
-
-
+        
         #endregion
     }
 }

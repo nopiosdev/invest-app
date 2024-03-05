@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
-using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Models
@@ -25,9 +25,8 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Models
 
         [NopResourceDisplayName("Plugins.Widgets.FacebookPixel.Configuration.Fields.PixelId")]
         public string PixelId { get; set; }
-
+        
         [NopResourceDisplayName("Plugins.Widgets.FacebookPixel.Configuration.Fields.AccessToken")]
-        [NoTrim]
         [DataType(DataType.Password)]
         public string AccessToken { get; set; }
 
@@ -36,7 +35,7 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Models
 
         [NopResourceDisplayName("Plugins.Widgets.FacebookPixel.Configuration.Fields.PixelScriptEnabled")]
         public bool PixelScriptEnabled { get; set; }
-
+        
         [NopResourceDisplayName("Plugins.Widgets.FacebookPixel.Configuration.Fields.ConversionsApiEnabled")]
         public bool ConversionsApiEnabled { get; set; }
 

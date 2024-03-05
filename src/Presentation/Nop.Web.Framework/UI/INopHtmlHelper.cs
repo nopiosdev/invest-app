@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 
 namespace Nop.Web.Framework.UI
@@ -223,6 +223,5 @@ namespace Nop.Web.Framework.UI
         /// <param name="handleDefaultRoutes">A value indicating whether to build the name using engine information unless otherwise specified</param>
         /// <returns>Route name</returns>
         string GetRouteName(bool handleDefaultRoutes = false);
-        Task<string> GetCustomerThemeAsync();
     }
 }

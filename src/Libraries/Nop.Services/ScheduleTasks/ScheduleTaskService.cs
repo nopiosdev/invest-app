@@ -1,4 +1,8 @@
-﻿using Nop.Core.Domain.ScheduleTasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.ScheduleTasks;
 using Nop.Data;
 using Nop.Services.Common;
 
@@ -11,7 +15,7 @@ namespace Nop.Services.ScheduleTasks
     {
         #region Fields
 
-        protected readonly IRepository<ScheduleTask> _taskRepository;
+        private readonly IRepository<ScheduleTask> _taskRepository;
 
         #endregion
 

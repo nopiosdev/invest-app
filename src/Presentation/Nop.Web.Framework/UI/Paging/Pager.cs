@@ -1,7 +1,12 @@
 ﻿//Contributor : MVCContrib
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
@@ -31,94 +36,94 @@ namespace Nop.Web.Framework.UI.Paging
         /// <summary>
         /// Page query string prameter name
         /// </summary>
-        protected string _queryParam = "page";
+        private string _queryParam = "page";
 
         /// <summary>
         /// A value indicating whether to show Total summary
         /// </summary>
-        protected bool _showTotalSummary = false;
+        private bool _showTotalSummary = false;
 
         /// <summary>
         /// A value indicating whether to show pager items
         /// </summary>
-        protected bool _showPagerItems = true;
+        private bool _showPagerItems = true;
 
         /// <summary>
         /// A value indicating whether to show the first item
         /// </summary>
-        protected bool _showFirst = true;
+        private bool _showFirst = true;
 
         /// <summary>
         /// A value indicating whether to the previous item
         /// </summary>
-        protected bool _showPrevious = true;
+        private bool _showPrevious = true;
 
         /// <summary>
         /// A value indicating whether to show the next item
         /// </summary>
-        protected bool _showNext = true;
+        private bool _showNext = true;
 
         /// <summary>
         /// A value indicating whether to show the last item
         /// </summary>
-        protected bool _showLast = true;
+        private bool _showLast = true;
 
         /// <summary>
         /// A value indicating whether to show individual page
         /// </summary>
-        protected bool _showIndividualPages = true;
+        private bool _showIndividualPages = true;
 
         /// <summary>
         /// A value indicating whether to render empty query string parameters (without values)
         /// </summary>
-        protected bool _renderEmptyParameters = true;
+        private bool _renderEmptyParameters = true;
 
         /// <summary>
         /// Number of individual page items to display
         /// </summary>
-        protected int _individualPagesDisplayedCount = 5;
+        private int _individualPagesDisplayedCount = 5;
 
         /// <summary>
         /// Boolean parameter names
         /// </summary>
-        protected IList<string> _booleanParameterNames = new List<string>();
+        private IList<string> _booleanParameterNames = new List<string>();
 
         /// <summary>
         /// First page css class name
         /// </summary>
-        protected string _firstPageCssClass = "first-page";
+        private string _firstPageCssClass = "first-page";
 
         /// <summary>
         /// Previous page css class name
         /// </summary>
-        protected string _previousPageCssClass = "previous-page";
+        private string _previousPageCssClass = "previous-page";
 
         /// <summary>
 		/// Current page css class name
 		/// </summary>
-        protected string _currentPageCssClass = "current-page";
+        private string _currentPageCssClass = "current-page";
 
         /// <summary>
         /// Individual page css class name
         /// </summary>
-        protected string _individualPageCssClass = "individual-page";
+        private string _individualPageCssClass = "individual-page";
 
         /// <summary>
 		/// Next page css class name
 		/// </summary>
-        protected string _nextPageCssClass = "next-page";
+        private string _nextPageCssClass = "next-page";
 
         /// <summary>
 		/// Last page css class name
 		/// </summary>
-        protected string _lastPageCssClass = "last-page";
+        private string _lastPageCssClass = "last-page";
 
         /// <summary>
 		/// Main ul css class name
 		/// </summary>
-        protected string _mainUlCssClass = string.Empty;
+        private string _mainUlCssClass = string.Empty;
 
-        protected readonly IPageableModel _model;
+        private readonly IPageableModel _model;
 
         #endregion
 
@@ -552,11 +557,11 @@ namespace Nop.Web.Framework.UI.Paging
 
             var webHelper = EngineContext.Current.Resolve<IWebHelper>();
             var url = webHelper.GetThisPageUrl(false);
-            foreach (var routeValue in routeValues)
+            foreach (var routeValue in routeValues) 
                 url = webHelper.ModifyQueryString(url, routeValue.Key, routeValue.Value?.ToString());
 
             if (_renderEmptyParameters && parametersWithEmptyValues.Any())
-                foreach (var key in parametersWithEmptyValues)
+                foreach (var key in parametersWithEmptyValues) 
                     url = webHelper.ModifyQueryString(url, key);
 
             return url;

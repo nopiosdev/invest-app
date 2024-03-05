@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Vendors;
+﻿using System.Threading.Tasks;
+using Nop.Core.Domain.Vendors;
 using Nop.Web.Areas.Admin.Models.Vendors;
 
 namespace Nop.Web.Areas.Admin.Factories

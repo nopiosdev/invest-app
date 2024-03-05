@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
@@ -8,7 +11,6 @@ using Nop.Services.Localization;
 using Nop.Services.Messages;
 using Nop.Services.Seo;
 using Nop.Web.Framework.Mvc.Filters;
-using Nop.Web.Infrastructure;
 using Nop.Web.Models.Catalog;
 using Nop.Web.Models.Common;
 
@@ -19,16 +21,16 @@ namespace Nop.Web.Controllers
     {
         #region Fields
 
-        protected readonly IBackInStockSubscriptionService _backInStockSubscriptionService;
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly CustomerSettings _customerSettings;
-        protected readonly ICustomerService _customerService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly INotificationService _notificationService;
-        protected readonly IProductService _productService;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IUrlRecordService _urlRecordService;
-        protected readonly IWorkContext _workContext;
+        private readonly IBackInStockSubscriptionService _backInStockSubscriptionService;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly CustomerSettings _customerSettings;
+        private readonly ICustomerService _customerService;
+        private readonly ILocalizationService _localizationService;
+        private readonly INotificationService _notificationService;
+        private readonly IProductService _productService;
+        private readonly IStoreContext _storeContext;
+        private readonly IUrlRecordService _urlRecordService;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -230,17 +232,6 @@ namespace Nop.Web.Controllers
             }
 
             return RedirectToRoute("CustomerBackInStockSubscriptions");
-        }
-
-        #endregion
-
-        #region Nested class
-
-        /// <summary>
-        /// record that has only page for route value. Used for (My Account) Back in stock subscriptions pagination
-        /// </summary>
-        public partial record BackInStockSubscriptionsRouteValues : BaseRouteValues
-        {
         }
 
         #endregion

@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Vendors
 {

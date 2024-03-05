@@ -1,4 +1,7 @@
-﻿using System.Linq.Dynamic.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Text.RegularExpressions;
 using Nop.Core.Domain.Messages;
@@ -12,7 +15,7 @@ namespace Nop.Services.Messages
     {
         #region Fields
 
-        protected readonly MessageTemplatesSettings _messageTemplatesSettings;
+        private readonly MessageTemplatesSettings _messageTemplatesSettings;
 
         #endregion
 

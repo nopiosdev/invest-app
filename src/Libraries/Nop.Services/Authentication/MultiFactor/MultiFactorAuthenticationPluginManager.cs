@@ -1,4 +1,7 @@
-﻿using Nop.Core.Domain.Customers;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Customers;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
 
@@ -11,7 +14,7 @@ namespace Nop.Services.Authentication.MultiFactor
     {
         #region Fields
 
-        protected readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
+        private readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
 
         #endregion
 
@@ -83,5 +86,6 @@ namespace Nop.Services.Authentication.MultiFactor
         }
 
         #endregion
+
     }
 }

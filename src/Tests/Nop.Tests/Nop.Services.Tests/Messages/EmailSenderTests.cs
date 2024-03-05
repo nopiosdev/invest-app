@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Domain.Messages;
 using Nop.Services.Messages;
 using NUnit.Framework;
@@ -42,7 +43,7 @@ namespace Nop.Tests.Nop.Services.Tests.Messages
             var toName = "To name";
             var replyToAddress = NopTestsDefaults.AdminEmail;
             var replyToName = "Reply to name";
-            var bcc = new[] { NopTestsDefaults.AdminEmail };
+            var bcc = new[] {NopTestsDefaults.AdminEmail};
             var cc = new[] { NopTestsDefaults.AdminEmail };
 
             await _emailSender.SendEmailAsync(emailAccount, subject, body,

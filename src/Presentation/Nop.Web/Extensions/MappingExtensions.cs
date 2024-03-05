@@ -23,27 +23,27 @@ namespace Nop.Web.Extensions
             if (trimFields)
             {
                 if (model.FirstName != null)
-                    model.FirstName = model.FirstName;
+                    model.FirstName = model.FirstName.Trim();
                 if (model.LastName != null)
-                    model.LastName = model.LastName;
+                    model.LastName = model.LastName.Trim();
                 if (model.Email != null)
-                    model.Email = model.Email;
+                    model.Email = model.Email.Trim();
                 if (model.Company != null)
-                    model.Company = model.Company;
+                    model.Company = model.Company.Trim();
                 if (model.County != null)
-                    model.County = model.County;
+                    model.County = model.County.Trim();
                 if (model.City != null)
-                    model.City = model.City;
+                    model.City = model.City.Trim();
                 if (model.Address1 != null)
-                    model.Address1 = model.Address1;
+                    model.Address1 = model.Address1.Trim();
                 if (model.Address2 != null)
-                    model.Address2 = model.Address2;
+                    model.Address2 = model.Address2.Trim();
                 if (model.ZipPostalCode != null)
-                    model.ZipPostalCode = model.ZipPostalCode;
+                    model.ZipPostalCode = model.ZipPostalCode.Trim();
                 if (model.PhoneNumber != null)
-                    model.PhoneNumber = model.PhoneNumber;
+                    model.PhoneNumber = model.PhoneNumber.Trim();
                 if (model.FaxNumber != null)
-                    model.FaxNumber = model.FaxNumber;
+                    model.FaxNumber = model.FaxNumber.Trim();
             }
             destination.Id = model.Id;
             destination.FirstName = model.FirstName;

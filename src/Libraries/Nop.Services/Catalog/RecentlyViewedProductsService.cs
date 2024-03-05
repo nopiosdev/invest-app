@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Http;
@@ -13,11 +17,11 @@ namespace Nop.Services.Catalog
     {
         #region Fields
 
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly CookieSettings _cookieSettings;
-        protected readonly IHttpContextAccessor _httpContextAccessor;
-        protected readonly IProductService _productService;
-        protected readonly IWebHelper _webHelper;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly CookieSettings _cookieSettings;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IProductService _productService;
+        private readonly IWebHelper _webHelper;
 
         #endregion
 

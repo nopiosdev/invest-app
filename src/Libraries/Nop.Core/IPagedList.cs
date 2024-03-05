@@ -1,4 +1,6 @@
-﻿namespace Nop.Core
+﻿using System.Collections.Generic;
+
+namespace Nop.Core
 {
     /// <summary>
     /// Paged list interface

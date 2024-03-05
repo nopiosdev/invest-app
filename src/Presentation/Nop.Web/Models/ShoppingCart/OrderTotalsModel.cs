@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.ShoppingCart
 {
@@ -39,7 +40,7 @@ namespace Nop.Web.Models.ShoppingCart
 
         #region Nested classes
 
-        public partial record TaxRate : BaseNopModel
+        public partial record TaxRate: BaseNopModel
         {
             public string Rate { get; set; }
             public string Value { get; set; }

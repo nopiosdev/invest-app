@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Directory;
+﻿using System;
+using Nop.Core.Domain.Directory;
 using Nop.Services.ScheduleTasks;
 
 namespace Nop.Services.Directory
@@ -10,8 +11,8 @@ namespace Nop.Services.Directory
     {
         #region Fields
 
-        protected readonly CurrencySettings _currencySettings;
-        protected readonly ICurrencyService _currencyService;
+        private readonly CurrencySettings _currencySettings;
+        private readonly ICurrencyService _currencyService;
 
         #endregion
 

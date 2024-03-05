@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Nop.Core.Infrastructure
 {
@@ -10,7 +12,7 @@ namespace Nop.Core.Infrastructure
     {
         #region Fields
 
-        protected bool _binFolderAssembliesLoaded;
+        private bool _binFolderAssembliesLoaded;
 
         #endregion
 
@@ -19,6 +21,15 @@ namespace Nop.Core.Infrastructure
         public WebAppTypeFinder(INopFileProvider fileProvider = null) : base(fileProvider)
         {
         }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets whether assemblies in the bin folder of the web application should be specifically checked for being loaded on application load. This is need in situations where plugins need to be loaded in the AppDomain after the application been reloaded.
+        /// </summary>
+        public bool EnsureBinFolderAssembliesLoaded { get; set; } = true;
 
         #endregion
 
@@ -39,7 +50,7 @@ namespace Nop.Core.Infrastructure
         /// <returns>Result</returns>
         public override IList<Assembly> GetAssemblies()
         {
-            if (!EnsureBinFolderAssembliesLoaded || _binFolderAssembliesLoaded)
+            if (!EnsureBinFolderAssembliesLoaded || _binFolderAssembliesLoaded) 
                 return base.GetAssemblies();
 
             _binFolderAssembliesLoaded = true;
@@ -49,15 +60,6 @@ namespace Nop.Core.Infrastructure
 
             return base.GetAssemblies();
         }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets whether assemblies in the bin folder of the web application should be specifically checked for being loaded on application load. This is need in situations where plugins need to be loaded in the AppDomain after the application been reloaded.
-        /// </summary>
-        public bool EnsureBinFolderAssembliesLoaded { get; set; } = true;
 
         #endregion
     }

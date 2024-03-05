@@ -1,4 +1,6 @@
-﻿namespace Nop.Services.Customers
+﻿using System.Collections.Generic;
+
+namespace Nop.Services.Customers
 {
     /// <summary>
     /// Customer multi-factor authentication info

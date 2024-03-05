@@ -1,4 +1,6 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Nop.Core;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
@@ -47,8 +49,7 @@ namespace Nop.Services.Customers
             string email = null, string username = null, string firstName = null, string lastName = null,
             int dayOfBirth = 0, int monthOfBirth = 0,
             string company = null, string phone = null, string zipPostalCode = null, string ipAddress = null,
-            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false,
-            bool? dontInvestAmount = default);
+            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false);
 
         /// <summary>
         /// Gets online customers
@@ -239,16 +240,6 @@ namespace Nop.Services.Customers
         /// The task result contains the number of deleted customers
         /// </returns>
         Task<int> DeleteGuestCustomersAsync(DateTime? createdFromUtc, DateTime? createdToUtc, bool onlyWithoutShoppingCart);
-
-        /// <summary>
-        /// Gets a tax display type for the customer
-        /// </summary>
-        /// <param name="customer">Customer</param>
-        /// <returns>
-        /// A task that represents the asynchronous operation
-        /// The task result contains the tax display type
-        /// </returns>
-        Task<TaxDisplayType> GetCustomerTaxDisplayTypeAsync(Customer customer);
 
         /// <summary>
         /// Gets a default tax display type (if configured)
@@ -649,26 +640,5 @@ namespace Nop.Services.Customers
         Task InsertCustomerAddressAsync(Customer customer, Address address);
 
         #endregion
-
-        #region NCT Back-end dev
-
-        #region Identity Verification
-
-        Task DeleteIdentityVerificationAsync(IdentityVerification verification);
-
-        Task InsertIdentityVerificationAsync(IdentityVerification verification);
-
-        Task<IdentityVerification> GetIdentityVerificationById(int verificationid);
-
-        Task UpdateIdentityVerificationAsync(IdentityVerification verification);
-
-
-        Task<IPagedList<IdentityVerification>> GetAllIdentityVerificationAsync(int formsubid, int proofaddressid,
-            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false);
-
-        #endregion
-
-        #endregion
-
     }
 }

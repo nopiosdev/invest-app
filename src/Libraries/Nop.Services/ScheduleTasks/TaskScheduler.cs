@@ -1,4 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Nop.Core;
 using Nop.Core.Configuration;
 using Nop.Core.Domain.ScheduleTasks;
@@ -164,11 +170,7 @@ namespace Nop.Services.ScheduleTasks
 
             #region Utilities
 
-            /// <summary>
-            /// Run task
-            /// </summary>
-            /// <returns>A task that represents the asynchronous operation</returns>
-            protected virtual async Task RunAsync()
+            private async Task RunAsync()
             {
                 if (Seconds <= 0)
                     return;
@@ -213,11 +215,7 @@ namespace Nop.Services.ScheduleTasks
                 IsRunning = false;
             }
 
-            /// <summary>
-            /// Method that handles calls from a <see cref="T:System.Threading.Timer" />
-            /// </summary>
-            /// <param name="state">An object containing application-specific information relevant to the method invoked by this delegate</param>
-            protected void TimerHandler(object state)
+            private void TimerHandler(object state)
             {
                 try
                 {
@@ -241,22 +239,6 @@ namespace Nop.Services.ScheduleTasks
                 }
             }
 
-            /// <summary>
-            /// Protected implementation of Dispose pattern.
-            /// </summary>
-            /// <param name="disposing">Specifies whether to disposing resources</param>
-            protected virtual void Dispose(bool disposing)
-            {
-                if (_disposed)
-                    return;
-
-                if (disposing)
-                    lock (this)
-                        _timer?.Dispose();
-
-                _disposed = true;
-            }
-
             #endregion
 
             #region Methods
@@ -268,6 +250,19 @@ namespace Nop.Services.ScheduleTasks
             {
                 Dispose(true);
                 GC.SuppressFinalize(this);
+            }
+
+            // Protected implementation of Dispose pattern.
+            protected virtual void Dispose(bool disposing)
+            {
+                if (_disposed)
+                    return;
+
+                if (disposing)
+                    lock (this)
+                        _timer?.Dispose();
+
+                _disposed = true;
             }
 
             /// <summary>
@@ -295,12 +290,12 @@ namespace Nop.Services.ScheduleTasks
             /// <summary>
             /// Get or sets a datetime when thread has been started
             /// </summary>
-            public DateTime StartedUtc { get; protected set; }
+            public DateTime StartedUtc { get; private set; }
 
             /// <summary>
             /// Get or sets a value indicating whether thread is running
             /// </summary>
-            public bool IsRunning { get; protected set; }
+            public bool IsRunning { get; private set; }
 
             /// <summary>
             /// Gets the interval (in milliseconds) at which to run the task

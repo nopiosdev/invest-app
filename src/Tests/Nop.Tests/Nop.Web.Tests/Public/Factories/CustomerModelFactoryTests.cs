@@ -1,8 +1,10 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
-using Nop.Services.Attributes;
+using Nop.Services.Customers;
 using Nop.Web.Factories;
 using Nop.Web.Models.Customer;
 using NUnit.Framework;
@@ -12,17 +14,19 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
     [TestFixture]
     public class CustomerModelFactoryTests : WebTest
     {
-        private IAttributeService<CustomerAttribute, CustomerAttributeValue> _customerAttributeService;
         private ICustomerModelFactory _customerModelFactory;
         private Customer _customer;
+        private ICustomerAttributeService _customerAttributeService;
         private CustomerAttribute[] _customerAttributes;
+
 
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            _customerAttributeService = GetService<IAttributeService<CustomerAttribute, CustomerAttributeValue>>();
             _customerModelFactory = GetService<ICustomerModelFactory>();
             _customer = await GetService<IWorkContext>().GetCurrentCustomerAsync();
+
+            _customerAttributeService = GetService<ICustomerAttributeService>();
 
             _customerAttributes = new[]
             {
@@ -68,15 +72,15 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
                 }
             };
 
-            foreach (var customerAttribute in _customerAttributes)
-                await _customerAttributeService.InsertAttributeAsync(customerAttribute);
+            foreach (var customerAttribute in _customerAttributes) 
+                await _customerAttributeService.InsertCustomerAttributeAsync(customerAttribute);
         }
 
         [OneTimeTearDown]
         public async Task TearDown()
         {
             foreach (var customerAttribute in _customerAttributes)
-                await _customerAttributeService.DeleteAttributeAsync(customerAttribute);
+                await _customerAttributeService.DeleteCustomerAttributeAsync(customerAttribute);
         }
 
         [Test]
@@ -120,11 +124,11 @@ namespace Nop.Tests.Nop.Web.Tests.Public.Factories
         [Test]
         public async Task CanPreparePasswordRecoveryModel()
         {
-            var model = await _customerModelFactory.PreparePasswordRecoveryModelAsync(new PasswordRecoveryModel { Email = "test@email.com" });
+            var model = await _customerModelFactory.PreparePasswordRecoveryModelAsync(new PasswordRecoveryModel{Email = "test@email.com"});
             model.DisplayCaptcha.Should().BeFalse();
             model.Email.Should().Be("test@email.com");
         }
-
+        
         [Test]
         public async Task CanPrepareRegisterResultModel()
         {

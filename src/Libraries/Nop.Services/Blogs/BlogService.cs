@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Blogs;
 using Nop.Data;
@@ -13,10 +17,10 @@ namespace Nop.Services.Blogs
     {
         #region Fields
 
-        protected readonly IRepository<BlogComment> _blogCommentRepository;
-        protected readonly IRepository<BlogPost> _blogPostRepository;
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly IStoreMappingService _storeMappingService;
+        private readonly IRepository<BlogComment> _blogCommentRepository;
+        private readonly IRepository<BlogPost> _blogPostRepository;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly IStoreMappingService _storeMappingService;
 
         #endregion
 

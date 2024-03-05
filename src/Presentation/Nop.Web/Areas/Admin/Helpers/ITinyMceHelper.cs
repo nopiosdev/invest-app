@@ -1,4 +1,6 @@
-﻿namespace Nop.Web.Areas.Admin.Helpers
+﻿using System.Threading.Tasks;
+
+namespace Nop.Web.Areas.Admin.Helpers
 {
     public partial interface ITinyMceHelper
     {

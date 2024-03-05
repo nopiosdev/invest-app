@@ -1,4 +1,7 @@
-﻿﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Nop.Web.Framework.TagHelpers.Public
@@ -11,11 +14,21 @@ namespace Nop.Web.Framework.TagHelpers.Public
     {
         #region Constants
 
-        protected const string FOR_ATTRIBUTE_NAME = "asp-for";
-        protected const string DISABLED_ATTRIBUTE_NAME = "asp-disabled";
+        private const string FOR_ATTRIBUTE_NAME = "asp-for";
+        private const string DISABLED_ATTRIBUTE_NAME = "asp-disabled";
 
         #endregion
-        
+
+        #region Properties
+
+        /// <summary>
+        /// Indicates whether the input is disabled
+        /// </summary>
+        [HtmlAttributeName(DISABLED_ATTRIBUTE_NAME)]
+        public string IsDisabled { set; get; }
+
+        #endregion
+
         #region Ctor
 
         public InputTagHelper(IHtmlGenerator generator) : base(generator)
@@ -63,16 +76,6 @@ namespace Nop.Web.Framework.TagHelpers.Public
                 }
             }
         }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Indicates whether the input is disabled
-        /// </summary>
-        [HtmlAttributeName(DISABLED_ATTRIBUTE_NAME)]
-        public string IsDisabled { set; get; }
 
         #endregion
     }

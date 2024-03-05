@@ -1,4 +1,6 @@
-﻿using MailKit;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using MailKit;
 using MailKit.Net.Smtp;
 using MimeKit;
 using Nop.Core.Domain.Messages;

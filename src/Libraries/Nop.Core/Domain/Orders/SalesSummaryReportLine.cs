@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Orders
+﻿using System;
+
+namespace Nop.Core.Domain.Orders
 {
     /// <summary>
     /// Represents sales summary report line

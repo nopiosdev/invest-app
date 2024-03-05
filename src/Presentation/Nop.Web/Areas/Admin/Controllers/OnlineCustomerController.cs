@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Customers;
@@ -9,8 +10,8 @@ namespace Nop.Web.Areas.Admin.Controllers
     {
         #region Fields
 
-        protected readonly ICustomerModelFactory _customerModelFactory;
-        protected readonly IPermissionService _permissionService;
+        private readonly ICustomerModelFactory _customerModelFactory;
+        private readonly IPermissionService _permissionService;
 
         #endregion
 
@@ -24,7 +25,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         #endregion
-
+        
         #region Methods
 
         public virtual async Task<IActionResult> List()

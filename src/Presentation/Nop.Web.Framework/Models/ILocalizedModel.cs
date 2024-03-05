@@ -1,4 +1,6 @@
-﻿namespace Nop.Web.Framework.Models
+﻿using System.Collections.Generic;
+
+namespace Nop.Web.Framework.Models
 {
     /// <summary>
     /// Represents localized model

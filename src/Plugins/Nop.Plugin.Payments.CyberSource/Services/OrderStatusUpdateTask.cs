@@ -1,4 +1,7 @@
-﻿using Nop.Core.Domain.Orders;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Services.Common;
 using Nop.Services.Orders;
@@ -14,12 +17,12 @@ namespace Nop.Plugin.Payments.CyberSource.Services
     {
         #region Fields
 
-        protected readonly CyberSourceService _cyberSourceService;
-        protected readonly CyberSourceSettings _cyberSourceSettings;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly IOrderProcessingService _orderProcessingService;
-        protected readonly IOrderService _orderService;
-        protected readonly IPaymentPluginManager _paymentPluginManager;
+        private readonly CyberSourceService _cyberSourceService;
+        private readonly CyberSourceSettings _cyberSourceSettings;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IOrderProcessingService _orderProcessingService;
+        private readonly IOrderService _orderService;
+        private readonly IPaymentPluginManager _paymentPluginManager;
 
         #endregion
 

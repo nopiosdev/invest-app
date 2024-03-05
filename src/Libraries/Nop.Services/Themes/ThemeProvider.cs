@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Nop.Core.Infrastructure;
 using Nop.Services.Plugins;
@@ -12,14 +16,14 @@ namespace Nop.Services.Themes
     {
         #region Fields
 
-        protected static readonly object _locker = new();
+        private static readonly object _locker = new();
 
-        protected readonly INopFileProvider _fileProvider;
+        private readonly INopFileProvider _fileProvider;
 
         protected Dictionary<string, ThemeDescriptor> _themeDescriptors;
 
         #endregion
-
+        
         #region Ctor
 
         public ThemeProvider(INopFileProvider fileProvider)

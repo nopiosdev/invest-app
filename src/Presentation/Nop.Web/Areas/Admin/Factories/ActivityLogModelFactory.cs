@@ -1,4 +1,8 @@
-﻿using Nop.Services.Customers;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Services.Customers;
 using Nop.Services.Helpers;
 using Nop.Services.Logging;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
@@ -14,10 +18,10 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
-        protected readonly ICustomerActivityService _customerActivityService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IBaseAdminModelFactory _baseAdminModelFactory;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly ICustomerService _customerService;
+        private readonly IDateTimeHelper _dateTimeHelper;
 
         #endregion
 

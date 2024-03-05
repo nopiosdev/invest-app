@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Media;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Media;
 
 namespace Nop.Services.Media
 {

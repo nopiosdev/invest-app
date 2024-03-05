@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System;
+using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog
@@ -12,7 +13,7 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
 
         public ProductReviewModel()
         {
-            ProductReviewReviewTypeMappingSearchModel = new ProductReviewReviewTypeMappingSearchModel();
+            ProductReviewReviewTypeMappingSearchModel = new ProductReviewReviewTypeMappingSearchModel();            
         }
 
         #endregion
@@ -34,13 +35,13 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
 
         [NopResourceDisplayName("Admin.Catalog.ProductReviews.Fields.Customer")]
         public string CustomerInfo { get; set; }
-
+        
         [NopResourceDisplayName("Admin.Catalog.ProductReviews.Fields.Title")]
         public string Title { get; set; }
-
+        
         [NopResourceDisplayName("Admin.Catalog.ProductReviews.Fields.ReviewText")]
         public string ReviewText { get; set; }
-
+        
         [NopResourceDisplayName("Admin.Catalog.ProductReviews.Fields.ReplyText")]
         public string ReplyText { get; set; }
 

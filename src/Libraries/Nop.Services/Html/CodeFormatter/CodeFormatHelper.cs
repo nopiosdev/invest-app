@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿﻿using System.Net;
 using System.Text.RegularExpressions;
 
 namespace Nop.Services.Html.CodeFormatter
@@ -10,9 +10,10 @@ namespace Nop.Services.Html.CodeFormatter
     {
         #region Fields
 
-        protected static readonly Regex _regexHtml = new("<[^>]*>", RegexOptions.Compiled);
+        //private static Regex regexCode1 = new Regex(@"(?<begin>\[code:(?<lang>.*?)(?:;ln=(?<linenumbers>(?:on|off)))?(?:;alt=(?<altlinenumbers>(?:on|off)))?(?:;(?<title>.*?))?\])(?<code>.*?)(?<end>\[/code\])", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex _regexHtml = new("<[^>]*>", RegexOptions.Compiled);
 
-        protected static readonly Regex _regexCode = new(@"\[code\](?<inner>(.*?))\[/code\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex _regexCode = new(@"\[code\](?<inner>(.*?))\[/code\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         #endregion
 
@@ -23,7 +24,7 @@ namespace Nop.Services.Html.CodeFormatter
         /// </summary>
         /// <param name="match">Match</param>
         /// <returns>Formatted text</returns>
-        protected static string CodeEvaluatorSimple(Match match)
+        private static string CodeEvaluatorSimple(Match match)
         {
             if (!match.Success)
                 return match.Value;
@@ -47,7 +48,7 @@ namespace Nop.Services.Html.CodeFormatter
         /// </summary>
         /// <param name="html">HTML</param>
         /// <returns>Formatted text</returns>
-        protected static string StripHtml(string html)
+        private static string StripHtml(string html)
         {
             if (string.IsNullOrEmpty(html))
                 return string.Empty;
@@ -61,7 +62,7 @@ namespace Nop.Services.Html.CodeFormatter
         /// <param name="options">Whatever options were set in the regex groups.</param>
         /// <param name="text">Send the e.body so it can get formatted.</param>
         /// <returns>The formatted string of the match.</returns>
-        protected static string Highlight(HighlightOptions options, string text)
+        private static string Highlight(HighlightOptions options, string text)
         {
             switch (options.Language)
             {
@@ -144,7 +145,7 @@ namespace Nop.Services.Html.CodeFormatter
             if (string.IsNullOrEmpty(text))
                 return string.Empty;
 
-            if (!text.Contains("[/code]"))
+            if (!text.Contains("[/code]")) 
                 return text;
 
             text = _regexCode.Replace(text, CodeEvaluatorSimple);

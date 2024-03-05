@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Core.Domain.Common;
 
 namespace Nop.Web.Framework.TagHelpers.Admin
@@ -11,14 +13,30 @@ namespace Nop.Web.Framework.TagHelpers.Admin
     {
         #region Constants
 
-        protected const string STRING_RESOURCE_ATTRIBUTE_NAME = "asp-string-resource";
-        protected const string ADD_WRAPPER_ATTRIBUTE_NAME = "asp-add-wrapper";
+        private const string STRING_RESOURCE_ATTRIBUTE_NAME = "asp-string-resource";
+        private const string ADD_WRAPPER_ATTRIBUTE_NAME = "asp-add-wrapper";
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// String resource value
+        /// </summary>
+        [HtmlAttributeName(STRING_RESOURCE_ATTRIBUTE_NAME)]
+        public string StringResource { get; set; }
+
+        /// <summary>
+        /// Indicates whether the wrapper tag should be added
+        /// </summary>
+        [HtmlAttributeName(ADD_WRAPPER_ATTRIBUTE_NAME)]
+        public bool AddWrapper { get; set; } = true;
 
         #endregion
 
         #region Fields
 
-        protected readonly AdminAreaSettings _adminAreaSettings;
+        private readonly AdminAreaSettings _adminAreaSettings;
 
         #endregion
 
@@ -66,22 +84,6 @@ namespace Nop.Web.Framework.TagHelpers.Admin
 
             return Task.CompletedTask;
         }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// String resource value
-        /// </summary>
-        [HtmlAttributeName(STRING_RESOURCE_ATTRIBUTE_NAME)]
-        public string StringResource { get; set; }
-
-        /// <summary>
-        /// Indicates whether the wrapper tag should be added
-        /// </summary>
-        [HtmlAttributeName(ADD_WRAPPER_ATTRIBUTE_NAME)]
-        public bool AddWrapper { get; set; } = true;
 
         #endregion
     }

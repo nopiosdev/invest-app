@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Services.Orders;
@@ -10,10 +11,10 @@ namespace Nop.Web.Components
 {
     public partial class OrderSummaryViewComponent : NopViewComponent
     {
-        protected readonly IShoppingCartModelFactory _shoppingCartModelFactory;
-        protected readonly IShoppingCartService _shoppingCartService;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IWorkContext _workContext;
+        private readonly IShoppingCartModelFactory _shoppingCartModelFactory;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
 
         public OrderSummaryViewComponent(IShoppingCartModelFactory shoppingCartModelFactory,
             IShoppingCartService shoppingCartService,

@@ -1,4 +1,5 @@
-﻿using Nop.Services.Plugins;
+﻿using System;
+using Nop.Services.Plugins;
 
 namespace Nop.Services.Authentication.External
 {

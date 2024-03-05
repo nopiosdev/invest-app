@@ -1,4 +1,8 @@
-﻿using Nop.Core.Caching;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
@@ -17,16 +21,16 @@ namespace Nop.Services.Catalog
     {
         #region Fields
 
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly CurrencySettings _currencySettings;
-        protected readonly ICategoryService _categoryService;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IDiscountService _discountService;
-        protected readonly IManufacturerService _manufacturerService;
-        protected readonly IProductAttributeParser _productAttributeParser;
-        protected readonly IProductService _productService;
-        protected readonly IStaticCacheManager _staticCacheManager;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly CurrencySettings _currencySettings;
+        private readonly ICategoryService _categoryService;
+        private readonly ICurrencyService _currencyService;
+        private readonly ICustomerService _customerService;
+        private readonly IDiscountService _discountService;
+        private readonly IManufacturerService _manufacturerService;
+        private readonly IProductAttributeParser _productAttributeParser;
+        private readonly IProductService _productService;
+        private readonly IStaticCacheManager _staticCacheManager;
 
         #endregion
 
@@ -77,12 +81,10 @@ namespace Nop.Services.Catalog
             if (!product.HasDiscountsApplied)
                 return allowedDiscounts;
 
-            var couponCodesToValidate = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
-
             //we use this property ("HasDiscountsApplied") for performance optimization to avoid unnecessary database calls
             foreach (var discount in await _discountService.GetAppliedDiscountsAsync(product))
                 if (discount.DiscountType == DiscountType.AssignedToSkus &&
-                    (await _discountService.ValidateDiscountAsync(discount, customer, couponCodesToValidate)).IsValid)
+                    (await _discountService.ValidateDiscountAsync(discount, customer)).IsValid)
                     allowedDiscounts.Add(discount);
 
             return allowedDiscounts;
@@ -119,15 +121,13 @@ namespace Nop.Services.Catalog
                         .ToList();
                 }
 
-                var couponCodesToValidate = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
-
                 foreach (var categoryId in productCategoryIds)
                 {
                     if (!discountCategoryIds.Contains(categoryId))
                         continue;
 
                     if (!_discountService.ContainsDiscount(allowedDiscounts, discount) &&
-                        (await _discountService.ValidateDiscountAsync(discount, customer, couponCodesToValidate)).IsValid)
+                        (await _discountService.ValidateDiscountAsync(discount, customer)).IsValid)
                         allowedDiscounts.Add(discount);
                 }
             }
@@ -166,15 +166,13 @@ namespace Nop.Services.Catalog
                         .ToList();
                 }
 
-                var couponCodesToValidate = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
-
                 foreach (var manufacturerId in productManufacturerIds)
                 {
                     if (!discountManufacturerIds.Contains(manufacturerId))
                         continue;
 
                     if (!_discountService.ContainsDiscount(allowedDiscounts, discount) &&
-                        (await _discountService.ValidateDiscountAsync(discount, customer, couponCodesToValidate)).IsValid)
+                        (await _discountService.ValidateDiscountAsync(discount, customer)).IsValid)
                         allowedDiscounts.Add(discount);
                 }
             }
@@ -512,7 +510,7 @@ namespace Nop.Services.Catalog
         /// </returns>
         public virtual async Task<decimal> RoundPriceAsync(decimal value, Currency currency = null)
         {
-            //we use this method because some currencies (e.g. Hungarian Forint or Swiss Franc) use non-standard rules for rounding
+            //we use this method because some currencies (e.g. Gungarian Forint or Swiss Franc) use non-standard rules for rounding
             //you can implement any rounding logic here
 
             currency ??= await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);

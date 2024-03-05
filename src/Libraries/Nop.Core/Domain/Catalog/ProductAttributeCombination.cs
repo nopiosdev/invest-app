@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Nop.Core.Domain.Catalog
+﻿namespace Nop.Core.Domain.Catalog
 {
     /// <summary>
     /// Represents a product attribute combination
@@ -27,7 +24,7 @@ namespace Nop.Core.Domain.Catalog
         /// Gets or sets a value indicating whether to allow orders when out of stock
         /// </summary>
         public bool AllowOutOfStockOrders { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the SKU
         /// </summary>
@@ -54,17 +51,13 @@ namespace Nop.Core.Domain.Catalog
         public int NotifyAdminForQuantityBelow { get; set; }
 
         /// <summary>
+        /// Gets or sets the identifier of picture associated with this combination
+        /// </summary>
+        public int PictureId { get; set; }
+
+        /// <summary>
         /// Gets or sets the minimum stock quantity
         /// </summary>
         public int MinStockQuantity { get; set; }
-
-        /// <summary>
-        /// The field is not used since 4.70 and is left only for the update process
-        /// use the <see cref="ProductAttributeCombinationPicture"/> instead
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Browsable(false)]
-        [Obsolete("The field is not used since 4.70 and is left only for the update process use the ProductAttributeCombinationPicture instead")]
-        public int? PictureId { get; set; }
     }
 }

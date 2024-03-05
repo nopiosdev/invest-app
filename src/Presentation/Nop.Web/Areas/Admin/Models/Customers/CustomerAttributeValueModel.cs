@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Web.Areas.Admin.Models.Customers
@@ -19,7 +20,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         #region Properties
 
-        public int AttributeId { get; set; }
+        public int CustomerAttributeId { get; set; }
 
         [NopResourceDisplayName("Admin.Customers.CustomerAttributes.Values.Fields.Name")]
         public string Name { get; set; }
@@ -28,7 +29,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         public bool IsPreSelected { get; set; }
 
         [NopResourceDisplayName("Admin.Customers.CustomerAttributes.Values.Fields.DisplayOrder")]
-        public int DisplayOrder { get; set; }
+        public int DisplayOrder {get;set;}
 
         public IList<CustomerAttributeValueLocalizedModel> Locales { get; set; }
 

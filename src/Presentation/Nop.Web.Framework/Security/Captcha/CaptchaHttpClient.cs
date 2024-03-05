@@ -1,4 +1,7 @@
-﻿using Microsoft.Net.Http.Headers;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Domain.Security;
@@ -13,9 +16,9 @@ namespace Nop.Web.Framework.Security.Captcha
     {
         #region Fields
 
-        protected readonly CaptchaSettings _captchaSettings;
-        protected readonly HttpClient _httpClient;
-        protected readonly IWebHelper _webHelper;
+        private readonly CaptchaSettings _captchaSettings;
+        private readonly HttpClient _httpClient;
+        private readonly IWebHelper _webHelper;
 
         #endregion
 

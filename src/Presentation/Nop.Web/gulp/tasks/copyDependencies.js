@@ -124,13 +124,6 @@ export default function copyDependencies()
     //Magnific Popup
     gulp
       .src(nodeModules + 'magnific-popup/dist/**/*.{css,min.js}')
-      .pipe(gulp.dest(`${targetPath}magnific-popup`)),
-
-    //Admin LTE plugins: select2
-    gulp
-    .src(nodeModules + '/admin-lte/plugins/select2/**/*.{css,min.js}')
-    .pipe(gulp.dest(`${targetPath}admin-lte/plugins/select2`))
+      .pipe(gulp.dest(`${targetPath}magnific-popup`))
     ]);
-
-    
 }

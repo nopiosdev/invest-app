@@ -1,13 +1,15 @@
-﻿using Nop.Core.Domain.Blogs;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Blogs;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
+using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
-using Nop.Core.Domain.Transaction;
 using Nop.Core.Domain.Vendors;
 
 namespace Nop.Services.Messages
@@ -144,7 +146,7 @@ namespace Nop.Services.Messages
         /// <param name="newsComment">News comment</param>
         /// <returns>A task that represents the asynchronous operation</returns>
         Task AddNewsCommentTokensAsync(IList<Token> tokens, NewsComment newsComment);
-
+        
         /// <summary>
         /// Add product tokens
         /// </summary>
@@ -231,7 +233,5 @@ namespace Nop.Services.Messages
         /// <param name="messageTemplate">Message template</param>
         /// <returns>Collection of token group names</returns>
         IEnumerable<string> GetTokenGroups(MessageTemplate messageTemplate);
-
-        Task AddTransactionTokensAsync(IList<Token> tokens, Transaction transaction, int languageId);
     }
 }

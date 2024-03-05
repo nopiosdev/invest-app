@@ -17,9 +17,10 @@
  *      be misrepresented as being the original software.
  * 
  *   3. This notice may not be removed or altered from any source distribution.
- */
+ */ 
 #endregion
 
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -37,7 +38,7 @@ namespace Nop.Services.Html.CodeFormatter
         /// <remarks>
         /// Keywords must be separated with spaces.
         /// </remarks>
-        protected abstract string Keywords
+        protected abstract string Keywords 
         {
             get;
         }
@@ -104,8 +105,8 @@ namespace Nop.Services.Html.CodeFormatter
             regAll.Append(StringRegex);
             //if (regPreproc.Length > 0)
             //{
-            regAll.Append(")|(");
-            regAll.Append(regPreproc);
+                regAll.Append(")|(");
+                regAll.Append(regPreproc);
             //}
             regAll.Append(")|(");
             regAll.Append(regKeyword);
@@ -158,6 +159,8 @@ namespace Nop.Services.Html.CodeFormatter
             {
                 return "<span class=\"kwrd\">" + match + "</span>";
             }
+
+            System.Diagnostics.Debug.Assert(false, "None of the above!");
 
             return string.Empty; //none of the above
         }

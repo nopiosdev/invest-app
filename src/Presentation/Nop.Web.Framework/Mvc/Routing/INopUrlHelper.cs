@@ -1,4 +1,5 @@
-﻿using Nop.Core;
+﻿using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Seo;
 
 namespace Nop.Web.Framework.Mvc.Routing

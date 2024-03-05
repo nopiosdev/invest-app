@@ -1,5 +1,10 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.ServiceModel;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Nop.Core;
@@ -29,38 +34,38 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// <summary>
         /// Package weight limit (lbs) https://www.ups.com/us/en/help-center/packaging-and-supplies/prepare-overize.page
         /// </summary>
-        protected const int WEIGHT_LIMIT = 150;
+        private const int WEIGHT_LIMIT = 150;
 
         /// <summary>
         /// Packahe size limit (inches in length and girth combined) https://www.ups.com/us/en/help-center/packaging-and-supplies/prepare-overize.page
         /// </summary>
-        protected const int SIZE_LIMIT = 165;
+        private const int SIZE_LIMIT = 165;
 
         /// <summary>
         /// Package length limit (inches) https://www.ups.com/us/en/help-center/packaging-and-supplies/prepare-overize.page
         /// </summary>
-        protected const int LENGTH_LIMIT = 108;
+        private const int LENGTH_LIMIT = 108;
 
         #endregion
 
         #region Fields
 
-        protected readonly CurrencySettings _currencySettings;
-        protected readonly ICountryService _countryService;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ILogger _logger;
-        protected readonly IMeasureService _measureService;
-        protected readonly IOrderTotalCalculationService _orderTotalCalculationService;
-        protected readonly IShippingService _shippingService;
-        protected readonly IStateProvinceService _stateProvinceService;
-        protected readonly IWorkContext _workContext;
-        protected readonly UPSSettings _upsSettings;
+        private readonly CurrencySettings _currencySettings;
+        private readonly ICountryService _countryService;
+        private readonly ICurrencyService _currencyService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILogger _logger;
+        private readonly IMeasureService _measureService;
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly IShippingService _shippingService;
+        private readonly IStateProvinceService _stateProvinceService;
+        private readonly IWorkContext _workContext;
+        private readonly UPSSettings _upsSettings;
 
-        protected MeasureDimension _measureDimension;
-        protected MeasureWeight _measureWeight;
-        protected MeasureDimension _inchesDimension;
-        protected MeasureWeight _lbWeight;
+        private MeasureDimension _measureDimension;
+        private MeasureWeight _measureWeight;
+        private MeasureDimension _inchesDimension;
+        private MeasureWeight _lbWeight;
 
         #endregion
 
@@ -102,7 +107,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the value
         /// </returns>
-        protected async Task<decimal> GetWeightLimitAsync()
+        private async Task<decimal> GetWeightLimitAsync()
         {
             return await _measureService.ConvertWeightAsync(WEIGHT_LIMIT, _lbWeight, _measureWeight);
         }
@@ -114,7 +119,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the value
         /// </returns>
-        protected async Task<decimal> GetSizeLimitAsync()
+        private async Task<decimal> GetSizeLimitAsync()
         {
             return await _measureService.ConvertDimensionAsync(SIZE_LIMIT, _inchesDimension, _measureDimension);
         }
@@ -126,7 +131,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the value
         /// </returns>
-        protected async Task<decimal> GetLengthLimitAsync()
+        private async Task<decimal> GetLengthLimitAsync()
         {
             return await _measureService.ConvertDimensionAsync(LENGTH_LIMIT, _inchesDimension, _measureDimension);
         }
@@ -137,7 +142,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// <typeparam name="TAttribute">Type of the attribute</typeparam>
         /// <param name="enumValue">Enum value</param>
         /// <returns>The attribute value</returns>
-        protected TAttribute GetAttributeValue<TAttribute>(Enum enumValue) where TAttribute : Attribute
+        private TAttribute GetAttributeValue<TAttribute>(Enum enumValue) where TAttribute : Attribute
         {
             var enumType = enumValue.GetType();
             var enumValueInfo = enumType.GetMember(enumValue.ToString()).FirstOrDefault();
@@ -151,7 +156,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// <typeparam name="T">Type of object</typeparam>
         /// <param name="value">Object to serialize</param>
         /// <returns>XML string</returns>
-        protected string ToXml<T>(T value)
+        private string ToXml<T>(T value)
         {
             using var writer = new StringWriter();
             using var xmlWriter = new XmlTextWriter(writer) { Formatting = Formatting.Indented };
@@ -168,7 +173,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the asynchronous task whose result contains the tracking info
         /// </returns>
-        protected async Task<UPSTrack.TrackResponse> TrackAsync(UPSTrack.TrackRequest request)
+        private async Task<UPSTrack.TrackResponse> TrackAsync(UPSTrack.TrackRequest request)
         {
             try
             {
@@ -225,7 +230,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// </summary>
         /// <param name="trackingNumber">Tracking number</param>
         /// <returns>Track request details</returns>
-        protected UPSTrack.TrackRequest CreateTrackRequest(string trackingNumber)
+        private UPSTrack.TrackRequest CreateTrackRequest(string trackingNumber)
         {
             return new UPSTrack.TrackRequest
             {
@@ -247,7 +252,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the shipment status event 
         /// </returns>
-        protected async Task<ShipmentStatusEvent> PrepareShipmentStatusEventAsync(UPSTrack.ActivityType activity)
+        private async Task<ShipmentStatusEvent> PrepareShipmentStatusEventAsync(UPSTrack.ActivityType activity)
         {
             var shipmentStatusEvent = new ShipmentStatusEvent();
 
@@ -324,7 +329,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the asynchronous task whose result contains the rates info
         /// </returns>
-        protected async Task<UPSRate.RateResponse> GetRatesAsync(UPSRate.RateRequest request)
+        private async Task<UPSRate.RateResponse> GetRatesAsync(UPSRate.RateRequest request)
         {
             try
             {
@@ -385,7 +390,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the rate request details
         /// </returns>
-        protected async Task<UPSRate.RateRequest> CreateRateRequestAsync(GetShippingOptionRequest shippingOptionRequest, bool saturdayDelivery = false)
+        private async Task<UPSRate.RateRequest> CreateRateRequestAsync(GetShippingOptionRequest shippingOptionRequest, bool saturdayDelivery = false)
         {
             //set request details
             var request = new UPSRate.RateRequest
@@ -493,7 +498,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the package details
         /// </returns>
-        protected async Task<UPSRate.PackageType> CreatePackageAsync(decimal width, decimal length, decimal height, decimal weight, decimal insuranceAmount)
+        private async Task<UPSRate.PackageType> CreatePackageAsync(decimal width, decimal length, decimal height, decimal weight, decimal insuranceAmount)
         {
             //set package details
             var package = new UPSRate.PackageType
@@ -548,7 +553,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the packages
         /// </returns>
-        protected async Task<IEnumerable<UPSRate.PackageType>> GetPackagesForOneItemPerPackageAsync(GetShippingOptionRequest shippingOptionRequest)
+        private async Task<IEnumerable<UPSRate.PackageType>> GetPackagesForOneItemPerPackageAsync(GetShippingOptionRequest shippingOptionRequest)
         {
             return await shippingOptionRequest.Items.SelectManyAwait(async packageItem =>
             {
@@ -578,7 +583,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the packages
         /// </returns>
-        protected async Task<IEnumerable<UPSRate.PackageType>> GetPackagesByDimensionsAsync(GetShippingOptionRequest shippingOptionRequest)
+        private async Task<IEnumerable<UPSRate.PackageType>> GetPackagesByDimensionsAsync(GetShippingOptionRequest shippingOptionRequest)
         {
             //get dimensions and weight of the whole package
             var (width, length, height) = await GetDimensionsAsync(shippingOptionRequest.Items);
@@ -649,7 +654,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the packages
         /// </returns>
-        protected async Task<IEnumerable<UPSRate.PackageType>> GetPackagesByCubicRootAsync(GetShippingOptionRequest shippingOptionRequest)
+        private async Task<IEnumerable<UPSRate.PackageType>> GetPackagesByCubicRootAsync(GetShippingOptionRequest shippingOptionRequest)
         {
             //Dimensional weight is based on volume (the amount of space a package occupies in relation to its actual weight). 
             //If the cubic size of package measures three cubic feet (5,184 cubic inches or 84,951 cubic centimetres) or greater, you will be charged the greater of the dimensional weight or the actual weight.
@@ -736,10 +741,10 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the dimensions values
         /// </returns>
-        protected async Task<(decimal width, decimal length, decimal height)> GetDimensionsForSingleItemAsync(ShoppingCartItem item, Product product)
+        private async Task<(decimal width, decimal length, decimal height)> GetDimensionsForSingleItemAsync(ShoppingCartItem item, Product product)
         {
             var items = new[] { new GetShippingOptionRequest.PackageItem(item, product, 1) };
-
+            
             return await GetDimensionsAsync(items);
         }
 
@@ -751,7 +756,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the dimensions values
         /// </returns>
-        protected async Task<(decimal width, decimal length, decimal height)> GetDimensionsAsync(IList<GetShippingOptionRequest.PackageItem> items)
+        private async Task<(decimal width, decimal length, decimal height)> GetDimensionsAsync(IList<GetShippingOptionRequest.PackageItem> items)
         {
             async Task<decimal> convertAndRoundDimensionAsync(decimal dimension)
             {
@@ -776,7 +781,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the weight value
         /// </returns>
-        protected async Task<decimal> GetWeightForSingleItemAsync(ShoppingCartItem item, Customer customer, Product product)
+        private async Task<decimal> GetWeightForSingleItemAsync(ShoppingCartItem item, Customer customer, Product product)
         {
             var shippingOptionRequest = new GetShippingOptionRequest
             {
@@ -795,7 +800,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the weight value
         /// </returns>
-        protected async Task<decimal> GetWeightAsync(GetShippingOptionRequest shippingOptionRequest)
+        private async Task<decimal> GetWeightAsync(GetShippingOptionRequest shippingOptionRequest)
         {
             var weight = await _shippingService.GetTotalWeightAsync(shippingOptionRequest, ignoreFreeShippedItems: true);
             weight = await _measureService.ConvertFromPrimaryMeasureWeightAsync(weight, _measureWeight);
@@ -810,7 +815,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// <param name="height">Height</param>
         /// <param name="width">Width</param>
         /// <returns>Package size</returns>
-        protected decimal GetPackageSize(decimal width, decimal length, decimal height)
+        private decimal GetPackageSize(decimal width, decimal length, decimal height)
         {
             //To measure ground packages use the following formula: Length + 2x Width +2x Height. Details: https://www.ups.com/us/en/help-center/packaging-and-supplies/prepare-overize.page
             return length + width * 2 + height * 2;
@@ -825,7 +830,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the shipping options; errors if exist
         /// </returns>
-        protected async Task<(IList<ShippingOption> shippingOptions, string error)> GetShippingOptionsAsync(GetShippingOptionRequest shippingOptionRequest,
+        private async Task<(IList<ShippingOption> shippingOptions, string error)> GetShippingOptionsAsync(GetShippingOptionRequest shippingOptionRequest,
             bool saturdayDelivery = false)
         {
             try
@@ -869,7 +874,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
         /// A task that represents the asynchronous operation
         /// The task result contains the shipping options
         /// </returns>
-        protected async Task<IEnumerable<ShippingOption>> PrepareShippingOptionsAsync(UPSRate.RateResponse rateResponse)
+        private async Task<IEnumerable<ShippingOption>> PrepareShippingOptionsAsync(UPSRate.RateResponse rateResponse)
         {
             var shippingOptions = new List<ShippingOption>();
 

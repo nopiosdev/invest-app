@@ -1,4 +1,6 @@
-﻿using Nop.Web.Models.Sitemap;
+﻿using System;
+using System.Threading.Tasks;
+using Nop.Web.Models.Sitemap;
 
 namespace Nop.Web.Factories
 {

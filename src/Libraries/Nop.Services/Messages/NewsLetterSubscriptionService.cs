@@ -1,4 +1,7 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Events;
@@ -14,11 +17,11 @@ namespace Nop.Services.Messages
     {
         #region Fields
 
-        protected readonly ICustomerService _customerService;
-        protected readonly IEventPublisher _eventPublisher;
-        protected readonly IRepository<Customer> _customerRepository;
-        protected readonly IRepository<CustomerCustomerRoleMapping> _customerCustomerRoleMappingRepository;
-        protected readonly IRepository<NewsLetterSubscription> _subscriptionRepository;
+        private readonly ICustomerService _customerService;
+        private readonly IEventPublisher _eventPublisher;
+        private readonly IRepository<Customer> _customerRepository;
+        private readonly IRepository<CustomerCustomerRoleMapping> _customerCustomerRoleMappingRepository;
+        private readonly IRepository<NewsLetterSubscription> _subscriptionRepository;
 
         #endregion
 
@@ -48,9 +51,9 @@ namespace Nop.Services.Messages
         /// <param name="isSubscribe">if set to <c>true</c> [is subscribe].</param>
         /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected virtual async Task PublishSubscriptionEventAsync(NewsLetterSubscription subscription, bool isSubscribe, bool publishSubscriptionEvents)
+        private async Task PublishSubscriptionEventAsync(NewsLetterSubscription subscription, bool isSubscribe, bool publishSubscriptionEvents)
         {
-            if (!publishSubscriptionEvents)
+            if (!publishSubscriptionEvents) 
                 return;
 
             if (isSubscribe)
@@ -85,9 +88,9 @@ namespace Nop.Services.Messages
 
             //Persist
             await _subscriptionRepository.InsertAsync(newsLetterSubscription);
-
+            
             //Publish the subscription event 
-            if (newsLetterSubscription.Active)
+            if (newsLetterSubscription.Active) 
                 await PublishSubscriptionEventAsync(newsLetterSubscription, true, publishSubscriptionEvents);
         }
 
@@ -112,7 +115,7 @@ namespace Nop.Services.Messages
 
             //Persist
             await _subscriptionRepository.UpdateAsync(newsLetterSubscription);
-
+            
             //Publish the subscription event 
             if ((originalSubscription.Active == false && newsLetterSubscription.Active) ||
                 (newsLetterSubscription.Active && originalSubscription.Email != newsLetterSubscription.Email))
@@ -141,11 +144,11 @@ namespace Nop.Services.Messages
         /// <returns>A task that represents the asynchronous operation</returns>
         public virtual async Task DeleteNewsLetterSubscriptionAsync(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
         {
-            if (newsLetterSubscription == null)
+            if (newsLetterSubscription == null) 
                 throw new ArgumentNullException(nameof(newsLetterSubscription));
 
             await _subscriptionRepository.DeleteAsync(newsLetterSubscription);
-
+            
             //Publish the unsubscribe event 
             await PublishSubscriptionEventAsync(newsLetterSubscription, false, publishSubscriptionEvents);
         }
@@ -173,8 +176,7 @@ namespace Nop.Services.Messages
         /// </returns>
         public virtual async Task<NewsLetterSubscription> GetNewsLetterSubscriptionByGuidAsync(Guid newsLetterSubscriptionGuid)
         {
-            if (newsLetterSubscriptionGuid == Guid.Empty)
-                return null;
+            if (newsLetterSubscriptionGuid == Guid.Empty) return null;
 
             var newsLetterSubscriptions = from nls in _subscriptionRepository.Table
                                           where nls.NewsLetterSubscriptionGuid == newsLetterSubscriptionGuid
@@ -287,7 +289,7 @@ namespace Nop.Services.Messages
                     var joindQuery = query.Join(_customerRepository.Table,
                         nls => nls.Email,
                         c => c.Email,
-                        (nls, c) => new { NewsletterSubscribers = nls, Customer = c });
+                        (nls, c) => new {NewsletterSubscribers = nls, Customer = c});
 
                     joindQuery = joindQuery.Where(x => _customerCustomerRoleMappingRepository.Table.Any(ccrm =>
                         ccrm.CustomerId == x.Customer.Id && ccrm.CustomerRoleId == customerRoleId));

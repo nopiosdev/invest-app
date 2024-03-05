@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Customers
+﻿using System;
+
+namespace Nop.Core.Domain.Customers
 {
     /// <summary>
     /// RewardPointsActivatingDelayPeriod Extensions

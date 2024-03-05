@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -15,17 +17,17 @@ namespace Nop.Web.Framework.Mvc.Routing
     {
         #region Fields
 
-        protected readonly IActionContextAccessor _actionContextAccessor;
-        protected readonly IUrlHelperFactory _urlHelperFactory;
-        protected readonly SecuritySettings _securitySettings;
-        protected readonly IWebHelper _webHelper;
+        private readonly IActionContextAccessor _actionContextAccessor;
+        private readonly IUrlHelperFactory _urlHelperFactory;
+        private readonly SecuritySettings _securitySettings;
+        private readonly IWebHelper _webHelper;
 
         #endregion
 
         #region Ctor
 
         public NopRedirectResultExecutor(IActionContextAccessor actionContextAccessor,
-            ILoggerFactory loggerFactory,
+            ILoggerFactory loggerFactory, 
             IUrlHelperFactory urlHelperFactory,
             SecuritySettings securitySettings,
             IWebHelper webHelper) : base(loggerFactory, urlHelperFactory)
@@ -59,13 +61,7 @@ namespace Nop.Web.Framework.Mvc.Routing
                 var urlHelper = result.UrlHelper ?? _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
                 var isLocalUrl = urlHelper.IsLocalUrl(url);
 
-                var uriStr = url;
-                if (isLocalUrl)
-                {
-                    var pathBase = context.HttpContext.Request.PathBase;
-                    uriStr = $"{_webHelper.GetStoreLocation().TrimEnd('/')}{(url.StartsWith(pathBase) && !string.IsNullOrEmpty(pathBase) ? url.Replace(pathBase, "") : url)}";
-                }
-                var uri = new Uri(uriStr, UriKind.Absolute);
+                var uri = new Uri(isLocalUrl ? $"{_webHelper.GetStoreLocation().TrimEnd('/')}{url}" : url, UriKind.Absolute);
 
                 //Allowlist redirect URI schemes to http and https
                 if ((uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) && urlHelper.IsLocalUrl(uri.AbsolutePath))

@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Web.Framework.Extensions;
-using Nop.Web.Framework.Factories;
-using Nop.Web.Framework.Infrastructure;
-using Nop.Web.Framework.Models.Cms;
 
 namespace Nop.Web.Framework.TagHelpers.Admin
 {
@@ -17,29 +16,73 @@ namespace Nop.Web.Framework.TagHelpers.Admin
     {
         #region Constants
 
-        protected const string NAME_ATTRIBUTE_NAME = "asp-name";
-        protected const string TITLE_ATTRIBUTE_NAME = "asp-title";
-        protected const string HIDE_BLOCK_ATTRIBUTE_NAME_ATTRIBUTE_NAME = "asp-hide-block-attribute-name";
-        protected const string IS_HIDE_ATTRIBUTE_NAME = "asp-hide";
-        protected const string IS_ADVANCED_ATTRIBUTE_NAME = "asp-advanced";
-        protected const string CARD_ICON_ATTRIBUTE_NAME = "asp-icon";
+        private const string NAME_ATTRIBUTE_NAME = "asp-name";
+        private const string TITLE_ATTRIBUTE_NAME = "asp-title";
+        private const string HIDE_BLOCK_ATTRIBUTE_NAME_ATTRIBUTE_NAME = "asp-hide-block-attribute-name";
+        private const string IS_HIDE_ATTRIBUTE_NAME = "asp-hide";
+        private const string IS_ADVANCED_ATTRIBUTE_NAME = "asp-advanced";
+        private const string CARD_ICON_ATTRIBUTE_NAME = "asp-icon";
 
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Title of the card
+        /// </summary>
+        [HtmlAttributeName(TITLE_ATTRIBUTE_NAME)]
+        public string Title { get; set; }
+
+        /// <summary>
+        /// Name of the card
+        /// </summary>
+        [HtmlAttributeName(NAME_ATTRIBUTE_NAME)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Name of the hide attribute of the card
+        /// </summary>
+        [HtmlAttributeName(HIDE_BLOCK_ATTRIBUTE_NAME_ATTRIBUTE_NAME)]
+        public string HideBlockAttributeName { get; set; }
+
+        /// <summary>
+        /// Indicates whether a block is hidden or not
+        /// </summary>
+        [HtmlAttributeName(IS_HIDE_ATTRIBUTE_NAME)]
+        public bool IsHide { get; set; }
+
+        /// <summary>
+        /// Indicates whether a card is advanced or not
+        /// </summary>
+        [HtmlAttributeName(IS_ADVANCED_ATTRIBUTE_NAME)]
+        public bool IsAdvanced { get; set; }
+
+        /// <summary>
+        /// Card icon
+        /// </summary>
+        [HtmlAttributeName(CARD_ICON_ATTRIBUTE_NAME)]
+        public string CardIconIsAdvanced { get; set; }
+
+        /// <summary>
+        /// ViewContext
+        /// </summary>
+        [HtmlAttributeNotBound]
+        [ViewContext]
+        public ViewContext ViewContext { get; set; }
 
         #endregion
 
         #region Fields
 
-        protected readonly IViewComponentHelper _viewComponentHelper;
-        protected readonly IWidgetModelFactory _widgetModelFactory;
+        private readonly IHtmlHelper _htmlHelper;
 
         #endregion
 
         #region Ctor
 
-        public NopCardTagHelper(IViewComponentHelper viewComponentHelper, IWidgetModelFactory widgetModelFactory)
+        public NopCardTagHelper(IHtmlHelper htmlHelper)
         {
-            _viewComponentHelper = viewComponentHelper;
-            _widgetModelFactory = widgetModelFactory;
+            _htmlHelper = htmlHelper;
         }
 
         #endregion
@@ -61,7 +104,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin
                 throw new ArgumentNullException(nameof(output));
 
             //contextualize IHtmlHelper
-            var viewContextAware = _viewComponentHelper as IViewContextAware;
+            var viewContextAware = _htmlHelper as IViewContextAware;
             viewContextAware?.Contextualize(ViewContext);
 
             //create card
@@ -120,75 +163,10 @@ namespace Nop.Web.Framework.TagHelpers.Admin
 
             //add heading and container to card
             card.InnerHtml.AppendHtml(cardHeading);
-
-            var modelsBefore = await _widgetModelFactory.PrepareRenderWidgetModelAsync(AdminWidgetZones.CardBefore, new WidgetNopCardModel { CardName = Name });
-
-            foreach (var model in modelsBefore)
-            {
-                var content = await _viewComponentHelper.InvokeAsync(model.WidgetViewComponent, model.WidgetViewComponentArguments);
-                card.InnerHtml.AppendHtml(content);
-            }
-
             var childContent = await output.GetChildContentAsync();
             card.InnerHtml.AppendHtml(childContent.GetContent());
-
-            var modelsAfter = await _widgetModelFactory.PrepareRenderWidgetModelAsync(AdminWidgetZones.CardAfter, new WidgetNopCardModel { CardName = Name });
-
-            foreach (var model in modelsAfter)
-            {
-                var content = await _viewComponentHelper.InvokeAsync(model.WidgetViewComponent, model.WidgetViewComponentArguments);
-                card.InnerHtml.AppendHtml(content);
-            }
-
             output.Content.AppendHtml(await card.RenderHtmlContentAsync());
         }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Title of the card
-        /// </summary>
-        [HtmlAttributeName(TITLE_ATTRIBUTE_NAME)]
-        public string Title { get; set; }
-
-        /// <summary>
-        /// Name of the card
-        /// </summary>
-        [HtmlAttributeName(NAME_ATTRIBUTE_NAME)]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Name of the hide attribute of the card
-        /// </summary>
-        [HtmlAttributeName(HIDE_BLOCK_ATTRIBUTE_NAME_ATTRIBUTE_NAME)]
-        public string HideBlockAttributeName { get; set; }
-
-        /// <summary>
-        /// Indicates whether a block is hidden or not
-        /// </summary>
-        [HtmlAttributeName(IS_HIDE_ATTRIBUTE_NAME)]
-        public bool IsHide { get; set; }
-
-        /// <summary>
-        /// Indicates whether a card is advanced or not
-        /// </summary>
-        [HtmlAttributeName(IS_ADVANCED_ATTRIBUTE_NAME)]
-        public bool IsAdvanced { get; set; }
-
-        /// <summary>
-        /// Card icon
-        /// </summary>
-        [HtmlAttributeName(CARD_ICON_ATTRIBUTE_NAME)]
-        public string CardIconIsAdvanced { get; set; }
-
-        /// <summary>
-        /// ViewContext
-        /// </summary>
-        [HtmlAttributeNotBound]
-        [ViewContext]
-        public ViewContext ViewContext { get; set; }
 
         #endregion
     }

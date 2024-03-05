@@ -1,8 +1,12 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using FluentMigrator;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
+using Nop.Core;
 
 namespace Nop.Data.Migrations
 {
@@ -13,10 +17,10 @@ namespace Nop.Data.Migrations
     {
         #region Fields
 
-        protected readonly IFilteringMigrationSource _filteringMigrationSource;
-        protected readonly IMigrationRunner _migrationRunner;
-        protected readonly IMigrationRunnerConventions _migrationRunnerConventions;
-        protected readonly Lazy<IVersionLoader> _versionLoader;
+        private readonly IFilteringMigrationSource _filteringMigrationSource;
+        private readonly IMigrationRunner _migrationRunner;
+        private readonly IMigrationRunnerConventions _migrationRunnerConventions;
+        private readonly Lazy<IVersionLoader> _versionLoader;
 
         #endregion
 
@@ -37,42 +41,56 @@ namespace Nop.Data.Migrations
 
         #endregion
 
-        #region Utilities
+        #region Utils
 
         /// <summary>
-        /// Returns the instances for found types implementing FluentMigrator.IMigration which ready to Up or Down process (depends on isApplied parameter)
+        /// Returns the instances for found types implementing FluentMigrator.IMigration which ready to Up process
         /// </summary>
         /// <param name="assembly">Assembly to find migrations</param>
-        /// <param name="exactlyProcessType">Indicate whether to found exactly specified migration process type; if it set to true, you should set the migrationProcessType parameter to different of NoMatter</param>
         /// <param name="migrationProcessType">Type of migration process; pass MigrationProcessType.NoMatter to load all migrations</param>
-        /// <param name="isApplied">A value indicating whether to select those migrations that have been applied</param>
-        /// <param name="isSchemaMigration">Indicate whether to found only schema migration; if set to true will by returns only that migrations which has the IsSchemaMigration property set to true</param>
         /// <returns>The instances for found types implementing FluentMigrator.IMigration</returns>
-        protected virtual IEnumerable<IMigrationInfo> GetMigrations(Assembly assembly, bool exactlyProcessType,
-            MigrationProcessType migrationProcessType = MigrationProcessType.NoMatter, bool isApplied = false, bool isSchemaMigration = false)
+        protected virtual IEnumerable<IMigrationInfo> GetUpMigrations(Assembly assembly, MigrationProcessType migrationProcessType = MigrationProcessType.NoMatter)
         {
-            if (exactlyProcessType && migrationProcessType == MigrationProcessType.NoMatter)
-                throw new ArgumentException("Migration process type can't be NoMatter if exactlyProcessType set to true", nameof(migrationProcessType));
-
-            //load all version data stored in the version table
-            //we do this for avoid a problem with state of migration
-            _versionLoader.Value.LoadVersionInfo();
-
             var migrations = _filteringMigrationSource
                 .GetMigrations(t =>
                 {
                     var migrationAttribute = t.GetCustomAttribute<NopMigrationAttribute>();
 
-                    if (migrationAttribute is null)
+                    if (migrationAttribute is null || _versionLoader.Value.VersionInfo.HasAppliedMigration(migrationAttribute.Version))
                         return false;
 
-                    if (isSchemaMigration && !migrationAttribute.IsSchemaMigration)
+                    if (migrationAttribute.TargetMigrationProcess != MigrationProcessType.NoMatter &&
+                        migrationProcessType != MigrationProcessType.NoMatter &&
+                        migrationProcessType != migrationAttribute.TargetMigrationProcess)
                         return false;
 
-                    if (isApplied == !_versionLoader.Value.VersionInfo.HasAppliedMigration(migrationAttribute.Version))
+                    if (migrationProcessType == MigrationProcessType.NoDependencies &&
+                        migrationAttribute.TargetMigrationProcess != MigrationProcessType.NoDependencies)
                         return false;
 
-                    if (exactlyProcessType && migrationProcessType != migrationAttribute.TargetMigrationProcess)
+                    return assembly == null || t.Assembly == assembly;
+
+                }) ?? Enumerable.Empty<IMigration>();
+
+            return migrations
+                .Select(m => _migrationRunnerConventions.GetMigrationInfoForMigration(m))
+                .OrderBy(migration => migration.Version);
+        }
+
+        /// <summary>
+        /// Returns the instances for found types implementing FluentMigrator.IMigration which ready to Down process
+        /// </summary>
+        /// <param name="assembly">Assembly to find migrations</param>
+        /// <param name="migrationProcessType">Type of migration process; pass MigrationProcessType.NoMatter to load all migrations</param>
+        /// <returns>The instances for found types implementing FluentMigrator.IMigration</returns>
+        protected virtual IEnumerable<IMigrationInfo> GetDownMigrations(Assembly assembly, MigrationProcessType migrationProcessType = MigrationProcessType.NoMatter)
+        {
+            var migrations = _filteringMigrationSource
+                .GetMigrations(t =>
+                {
+                    var migrationAttribute = t.GetCustomAttribute<NopMigrationAttribute>();
+
+                    if (migrationAttribute is null || !_versionLoader.Value.VersionInfo.HasAppliedMigration(migrationAttribute.Version))
                         return false;
 
                     if (migrationAttribute.TargetMigrationProcess != MigrationProcessType.NoMatter &&
@@ -83,7 +101,9 @@ namespace Nop.Data.Migrations
                     return assembly == null || t.Assembly == assembly;
                 }) ?? Enumerable.Empty<IMigration>();
 
-            return migrations.Select(_migrationRunnerConventions.GetMigrationInfoForMigration);
+            return migrations
+                .Select(m => _migrationRunnerConventions.GetMigrationInfoForMigration(m))
+                .OrderBy(migration => migration.Version);
         }
 
         #endregion
@@ -101,21 +121,27 @@ namespace Nop.Data.Migrations
             if (assembly is null)
                 throw new ArgumentNullException(nameof(assembly));
 
-            foreach (var migrationInfo in GetMigrations(assembly, commitVersionOnly && migrationProcessType != MigrationProcessType.NoMatter, migrationProcessType).OrderBy(migration => migration.Version))
-                ApplyUpMigration(migrationInfo, commitVersionOnly);
-        }
+            foreach (var migrationInfo in GetUpMigrations(assembly, migrationProcessType))
+            {
+                if (!commitVersionOnly)
+                    _migrationRunner.Up(migrationInfo.Migration);
 
-        /// <summary>
-        /// Executes an Up for schema unapplied migrations
-        /// </summary>
-        /// <param name="assembly">Assembly to find migrations</param>
-        public virtual void ApplyUpSchemaMigrations(Assembly assembly)
-        {
-            if (assembly is null)
-                throw new ArgumentNullException(nameof(assembly));
-
-            foreach (var migrationInfo in GetMigrations(assembly, false, MigrationProcessType.NoMatter, isSchemaMigration: true).OrderBy(migration => migration.Version))
-                ApplyUpMigration(migrationInfo);
+#if DEBUG
+                if (!string.IsNullOrEmpty(migrationInfo.Description) &&
+                    migrationInfo.Description.StartsWith(string.Format(NopMigrationDefaults.UpdateMigrationDescriptionPrefix, NopVersion.CURRENT_VERSION)))
+                    continue;
+#endif
+                try
+                {
+                    _versionLoader.Value
+                        .UpdateVersionInfo(migrationInfo.Version,
+                            migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
+                }
+                catch 
+                {
+                    //TODO: refactoring the GetUpMigrations to get directly selected MigrationProcessType for commitVersionOnly == true
+                }
+            }
         }
 
         /// <summary>
@@ -127,18 +153,23 @@ namespace Nop.Data.Migrations
             if (assembly is null)
                 throw new ArgumentNullException(nameof(assembly));
 
-            foreach (var migrationInfo in GetMigrations(assembly, false, MigrationProcessType.NoMatter, true).OrderByDescending(migration => migration.Version))
-                ApplyDownMigration(migrationInfo);
+            foreach (var migrationInfo in GetDownMigrations(assembly).Reverse())
+            {
+                _migrationRunner.Down(migrationInfo.Migration);
+                _versionLoader.Value.DeleteVersion(migrationInfo.Version);
+            }
         }
 
         /// <summary>
         /// Executes down expressions for the passed migration
         /// </summary>
-        /// <param name="migrationInfo">Migration to rollback</param>
-        public void ApplyDownMigration(IMigrationInfo migrationInfo)
+        /// <param name="migration">Migration to rollback</param>
+        public void DownMigration(IMigration migration)
         {
-            if (migrationInfo is null)
-                throw new ArgumentNullException(nameof(migrationInfo));
+            if (migration is null)
+                throw new ArgumentNullException(nameof(migration));
+
+            var migrationInfo = _migrationRunnerConventions.GetMigrationInfoForMigration(migration);
 
             _migrationRunner.Down(migrationInfo.Migration);
             _versionLoader.Value.DeleteVersion(migrationInfo.Version);
@@ -147,19 +178,15 @@ namespace Nop.Data.Migrations
         /// <summary>
         /// Executes up expressions for the passed migration
         /// </summary>
-        /// <param name="migrationInfo">Migration to apply</param>
-        /// <param name="commitVersionOnly">Commit only version information</param>
-        public void ApplyUpMigration(IMigrationInfo migrationInfo, bool commitVersionOnly = false)
+        /// <param name="migration">Migration to apply</param>
+        public void UpMigration(IMigration migration)
         {
-            if (migrationInfo is null)
-                throw new ArgumentNullException(nameof(migrationInfo));
+            if (migration is null)
+                throw new ArgumentNullException(nameof(migration));
 
-            if (!commitVersionOnly)
-                _migrationRunner.Up(migrationInfo.Migration);
-#if DEBUG
-            if (!migrationInfo.IsNeedToApplyInDbOnDebugMode())
-                return;
-#endif
+            var migrationInfo = _migrationRunnerConventions.GetMigrationInfoForMigration(migration);
+            _migrationRunner.Up(migrationInfo.Migration);
+
             _versionLoader.Value
                     .UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
         }

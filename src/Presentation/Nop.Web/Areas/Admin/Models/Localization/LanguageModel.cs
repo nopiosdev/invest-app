@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
@@ -14,7 +15,6 @@ namespace Nop.Web.Areas.Admin.Models.Localization
         public LanguageModel()
         {
             AvailableCurrencies = new List<SelectListItem>();
-            AvailableFlagImages = new List<SelectListItem>();
             SelectedStoreIds = new List<int>();
             AvailableStores = new List<SelectListItem>();
             LocaleResourceSearchModel = new LocaleResourceSearchModel();
@@ -55,8 +55,6 @@ namespace Nop.Web.Areas.Admin.Models.Localization
         //store mapping
         [NopResourceDisplayName("Admin.Configuration.Languages.Fields.LimitedToStores")]
         public IList<int> SelectedStoreIds { get; set; }
-
-        public IList<SelectListItem> AvailableFlagImages { get; set; }
 
         public IList<SelectListItem> AvailableStores { get; set; }
 

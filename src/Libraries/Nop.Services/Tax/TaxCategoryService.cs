@@ -1,4 +1,7 @@
-﻿using Nop.Core.Domain.Tax;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Tax;
 using Nop.Data;
 
 namespace Nop.Services.Tax
@@ -10,7 +13,7 @@ namespace Nop.Services.Tax
     {
         #region Fields
 
-        protected readonly IRepository<TaxCategory> _taxCategoryRepository;
+        private readonly IRepository<TaxCategory> _taxCategoryRepository;
 
         #endregion
 
@@ -44,11 +47,11 @@ namespace Nop.Services.Tax
         /// </returns>
         public virtual async Task<IList<TaxCategory>> GetAllTaxCategoriesAsync()
         {
-            var taxCategories = await _taxCategoryRepository.GetAllAsync(query =>
+            var taxCategories = await _taxCategoryRepository.GetAllAsync(query=>
             {
                 return from tc in query
-                       orderby tc.DisplayOrder, tc.Id
-                       select tc;
+                    orderby tc.DisplayOrder, tc.Id
+                    select tc;
             }, cache => default);
 
             return taxCategories;

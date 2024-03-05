@@ -1,4 +1,5 @@
-﻿using Nop.Web.Areas.Admin.Models.MultiFactorAuthentication;
+﻿using System.Threading.Tasks;
+using Nop.Web.Areas.Admin.Models.MultiFactorAuthentication;
 
 namespace Nop.Web.Areas.Admin.Factories
 {

@@ -1,4 +1,8 @@
-﻿using Nop.Services.Directory;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Services.Payments;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
@@ -15,10 +19,10 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly ICountryService _countryService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IPaymentPluginManager _paymentPluginManager;
-        protected readonly IStateProvinceService _stateProvinceService;
+        private readonly ICountryService _countryService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IPaymentPluginManager _paymentPluginManager;
+        private readonly IStateProvinceService _stateProvinceService;
 
         #endregion
 
@@ -36,7 +40,7 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         #endregion
-
+        
         #region Methods
 
         /// <summary>

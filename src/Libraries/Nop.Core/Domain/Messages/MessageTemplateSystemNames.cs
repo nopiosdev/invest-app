@@ -270,38 +270,6 @@
         /// Represents system name of 'Contact vendor' message
         /// </summary>
         public const string ContactVendorMessage = "Service.ContactVendor";
-        
-        public const string DeleteAccountRequestNotification = "Customer.DeleteAccountRequest";
-
-        #endregion
-
-        #region Transaction
-
-        public const string TransactionDebitNotification = "Transaction.DebitNotification";
-
-        public const string PendingDebitTransactionCustomerNotification= "Transaction.PendingDebitTransaction.CustomerNotification";
-        public const string CompletedDebitTransactionCustomerNotification = "Transaction.CompletedDebitTransaction.CustomerNotification";
-        public const string DeclinedDebitTransactionCustomerNotification = "Transaction.DeclinedDebitTransaction.CustomerNotification";
-        public const string RemovedDebitTransactionCustomerNotification = "Transaction.RemovedDebitTransaction.CustomerNotification";
-        
-        public const string PendingDebitTransactionAdminNotification = "Transaction.PendingDebitTransaction.AdminNotification";
-        public const string CompletedDebitTransactionAdminNotification = "Transaction.CompletedDebitTransaction.AdminNotification";
-        public const string DeclinedDebitTransactionAdminNotification = "Transaction.DeclinedDebitTransaction.AdminNotification";
-        public const string RemovedDebitTransactionAdminNotification = "Transaction.RemovedDebitTransaction.AdminNotification";
-
-        public const string PendingCreditTransactionCustomerNotification= "Transaction.PendingCreditTransaction.CustomerNotification";
-        public const string CompletedCreditTransactionCustomerNotification = "Transaction.CompletedCreditTransaction.CustomerNotification";
-        public const string DeclinedCreditTransactionCustomerNotification = "Transaction.DeclinedCreditTransaction.CustomerNotification";
-        public const string RemovedCreditTransactionCustomerNotification = "Transaction.RemovedCreditTransaction.CustomerNotification";
-        
-        public const string PendingCreditTransactionAdminNotification = "Transaction.PendingCreditTransaction.AdminNotification";
-        public const string CompletedCreditTransactionAdminNotification = "Transaction.CompletedCreditTransaction.AdminNotification";
-        public const string DeclinedCreditTransactionAdminNotification = "Transaction.DeclinedCreditTransaction.AdminNotification";
-        public const string RemovedCreditTransactionAdminNotification = "Transaction.RemovedCreditTransaction.AdminNotification";
-
-
-        public const string ReturnGeneratedAdminNotification = "Transaction.ReturnGenerated.AdminNotification";
-        public const string ReturnGeneratedCustomerNotification = "Transaction.ReturnGenerated.CustomerNotification";
 
         #endregion
     }

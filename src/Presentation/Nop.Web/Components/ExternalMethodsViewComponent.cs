@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
 
@@ -8,7 +9,7 @@ namespace Nop.Web.Components
     {
         #region Fields
 
-        protected readonly IExternalAuthenticationModelFactory _externalAuthenticationModelFactory;
+        private readonly IExternalAuthenticationModelFactory _externalAuthenticationModelFactory;
 
         #endregion
 

@@ -1,4 +1,9 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.DataProvider;
@@ -13,18 +18,18 @@ namespace Nop.Data.DataProviders
     /// </summary>
     public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     {
-        #region Utilities
+        #region Utils
 
-        /// <summary>
-        /// Gets the connection string builder
-        /// </summary>
-        /// <returns>The connection string builder</returns>
-        protected static SqlConnectionStringBuilder GetConnectionStringBuilder()
+        protected virtual SqlConnectionStringBuilder GetConnectionStringBuilder()
         {
             var connectionString = DataSettingsManager.LoadSettings().ConnectionString;
 
             return new SqlConnectionStringBuilder(connectionString);
         }
+
+        #endregion
+
+        #region Utils
 
         /// <summary>
         /// Gets a connection to the database for a current data provider
@@ -225,7 +230,7 @@ namespace Nop.Data.DataProviders
                     DECLARE @TableName sysname 
                     DECLARE cur_reindex CURSOR FOR
                     SELECT table_name
-                    FROM [{currentConnection.Connection.Database}].INFORMATION_SCHEMA.TABLES
+                    FROM [{currentConnection.Connection.Database}].information_schema.tables
                     WHERE table_type = 'base table'
                     OPEN cur_reindex
                     FETCH NEXT FROM cur_reindex INTO @TableName

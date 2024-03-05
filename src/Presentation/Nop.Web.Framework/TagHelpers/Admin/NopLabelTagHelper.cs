@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -16,15 +18,40 @@ namespace Nop.Web.Framework.TagHelpers.Admin
     {
         #region Constants
 
-        protected const string FOR_ATTRIBUTE_NAME = "asp-for";
-        protected const string DISPLAY_HINT_ATTRIBUTE_NAME = "asp-display-hint";
+        private const string FOR_ATTRIBUTE_NAME = "asp-for";
+        private const string DISPLAY_HINT_ATTRIBUTE_NAME = "asp-display-hint";
 
         #endregion
-        
+
+        #region Properties
+
+        protected IHtmlGenerator Generator { get; set; }
+
+        /// <summary>
+        /// An expression to be evaluated against the current model
+        /// </summary>
+        [HtmlAttributeName(FOR_ATTRIBUTE_NAME)]
+        public ModelExpression For { get; set; }
+
+        /// <summary>
+        /// Indicates whether the hint should be displayed
+        /// </summary>
+        [HtmlAttributeName(DISPLAY_HINT_ATTRIBUTE_NAME)]
+        public bool DisplayHint { get; set; } = true;
+
+        /// <summary>
+        /// ViewContext
+        /// </summary>
+        [HtmlAttributeNotBound]
+        [ViewContext]
+        public ViewContext ViewContext { get; set; }
+
+        #endregion
+
         #region Fields
 
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IWorkContext _workContext;
+        private readonly ILocalizationService _localizationService;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -88,31 +115,6 @@ namespace Nop.Web.Framework.TagHelpers.Admin
                 }
             }
         }
-
-        #endregion
-
-        #region Properties
-
-        protected IHtmlGenerator Generator { get; set; }
-
-        /// <summary>
-        /// An expression to be evaluated against the current model
-        /// </summary>
-        [HtmlAttributeName(FOR_ATTRIBUTE_NAME)]
-        public ModelExpression For { get; set; }
-
-        /// <summary>
-        /// Indicates whether the hint should be displayed
-        /// </summary>
-        [HtmlAttributeName(DISPLAY_HINT_ATTRIBUTE_NAME)]
-        public bool DisplayHint { get; set; } = true;
-
-        /// <summary>
-        /// ViewContext
-        /// </summary>
-        [HtmlAttributeNotBound]
-        [ViewContext]
-        public ViewContext ViewContext { get; set; }
 
         #endregion
     }

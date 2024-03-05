@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.News;
+﻿using System.Threading.Tasks;
+using Nop.Core.Domain.News;
 using Nop.Web.Models.News;
 
 namespace Nop.Web.Factories

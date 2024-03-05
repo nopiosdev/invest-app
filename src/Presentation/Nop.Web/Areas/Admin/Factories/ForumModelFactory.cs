@@ -1,4 +1,7 @@
-﻿using Nop.Core.Domain.Forums;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Forums;
 using Nop.Services.Forums;
 using Nop.Services.Helpers;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
@@ -14,8 +17,8 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly IDateTimeHelper _dateTimeHelper;
-        protected readonly IForumService _forumService;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IForumService _forumService;
 
         #endregion
 
@@ -146,7 +149,7 @@ namespace Nop.Web.Areas.Admin.Factories
 
             if (forumGroup == null)
                 throw new ArgumentNullException(nameof(forumGroup));
-
+            
             //get forums
             var forums = (await _forumService.GetAllForumsByGroupIdAsync(forumGroup.Id)).ToPagedList(searchModel);
 

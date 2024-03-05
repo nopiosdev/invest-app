@@ -1,13 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Nop.Web.Framework.Models;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Messages
 {
     /// <summary>
     /// Represents a queued email model
     /// </summary>
-    public partial record QueuedEmailModel : BaseNopEntityModel
+    public partial record QueuedEmailModel: BaseNopEntityModel
     {
         #region Properties
 

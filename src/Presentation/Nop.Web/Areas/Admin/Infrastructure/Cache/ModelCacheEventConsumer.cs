@@ -1,4 +1,5 @@
-﻿using Nop.Core.Caching;
+﻿using System.Threading.Tasks;
+using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Configuration;
 using Nop.Core.Domain.Vendors;
@@ -31,7 +32,7 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Cache
     {
         #region Fields
 
-        protected readonly IStaticCacheManager _staticCacheManager;
+        private readonly IStaticCacheManager _staticCacheManager;
 
         #endregion
 

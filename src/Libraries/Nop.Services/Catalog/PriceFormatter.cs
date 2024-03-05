@@ -1,7 +1,6 @@
-﻿using System.Globalization;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.VariantTypes;
-using DocumentFormat.OpenXml.Wordprocessing;
+﻿using System;
+using System.Globalization;
+using System.Threading.Tasks;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Directory;
@@ -18,13 +17,13 @@ namespace Nop.Services.Catalog
     {
         #region Fields
 
-        protected readonly CurrencySettings _currencySettings;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IMeasureService _measureService;
-        protected readonly IPriceCalculationService _priceCalculationService;
-        protected readonly IWorkContext _workContext;
-        protected readonly TaxSettings _taxSettings;
+        private readonly CurrencySettings _currencySettings;
+        private readonly ICurrencyService _currencyService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IMeasureService _measureService;
+        private readonly IPriceCalculationService _priceCalculationService;
+        private readonly IWorkContext _workContext;
+        private readonly TaxSettings _taxSettings;
 
         #endregion
 
@@ -59,7 +58,7 @@ namespace Nop.Services.Catalog
         /// <param name="targetCurrency">Target currency</param>
         /// <returns>Currency string without exchange rate</returns>
         protected virtual string GetCurrencyString(decimal amount,
-            bool showCurrency, Currency targetCurrency, bool showCurrencySymbol)
+            bool showCurrency, Currency targetCurrency)
         {
             if (targetCurrency == null)
                 throw new ArgumentNullException(nameof(targetCurrency));
@@ -72,7 +71,7 @@ namespace Nop.Services.Catalog
             {
                 if (!string.IsNullOrEmpty(targetCurrency.DisplayLocale))
                     //default behavior
-                    result = amount.ToString(showCurrencySymbol ? "C" : "F2", new CultureInfo(targetCurrency.DisplayLocale));
+                    result = amount.ToString("C", new CultureInfo(targetCurrency.DisplayLocale));
                 else
                 {
                     //not possible because "DisplayLocale" should be always specified
@@ -139,16 +138,9 @@ namespace Nop.Services.Catalog
         /// A task that represents the asynchronous operation
         /// The task result contains the price
         /// </returns>
-        public virtual async Task<string> FormatPriceAsync(decimal price, bool showCurrencySymbol = true)
+        public virtual async Task<string> FormatPriceAsync(decimal price)
         {
-            var formattedPrice = await FormatPriceAsync(price, true, await _workContext.GetWorkingCurrencyAsync(), showCurrencySymbol);
-            if (!showCurrencySymbol)
-            {
-                var currencySymbol = await this.GetCurrentSymbolAsync();
-                formattedPrice = formattedPrice.Replace(currencySymbol, string.Empty);
-            }
-
-            return formattedPrice;
+            return await FormatPriceAsync(price, true, await _workContext.GetWorkingCurrencyAsync());
         }
 
         /// <summary>
@@ -161,10 +153,10 @@ namespace Nop.Services.Catalog
         /// A task that represents the asynchronous operation
         /// The task result contains the price
         /// </returns>
-        public virtual async Task<string> FormatPriceAsync(decimal price, bool showCurrency, Currency targetCurrency, bool showCurrencySymbol = true)
+        public virtual async Task<string> FormatPriceAsync(decimal price, bool showCurrency, Currency targetCurrency)
         {
             var priceIncludesTax = await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
-            return await FormatPriceAsync(price, showCurrency, targetCurrency, (await _workContext.GetWorkingLanguageAsync()).Id, priceIncludesTax, showCurrencySymbol);
+            return await FormatPriceAsync(price, showCurrency, targetCurrency, (await _workContext.GetWorkingLanguageAsync()).Id, priceIncludesTax);
         }
 
         /// <summary>
@@ -278,10 +270,10 @@ namespace Nop.Services.Catalog
         /// The task result contains the price
         /// </returns>
         public virtual async Task<string> FormatPriceAsync(decimal price, bool showCurrency,
-            Currency targetCurrency, int languageId, bool priceIncludesTax, bool showCurrencySymbol = true)
+            Currency targetCurrency, int languageId, bool priceIncludesTax)
         {
             return await FormatPriceAsync(price, showCurrency, targetCurrency, languageId,
-                priceIncludesTax, _taxSettings.DisplayTaxSuffix, showCurrencySymbol);
+                priceIncludesTax, _taxSettings.DisplayTaxSuffix);
         }
 
         /// <summary>
@@ -298,12 +290,12 @@ namespace Nop.Services.Catalog
         /// The task result contains the price
         /// </returns>
         public virtual async Task<string> FormatPriceAsync(decimal price, bool showCurrency,
-            Currency targetCurrency, int languageId, bool priceIncludesTax, bool showTax, bool showCurrencySymbol = true)
+            Currency targetCurrency, int languageId, bool priceIncludesTax, bool showTax)
         {
             //we should round it no matter of "ShoppingCartSettings.RoundPricesDuringCalculation" setting
             price = await _priceCalculationService.RoundPriceAsync(price, targetCurrency);
 
-            var currencyString = GetCurrencyString(price, showCurrency, targetCurrency, showCurrencySymbol);
+            var currencyString = GetCurrencyString(price, showCurrency, targetCurrency);
             if (!showTax)
                 return currencyString;
 
@@ -526,15 +518,6 @@ namespace Nop.Services.Catalog
             var result = string.Format(await _localizationService.GetResourceAsync("Products.BasePrice"),
                 basePriceStr, referenceAmount.ToString("G29"), referenceUnit.Name);
             return result;
-        }
-
-        public virtual async Task<string> GetCurrentSymbolAsync()
-            => System.Text.RegularExpressions.Regex.Replace(await this.FormatPriceAsync(0), @"-?\d{1,3}(?:,\d{3})*(?:\.\d+)?", string.Empty).Trim();
-
-        public virtual async Task<string> FormatPriceInCurrencyAsync(decimal price, bool showCurrencySymbol = true)
-        {
-            var convertedPrice = _currencyService.ConvertCurrency(price, (await _workContext.GetWorkingCurrencyAsync()).Rate);
-            return await FormatPriceAsync(convertedPrice, showCurrencySymbol);
         }
 
         #endregion

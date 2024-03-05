@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Blogs;
+﻿using System.Threading.Tasks;
+using Nop.Core.Domain.Blogs;
 using Nop.Services.Caching;
 
 namespace Nop.Services.Blogs.Caching

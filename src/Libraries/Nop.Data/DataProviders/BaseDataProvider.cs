@@ -1,7 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using FluentMigrator;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
@@ -11,10 +15,14 @@ using LinqToDB.DataProvider;
 using LinqToDB.Mapping;
 using LinqToDB.Tools;
 using Nop.Core;
+using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
+using Nop.Data.DataProviders.Interceptors;
 using Nop.Data.Extensions;
 using Nop.Data.Mapping;
 using Nop.Data.Migrations;
+using StackExchange.Profiling;
+using StackExchange.Profiling.Data;
 
 namespace Nop.Data.DataProviders
 {
@@ -26,7 +34,7 @@ namespace Nop.Data.DataProviders
 
         #endregion
 
-        #region Utilities
+        #region Utils
 
         /// <summary>
         /// Gets a connection to the database for a current data provider
@@ -73,6 +81,11 @@ namespace Nop.Data.DataProviders
                 CommandTimeout = DataSettingsManager.GetSqlCommandTimeout()
             };
 
+            if (MiniProfillerEnabled)
+            {
+                dataConnection.AddInterceptor(UnwrapProfilerInterceptor.Instance);
+            }
+
             return dataConnection;
         }
 
@@ -83,7 +96,9 @@ namespace Nop.Data.DataProviders
         /// <returns>Connection to a database</returns>
         protected virtual DbConnection CreateDbConnection(string connectionString = null)
         {
-            return GetInternalDbConnection(!string.IsNullOrEmpty(connectionString) ? connectionString : GetCurrentConnectionString());
+            var dbConnection = GetInternalDbConnection(!string.IsNullOrEmpty(connectionString) ? connectionString : GetCurrentConnectionString());
+
+            return MiniProfillerEnabled ? new ProfiledDbConnection(dbConnection, MiniProfiler.Current) : dbConnection;
         }
 
         /// <summary>
@@ -120,13 +135,15 @@ namespace Nop.Data.DataProviders
             var typeFinder = Singleton<ITypeFinder>.Instance;
             var mAssemblies = typeFinder.FindClassesOfType<MigrationBase>()
                 .Select(t => t.Assembly)
-                .Where(assembly => !assembly.FullName?.Contains("FluentMigrator.Runner") ?? false)
+                .Where(assembly => !assembly.FullName.Contains("FluentMigrator.Runner"))
                 .Distinct()
                 .ToArray();
 
             //mark update migrations as applied
             foreach (var assembly in mAssemblies)
+            {
                 migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update, true);
+            }
         }
 
         /// <summary>
@@ -519,6 +536,11 @@ namespace Nop.Data.DataProviders
         /// Linq2Db data provider
         /// </summary>
         protected abstract IDataProvider LinqToDbDataProvider { get; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether should use MiniProfiler for the current connection
+        /// </summary>
+        protected static bool MiniProfillerEnabled => Singleton<AppSettings>.Instance.Get<CommonConfig>().MiniProfilerEnabled;
 
         /// <summary>
         /// Database connection string

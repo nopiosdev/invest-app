@@ -12,7 +12,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin
     {
         #region Constants
 
-        protected const string ID_ATTRIBUTE_NAME = "id";
+        private const string ID_ATTRIBUTE_NAME = "id";
 
         #endregion
 

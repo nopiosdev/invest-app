@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Nop.Core.Domain.News;
 using Nop.Services.News;
 using NUnit.Framework;

@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Logging
+﻿using System;
+
+namespace Nop.Core.Domain.Logging
 {
     /// <summary>
     /// Represents a log record

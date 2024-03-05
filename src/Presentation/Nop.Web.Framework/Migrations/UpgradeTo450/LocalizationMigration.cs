@@ -1,4 +1,5 @@
-﻿using FluentMigrator;
+﻿using System.Collections.Generic;
+using FluentMigrator;
 using Nop.Core.Infrastructure;
 using Nop.Data;
 using Nop.Data.Migrations;
@@ -7,7 +8,7 @@ using Nop.Web.Framework.Extensions;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo450
 {
-    [NopUpdateMigration("2021-04-23 00:00:00", "4.50", UpdateMigrationType.Localization)]
+    [NopMigration("2021-04-23 00:00:00", "4.50.0", UpdateMigrationType.Localization, MigrationProcessType.Update)]
     public class LocalizationMigration : MigrationBase
     {
         /// <summary>Collect the UP migration expressions</summary>
@@ -40,7 +41,7 @@ namespace Nop.Web.Framework.Migrations.UpgradeTo450
                 ["Admin.ContentManagement.MessageTemplates.List.SearchKeywords"] = "Search keywords",
                 ["Admin.ContentManagement.MessageTemplates.List.SearchKeywords.Hint"] = "Keywords to search by name, body, or subject.",
 
-                //New configurations to forward proxied headers
+				//New configurations to forward proxied headers
                 ["Admin.Configuration.AppSettings.Hosting.ForwardedForHeaderName"] = "The header used to retrieve the originating client IP",
                 ["Admin.Configuration.AppSettings.Hosting.ForwardedForHeaderName.Hint"] = "Specify a custom HTTP header name to determine the originating IP address (e.g., CF-Connecting-IP, X-ProxyUser-Ip).",
                 ["Admin.Configuration.AppSettings.Hosting.ForwardedProtoHeaderName"] = "The header used to retrieve the value for the originating scheme",
@@ -80,7 +81,7 @@ namespace Nop.Web.Framework.Migrations.UpgradeTo450
                 ["Enums.Nop.Data.DataProviderType.SqlServer"] = "Microsoft SQL Server",
                 ["Enums.Nop.Data.DataProviderType.MySql"] = "MySQL",
                 ["Enums.Nop.Data.DataProviderType.PostgreSQL"] = "PostgreSQL",
-
+                
                 //#5838
                 ["Admin.Configuration.Languages.NeedRestart"] = "Since language cultures are loaded only when the application is starting, you have to restart the application for it to work correctly once the language is changed.",
 
@@ -110,7 +111,7 @@ namespace Nop.Web.Framework.Migrations.UpgradeTo450
                 ["Order.Shipments.ReadyForPickupDate.NotYet"] = "Not yet",
                 ["Admin.Orders.Shipments.Products.QtyReadyForPickup"] = "Qty ready for pickup",
                 ["Admin.Orders.Shipments.Products.QtyToPickup"] = "Qty to pickup",
-
+                
                 //#5042
                 ["Admin.Help.Documentation"] = "Documentation",
                 ["Admin.Help.SolutionPartners"] = "Solution partners",
@@ -124,7 +125,7 @@ namespace Nop.Web.Framework.Migrations.UpgradeTo450
                 ["Admin.ReturnRequests.Fields.ReturnedQuantity.MustBeLessOrEqualQuantityField"] = "The quantity to be returned to stock must be less or equal the quantity field: {0}.",
                 ["Admin.ReturnRequests.Fields.Quantity.MustBeEqualOrGreaterThanReturnedQuantityField"] = "The quantity must be equal or greater than the quantity to be returned to stock: {0}.",
                 ["Admin.ReturnRequests.Fields.Quantity.Required"] = "The quantity is required.",
-
+                
                 //#5551
                 ["Admin.Configuration.Settings.Catalog.EnableSpecificationAttributeFiltering"] = "Enable specification attribute filtering",
                 ["Admin.Configuration.Settings.Catalog.EnableSpecificationAttributeFiltering.Hint"] = "Check to enable the specification attribute filtering on catalog pages.",
@@ -174,7 +175,7 @@ namespace Nop.Web.Framework.Migrations.UpgradeTo450
                 ["Permission.ManageMultifactorAuthenticationMethods"] = "Admin area. Manage Multifactor Authentication Methods",
                 ["Permission.AccessProfiling"] = "Public store. Access MiniProfiler results"
             }, languageId);
-
+            
             // rename locales
             this.RenameLocales(new Dictionary<string, string>
             {

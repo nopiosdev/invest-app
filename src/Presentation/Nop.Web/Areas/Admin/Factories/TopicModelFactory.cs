@@ -1,4 +1,7 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Topics;
 using Nop.Services.Localization;
@@ -20,16 +23,16 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly IAclSupportedModelFactory _aclSupportedModelFactory;
-        protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ILocalizedModelFactory _localizedModelFactory;
-        protected readonly INopUrlHelper _nopUrlHelper;
-        protected readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
-        protected readonly ITopicService _topicService;
-        protected readonly IUrlRecordService _urlRecordService;
-        protected readonly IWebHelper _webHelper;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly IAclSupportedModelFactory _aclSupportedModelFactory;
+        private readonly IBaseAdminModelFactory _baseAdminModelFactory;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedModelFactory _localizedModelFactory;
+        private readonly INopUrlHelper _nopUrlHelper;
+        private readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
+        private readonly ITopicService _topicService;
+        private readonly IUrlRecordService _urlRecordService;
+        private readonly IWebHelper _webHelper;
 
         #endregion
 
@@ -68,7 +71,7 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="searchModel">Topic search model</param>
         /// <returns>
         /// A task that represents the asynchronous operation
-        /// The task result contains the topic search model
+        /// The task result contains the opic search model
         /// </returns>
         public virtual async Task<TopicSearchModel> PrepareTopicSearchModelAsync(TopicSearchModel searchModel)
         {
@@ -92,7 +95,7 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="searchModel">Topic search model</param>
         /// <returns>
         /// A task that represents the asynchronous operation
-        /// The task result contains the topic list model
+        /// The task result contains the opic list model
         /// </returns>
         public virtual async Task<TopicListModel> PrepareTopicListModelAsync(TopicSearchModel searchModel)
         {
@@ -140,7 +143,7 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="excludeProperties">Whether to exclude populating of some properties of model</param>
         /// <returns>
         /// A task that represents the asynchronous operation
-        /// The task result contains the topic model
+        /// The task result contains the opic model
         /// </returns>
         public virtual async Task<TopicModel> PrepareTopicModelAsync(TopicModel model, Topic topic, bool excludeProperties = false)
         {

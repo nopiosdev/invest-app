@@ -1,4 +1,5 @@
-﻿using Nop.Core.Caching;
+﻿using System.Collections.Generic;
+using Nop.Core.Caching;
 
 namespace Nop.Services.Plugins
 {

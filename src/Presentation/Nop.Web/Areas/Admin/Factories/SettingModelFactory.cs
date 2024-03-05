@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Core.Configuration;
 using Nop.Core.Domain;
@@ -47,31 +51,31 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly AppSettings _appSettings;
-        protected readonly CurrencySettings _currencySettings;
-        protected readonly IAddressModelFactory _addressModelFactory;
-        protected readonly IAddressAttributeModelFactory _addressAttributeModelFactory;
-        protected readonly IAddressService _addressService;
-        protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly ICustomerAttributeModelFactory _customerAttributeModelFactory;
-        protected readonly INopDataProvider _dataProvider;
-        protected readonly INopFileProvider _fileProvider;
-        protected readonly IDateTimeHelper _dateTimeHelper;
-        protected readonly IGdprService _gdprService;
-        protected readonly ILocalizedModelFactory _localizedModelFactory;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly ILanguageService _languageService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IPictureService _pictureService;
-        protected readonly IReturnRequestModelFactory _returnRequestModelFactory;
-        protected readonly IReviewTypeModelFactory _reviewTypeModelFactory;
-        protected readonly ISettingService _settingService;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IStoreService _storeService;
-        protected readonly IThemeProvider _themeProvider;
-        protected readonly IVendorAttributeModelFactory _vendorAttributeModelFactory;
-        protected readonly IWorkContext _workContext;
+        private readonly AppSettings _appSettings;
+        private readonly CurrencySettings _currencySettings;
+        private readonly IAddressModelFactory _addressModelFactory;
+        private readonly IAddressAttributeModelFactory _addressAttributeModelFactory;
+        private readonly IAddressService _addressService;
+        private readonly IBaseAdminModelFactory _baseAdminModelFactory;
+        private readonly ICurrencyService _currencyService;
+        private readonly ICustomerAttributeModelFactory _customerAttributeModelFactory;
+        private readonly INopDataProvider _dataProvider;
+        private readonly INopFileProvider _fileProvider;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IGdprService _gdprService;
+        private readonly ILocalizedModelFactory _localizedModelFactory;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IPictureService _pictureService;
+        private readonly IReturnRequestModelFactory _returnRequestModelFactory;
+        private readonly IReviewTypeModelFactory _reviewTypeModelFactory;
+        private readonly ISettingService _settingService;
+        private readonly IStoreContext _storeContext;
+        private readonly IStoreService _storeService;
+        private readonly IThemeProvider _themeProvider;
+        private readonly IVendorAttributeModelFactory _vendorAttributeModelFactory;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -338,11 +342,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 InstagramLink = storeInformationSettings.InstagramLink,
                 SubjectFieldOnContactUsForm = commonSettings.SubjectFieldOnContactUsForm,
                 UseSystemEmailForContactUsForm = commonSettings.UseSystemEmailForContactUsForm,
-                PopupForTermsOfServiceLinks = commonSettings.PopupForTermsOfServiceLinks,
-
-                LinkedinLink = storeInformationSettings.LinkedinLink,
-                TelegramLink = storeInformationSettings.TelegramLink,
-                DiscordLink = storeInformationSettings.DiscordLink,
+                PopupForTermsOfServiceLinks = commonSettings.PopupForTermsOfServiceLinks
             };
 
             //prepare available themes
@@ -547,7 +547,6 @@ namespace Nop.Web.Areas.Admin.Factories
             model.ShowOnEmailProductToFriendPage_OverrideForStore = await _settingService.SettingExistsAsync(captchaSettings, x => x.ShowOnEmailProductToFriendPage, storeId);
             model.ShowOnBlogCommentPage_OverrideForStore = await _settingService.SettingExistsAsync(captchaSettings, x => x.ShowOnBlogCommentPage, storeId);
             model.ShowOnNewsCommentPage_OverrideForStore = await _settingService.SettingExistsAsync(captchaSettings, x => x.ShowOnNewsCommentPage, storeId);
-            model.ShowOnNewsletterPage_OverrideForStore = await _settingService.SettingExistsAsync(captchaSettings, x => x.ShowOnNewsletterPage, storeId);
             model.ShowOnProductReviewPage_OverrideForStore = await _settingService.SettingExistsAsync(captchaSettings, x => x.ShowOnProductReviewPage, storeId);
             model.ShowOnApplyVendorPage_OverrideForStore = await _settingService.SettingExistsAsync(captchaSettings, x => x.ShowOnApplyVendorPage, storeId);
             model.ShowOnForgotPasswordPage_OverrideForStore = await _settingService.SettingExistsAsync(captchaSettings, x => x.ShowOnForgotPasswordPage, storeId);
@@ -813,7 +812,7 @@ namespace Nop.Web.Areas.Admin.Factories
             //load settings for a chosen store scope
             var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
             var robotsTxtSettings = await _settingService.LoadSettingAsync<RobotsTxtSettings>(storeId);
-
+            
             model ??= new RobotsTxtSettingsModel
             {
                 AllowSitemapXml = robotsTxtSettings.AllowSitemapXml,
@@ -1134,7 +1133,6 @@ namespace Nop.Web.Areas.Admin.Factories
             //fill in overridden values
             if (storeId > 0)
             {
-                model.AutomaticallyDetectCountry_OverrideForStore = await _settingService.SettingExistsAsync(taxSettings, x => x.AutomaticallyDetectCountry, storeId);
                 model.PricesIncludeTax_OverrideForStore = await _settingService.SettingExistsAsync(taxSettings, x => x.PricesIncludeTax, storeId);
                 model.AllowCustomersToSelectTaxDisplayType_OverrideForStore = await _settingService.SettingExistsAsync(taxSettings, x => x.AllowCustomersToSelectTaxDisplayType, storeId);
                 model.TaxDisplayType_OverrideForStore = await _settingService.SettingExistsAsync(taxSettings, x => x.TaxDisplayType, storeId);
@@ -1568,17 +1566,11 @@ namespace Nop.Web.Areas.Admin.Factories
             //prepare customer settings model
             model.CustomerSettings = await PrepareCustomerSettingsModelAsync();
 
-            //prepare CustomerSettings list availableCountries
-            await _baseAdminModelFactory.PrepareCountriesAsync(model.CustomerSettings.AvailableCountries);
-
             //prepare multi-factor authentication settings model
             model.MultiFactorAuthenticationSettings = await PrepareMultiFactorAuthenticationSettingsModelAsync();
 
             //prepare address settings model
             model.AddressSettings = await PrepareAddressSettingsModelAsync();
-
-            //prepare AddressSettings list availableCountries
-            await _baseAdminModelFactory.PrepareCountriesAsync(model.AddressSettings.AvailableCountries);
 
             //prepare date time settings model
             model.DateTimeSettings = await PrepareDateTimeSettingsModelAsync();

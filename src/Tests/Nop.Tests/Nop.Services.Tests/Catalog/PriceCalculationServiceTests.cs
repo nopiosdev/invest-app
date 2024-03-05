@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
@@ -32,7 +35,7 @@ namespace Nop.Tests.Nop.Services.Tests.Catalog
         }
 
         #endregion
-
+        
         #region Tests
 
         [Test]
@@ -46,7 +49,7 @@ namespace Nop.Tests.Nop.Services.Tests.Catalog
             var (finalPriceWithoutDiscounts, finalPrice, _, _) = await _priceCalcService.GetFinalPriceAsync(product, customer, store, 0, false);
             finalPrice.Should().Be(79.99M);
             finalPrice.Should().Be(finalPriceWithoutDiscounts);
-
+            
             (finalPriceWithoutDiscounts, finalPrice, _, _) = await _priceCalcService.GetFinalPriceAsync(product, customer, store, 0, false, 2);
 
             finalPrice.Should().Be(19M);
@@ -87,7 +90,7 @@ namespace Nop.Tests.Nop.Services.Tests.Catalog
             //customer
             var customer = await _customerService.GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail);
             var store = new Store();
-
+                
             var roles = await _customerService.GetAllCustomerRolesAsync();
             var customerRole = roles.FirstOrDefault();
 
@@ -100,7 +103,7 @@ namespace Nop.Tests.Nop.Services.Tests.Catalog
                 new TierPrice { CustomerRoleId = customerRole.Id, ProductId = product.Id, Quantity = 10, Price = 15 }
             };
 
-            foreach (var tierPrice in tierPrices)
+            foreach (var tierPrice in tierPrices) 
                 await _productService.InsertTierPriceAsync(tierPrice);
 
             product.HasTierPrices = true;
@@ -151,7 +154,7 @@ namespace Nop.Tests.Nop.Services.Tests.Catalog
             var product = await _productService.GetProductBySkuAsync("BP_20_WSP");
             var customer = await _customerService.GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail);
             var store = new Store();
-
+            
             var mapping = new DiscountProductMapping
             {
                 DiscountId = 1,
@@ -163,7 +166,7 @@ namespace Nop.Tests.Nop.Services.Tests.Catalog
 
             //set HasDiscountsApplied property
             product.HasDiscountsApplied = true;
-
+           
             var (finalPriceWithoutDiscounts, finalPrice, _, _) = await _priceCalcService.GetFinalPriceAsync(product, customer, store);
 
             await _productService.DeleteDiscountProductMappingAsync(mapping);

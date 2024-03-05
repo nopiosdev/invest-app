@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Domain.Messages;
 using Nop.Services.Messages;
 using NUnit.Framework;
@@ -24,7 +26,7 @@ namespace Nop.Tests.Nop.Services.Tests.Messages
             message.Id.Should().BeGreaterThan(0);
             message = await _messageTemplateService.GetMessageTemplateByIdAsync(message.Id);
             message.Should().NotBeNull();
-            var namedMessage = (await _messageTemplateService.GetMessageTemplatesByNameAsync(message.Name)).FirstOrDefault(t => t.Id == message.Id);
+            var namedMessage = (await _messageTemplateService.GetMessageTemplatesByNameAsync(message.Name)).FirstOrDefault(t=>t.Id == message.Id);
             namedMessage.Should().NotBeNull();
             message.Subject = "Test subject";
             await _messageTemplateService.UpdateMessageTemplateAsync(message);
@@ -50,7 +52,7 @@ namespace Nop.Tests.Nop.Services.Tests.Messages
         [Test]
         public async Task CanCopyMessageTemplate()
         {
-            var initMessage = new MessageTemplate { Body = "Test body", Name = "Test template" };
+            var initMessage = new MessageTemplate {Body = "Test body", Name = "Test template"};
 
             var message = await _messageTemplateService.CopyMessageTemplateAsync(initMessage);
             message.Should().NotBeNull();

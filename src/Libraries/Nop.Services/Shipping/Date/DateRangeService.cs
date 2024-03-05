@@ -1,4 +1,7 @@
-﻿using Nop.Core.Domain.Shipping;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Shipping;
 using Nop.Data;
 
 namespace Nop.Services.Shipping.Date
@@ -10,8 +13,8 @@ namespace Nop.Services.Shipping.Date
     {
         #region Fields
 
-        protected readonly IRepository<DeliveryDate> _deliveryDateRepository;
-        protected readonly IRepository<ProductAvailabilityRange> _productAvailabilityRangeRepository;
+        private readonly IRepository<DeliveryDate> _deliveryDateRepository;
+        private readonly IRepository<ProductAvailabilityRange> _productAvailabilityRangeRepository;
 
         #endregion
 
@@ -55,8 +58,8 @@ namespace Nop.Services.Shipping.Date
             var deliveryDates = await _deliveryDateRepository.GetAllAsync(query =>
             {
                 return from dd in query
-                       orderby dd.DisplayOrder, dd.Id
-                       select dd;
+                    orderby dd.DisplayOrder, dd.Id
+                    select dd;
             }, cache => default);
 
             return deliveryDates;
@@ -121,8 +124,8 @@ namespace Nop.Services.Shipping.Date
             return await _productAvailabilityRangeRepository.GetAllAsync(query =>
             {
                 return from par in query
-                       orderby par.DisplayOrder, par.Id
-                       select par;
+                    orderby par.DisplayOrder, par.Id
+                    select par;
             }, cache => default);
         }
 

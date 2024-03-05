@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
@@ -17,8 +19,6 @@ namespace Nop.Web.Areas.Admin.Models.Reports
             AvailableCategories = new List<SelectListItem>();
             AvailableManufacturers = new List<SelectListItem>();
             AvailableCountries = new List<SelectListItem>();
-            OrderStatusIds = new List<int>();
-            PaymentStatusIds = new List<int>();
             GroupByOptions = new List<SelectListItem>();
             AvailableVendors = new List<SelectListItem>();
         }
@@ -39,10 +39,10 @@ namespace Nop.Web.Areas.Admin.Models.Reports
         public int StoreId { get; set; }
 
         [NopResourceDisplayName("Admin.Reports.SalesSummary.OrderStatus")]
-        public IList<int> OrderStatusIds { get; set; }
+        public int OrderStatusId { get; set; }
 
         [NopResourceDisplayName("Admin.Reports.SalesSummary.PaymentStatus")]
-        public IList<int> PaymentStatusIds { get; set; }
+        public int PaymentStatusId { get; set; }
 
         [NopResourceDisplayName("Admin.Reports.SalesSummary.Category")]
         public int CategoryId { get; set; }
@@ -73,7 +73,7 @@ namespace Nop.Web.Areas.Admin.Models.Reports
         public IList<SelectListItem> AvailableManufacturers { get; set; }
 
         public IList<SelectListItem> AvailableCountries { get; set; }
-
+        
         public IList<SelectListItem> GroupByOptions { get; set; }
 
         public IList<SelectListItem> AvailableVendors { get; set; }

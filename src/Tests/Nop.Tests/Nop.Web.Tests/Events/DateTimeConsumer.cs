@@ -1,4 +1,6 @@
-﻿using Nop.Services.Events;
+﻿using System;
+using System.Threading.Tasks;
+using Nop.Services.Events;
 
 namespace Nop.Tests.Nop.Web.Tests.Events
 {

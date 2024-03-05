@@ -1,4 +1,7 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
@@ -35,7 +38,7 @@ namespace Nop.Tests.Nop.Data.Tests
             }
             catch
             {
-                //ignore 
+               //ignore 
             }
 
             SetDataProviderType(DataProviderType.Unknown);
@@ -54,7 +57,7 @@ namespace Nop.Tests.Nop.Data.Tests
             var productRepository = GetService<IRepository<Product>>();
 
             var product = await productRepository.GetByIdAsync(1);
-            product.Should().NotBeNull();
+                    product.Should().NotBeNull();
 
             product = await productRepository.GetByIdAsync(2);
             product.Deleted = true;
@@ -62,14 +65,14 @@ namespace Nop.Tests.Nop.Data.Tests
 
             product = await productRepository.GetByIdAsync(2);
             product.Should().NotBeNull();
-            product = await productRepository.GetByIdAsync(2, includeDeleted: false);
+            product = await productRepository.GetByIdAsync(2, includeDeleted:false);
             product.Should().BeNull();
 
-            product = await _cacheManager.GetAsync(_cacheKey, default(Product));
+            product = await _cacheManager.GetAsync(_cacheKey, () => default(Product));
             product.Should().BeNull();
 
             await productRepository.GetByIdAsync(1, _ => _cacheKey);
-            product = await _cacheManager.GetAsync(_cacheKey, default(Product));
+            product = await _cacheManager.GetAsync(_cacheKey, () => default(Product));
             product.Should().NotBeNull();
         }
 
@@ -89,7 +92,7 @@ namespace Nop.Tests.Nop.Data.Tests
             product.Deleted = true;
             await productRepository.UpdateAsync(product);
 
-            var ids = new List<int> { 1, 2, 3 };
+            var ids = new List<int> {1, 2, 3};
 
             var products = await productRepository.GetByIdsAsync(ids);
             products.Count.Should().Be(3);
@@ -97,11 +100,11 @@ namespace Nop.Tests.Nop.Data.Tests
             products = await productRepository.GetByIdsAsync(ids, includeDeleted: false);
             products.Count.Should().Be(2);
 
-            products = await _cacheManager.GetAsync(_cacheKey, default(IList<Product>));
+            products = await _cacheManager.GetAsync(_cacheKey, () => default(IList<Product>));
             products.Should().BeNull();
 
             await productRepository.GetByIdsAsync(ids, _ => _cacheKey);
-            products = await _cacheManager.GetAsync(_cacheKey, default(IList<Product>));
+            products = await _cacheManager.GetAsync(_cacheKey, () => default(IList<Product>));
             products.Count.Should().Be(3);
         }
 
@@ -183,7 +186,7 @@ namespace Nop.Tests.Nop.Data.Tests
                 return;
 
             var taxCategoryRepository = GetService<IRepository<TaxCategory>>();
-            var taxCategory = new TaxCategory { DisplayOrder = 10, Name = "test tax category" };
+            var taxCategory = new TaxCategory {DisplayOrder = 10, Name = "test tax category"};
             taxCategory.Id.Should().Be(0);
 
             await taxCategoryRepository.InsertAsync(taxCategory);
@@ -288,7 +291,7 @@ namespace Nop.Tests.Nop.Data.Tests
             await gdprConsentRepository.TruncateAsync();
             var rezWithoutContent = await gdprConsentRepository.GetAllAsync(query => query);
 
-            var gdprConsent1 = new GdprConsent { Message = "Test message 1" };
+            var gdprConsent1 = new GdprConsent { Message = "Test message 1"};
             var gdprConsent2 = new GdprConsent { Message = "Test message 2" };
 
             await gdprConsentRepository.InsertAsync(gdprConsent1);

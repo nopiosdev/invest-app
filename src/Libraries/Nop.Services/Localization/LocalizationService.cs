@@ -1,6 +1,11 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Nop.Core;
 using Nop.Core.Caching;
@@ -57,7 +62,7 @@ namespace Nop.Services.Localization
         #endregion
 
         #region Utilities
-
+        
         /// <summary>
         /// Gets all locale string resources by language identifier
         /// </summary>
@@ -71,14 +76,14 @@ namespace Nop.Services.Localization
             var locales = await _lsrRepository.GetAllAsync(query =>
             {
                 return from l in query
-                       orderby l.ResourceName
-                       where l.LanguageId == languageId
-                       select l;
+                    orderby l.ResourceName
+                    where l.LanguageId == languageId
+                    select l;
             });
 
             return locales;
         }
-
+        
         protected virtual HashSet<(string name, string value)> LoadLocaleResourcesFromStream(StreamReader xmlStreamReader, string language)
         {
             var result = new HashSet<(string name, string value)>();
@@ -214,7 +219,7 @@ namespace Nop.Services.Localization
         {
             return await _lsrRepository.GetByIdAsync(localeStringResourceId, cache => default);
         }
-
+        
         /// <summary>
         /// Gets a locale string resource
         /// </summary>
@@ -254,9 +259,9 @@ namespace Nop.Services.Localization
             bool logIfNotFound = true)
         {
             var query = from lsr in _lsrRepository.Table
-                        orderby lsr.ResourceName
-                        where lsr.LanguageId == languageId && lsr.ResourceName == resourceName.ToLowerInvariant()
-                        select lsr;
+                orderby lsr.ResourceName
+                where lsr.LanguageId == languageId && lsr.ResourceName == resourceName.ToLowerInvariant()
+                select lsr;
 
             var localeStringResource = query.FirstOrDefault();
 
@@ -313,7 +318,7 @@ namespace Nop.Services.Localization
 
             //get all locale string resources by language identifier
             var allLocales =
-                await _staticCacheManager.GetAsync<Dictionary<string, KeyValuePair<int, string>>>(key);
+                await _staticCacheManager.GetAsync(key, () => (Dictionary<string, KeyValuePair<int, string>>)null);
 
             if (!loadPublicLocales.HasValue || allLocales != null)
             {
@@ -351,7 +356,7 @@ namespace Nop.Services.Localization
                             where l.LanguageId == languageId
                             select l;
                 query = loadPublicLocales.Value ? query.Where(r => !r.ResourceName.StartsWith(NopLocalizationDefaults.AdminLocaleStringResourcesPrefix)) : query.Where(r => r.ResourceName.StartsWith(NopLocalizationDefaults.AdminLocaleStringResourcesPrefix));
-
+                
                 return ResourceValuesToDictionary(query);
             });
         }
@@ -409,9 +414,9 @@ namespace Nop.Services.Localization
                     , languageId, resourceKey);
 
                 var query = from l in _lsrRepository.Table
-                            where l.ResourceName == resourceKey
-                                  && l.LanguageId == languageId
-                            select l.ResourceValue;
+                    where l.ResourceName == resourceKey
+                          && l.LanguageId == languageId
+                    select l.ResourceValue;
 
                 var lsr = await _staticCacheManager.GetAsync(key, async () => await query.FirstOrDefaultAsync());
 
@@ -460,7 +465,7 @@ namespace Nop.Services.Localization
 
             await using var stream = new MemoryStream();
             await using var xmlWriter = XmlWriter.Create(stream, settings);
-
+            
             await xmlWriter.WriteStartDocumentAsync();
             await xmlWriter.WriteStartElementAsync("Language");
             await xmlWriter.WriteAttributeStringAsync("Name", language.Name);
@@ -496,7 +501,7 @@ namespace Nop.Services.Localization
 
             if (xmlStreamReader.EndOfStream)
                 return;
-
+            
             var lsNamesList = new Dictionary<string, LocaleStringResource>();
 
             foreach (var localeStringResource in _lsrRepository.Table.Where(lsr => lsr.LanguageId == language.Id)
@@ -510,7 +515,7 @@ namespace Nop.Services.Localization
             {
                 if (lsNamesList.ContainsKey(name))
                 {
-                    if (!updateExistingResources)
+                    if (!updateExistingResources) 
                         continue;
 
                     var lsr = lsNamesList[name];
@@ -809,9 +814,7 @@ namespace Nop.Services.Localization
                     .Where(language => !languageId.HasValue || language.Id == languageId.Value)
                     .SelectMany(language => resourcesToInsert.Select(resource => new LocaleStringResource
                     {
-                        LanguageId = language.Id,
-                        ResourceName = resource.Key.Trim().ToLowerInvariant(),
-                        ResourceValue = resource.Value
+                        LanguageId = language.Id, ResourceName = resource.Key.Trim().ToLowerInvariant(), ResourceValue = resource.Value
                     }))
                     .ToList();
 

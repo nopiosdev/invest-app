@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Core.Domain.Security;
 using Nop.Services.Customers;
@@ -14,8 +17,8 @@ namespace Nop.Web.Framework.Factories
     {
         #region Fields
 
-        protected readonly IAclService _aclService;
-        protected readonly ICustomerService _customerService;
+        private readonly IAclService _aclService;
+        private readonly ICustomerService _customerService;
 
         #endregion
 

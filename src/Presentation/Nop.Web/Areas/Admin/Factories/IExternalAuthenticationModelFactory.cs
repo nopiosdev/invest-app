@@ -1,4 +1,5 @@
-﻿using Nop.Web.Areas.Admin.Models.ExternalAuthentication;
+﻿using System.Threading.Tasks;
+using Nop.Web.Areas.Admin.Models.ExternalAuthentication;
 
 namespace Nop.Web.Areas.Admin.Factories
 {

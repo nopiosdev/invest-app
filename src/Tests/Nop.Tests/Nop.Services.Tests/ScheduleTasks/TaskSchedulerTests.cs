@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Domain.ScheduleTasks;
 using Nop.Data;
 using Nop.Services.ScheduleTasks;

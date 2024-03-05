@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Core.Domain.Stores;
 using Nop.Services.Stores;
@@ -12,9 +15,9 @@ namespace Nop.Web.Framework.Factories
     public partial class StoreMappingSupportedModelFactory : IStoreMappingSupportedModelFactory
     {
         #region Fields
-
-        protected readonly IStoreMappingService _storeMappingService;
-        protected readonly IStoreService _storeService;
+        
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly IStoreService _storeService;
 
         #endregion
 
@@ -73,7 +76,7 @@ namespace Nop.Web.Framework.Factories
 
             await PrepareModelStoresAsync(model);
         }
-
+        
         #endregion
     }
 }

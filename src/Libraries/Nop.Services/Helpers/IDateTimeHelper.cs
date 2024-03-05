@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Nop.Core.Domain.Customers;
 
 namespace Nop.Services.Helpers
@@ -89,8 +91,8 @@ namespace Nop.Services.Helpers
         /// <summary>
         /// Gets or sets a default store time zone
         /// </summary>
-        TimeZoneInfo DefaultStoreTimeZone
-        {
+        TimeZoneInfo DefaultStoreTimeZone 
+        { 
             get;
         }
     }

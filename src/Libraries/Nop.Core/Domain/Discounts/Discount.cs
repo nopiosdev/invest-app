@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Domain.Discounts
+﻿using System;
+
+namespace Nop.Core.Domain.Discounts
 {
     /// <summary>
     /// Represents a discount

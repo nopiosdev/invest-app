@@ -1,4 +1,9 @@
-﻿namespace Nop.Services.Plugins
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
+namespace Nop.Services.Plugins
 {
     /// <summary>
     /// Represents an information about assembly which loaded by plugins
@@ -11,11 +16,11 @@
         /// Ctor
         /// </summary>
         /// <param name="shortName">Assembly short name</param>
-        /// <param name="assemblyInMemory">Assembly version</param>
-        public PluginLoadedAssemblyInfo(string shortName, Version assemblyInMemory)
+        /// <param name="assemblyInMemory">Assembly</param>
+        public PluginLoadedAssemblyInfo(string shortName, Assembly assemblyInMemory)
         {
             ShortName = shortName;
-            References = new List<(string PluginName, Version AssemblyVersion)>();
+            References = new List<(string PluginName, string AssemblyName)>();
             AssemblyInMemory = assemblyInMemory;
         }
 
@@ -26,7 +31,7 @@
         /// <summary>
         /// Assembly in memory
         /// </summary>
-        public Version AssemblyInMemory { get; }
+        public Assembly AssemblyInMemory { get; }
 
         /// <summary>
         /// Gets the short assembly name
@@ -34,15 +39,25 @@
         public string ShortName { get; }
 
         /// <summary>
+        /// Gets the full assembly name loaded in memory
+        /// </summary>
+        public string AssemblyFullNameInMemory {
+            get
+            {
+                return AssemblyInMemory.FullName;
+            }
+        }
+
+        /// <summary>
         /// Gets a list of all mentioned plugin-assembly pairs
         /// </summary>
-        public List<(string PluginName, Version AssemblyVersion)> References { get; }
+        public List<(string PluginName, string AssemblyName)> References { get; }
 
         /// <summary>
         /// Gets a list of plugins that conflict with the loaded assembly version
         /// </summary>
-        public IList<(string PluginName, Version AssemblyVersion)> Collisions =>
-            References.Where(reference => !reference.AssemblyVersion.Equals(AssemblyInMemory)).ToList();
+        public IList<(string PluginName, string AssemblyName)> Collisions =>
+            References.Where(reference => !reference.AssemblyName.Equals(AssemblyFullNameInMemory, StringComparison.CurrentCultureIgnoreCase)).ToList();
 
         #endregion
     }

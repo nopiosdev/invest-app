@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Logging;
 using Nop.Data;
@@ -12,10 +16,10 @@ namespace Nop.Services.Logging
     {
         #region Fields
 
-        protected readonly IRepository<ActivityLog> _activityLogRepository;
-        protected readonly IRepository<ActivityLogType> _activityLogTypeRepository;
-        protected readonly IWebHelper _webHelper;
-        protected readonly IWorkContext _workContext;
+        private readonly IRepository<ActivityLog> _activityLogRepository;
+        private readonly IRepository<ActivityLogType> _activityLogTypeRepository;
+        private readonly IWebHelper _webHelper;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -33,7 +37,7 @@ namespace Nop.Services.Logging
         }
 
         #endregion
-
+        
         #region Methods
 
         /// <summary>
@@ -55,11 +59,11 @@ namespace Nop.Services.Logging
         /// </returns>
         public virtual async Task<IList<ActivityLogType>> GetAllActivityTypesAsync()
         {
-            var activityLogTypes = await _activityLogTypeRepository.GetAllAsync(query =>
+            var activityLogTypes = await _activityLogTypeRepository.GetAllAsync(query=>
             {
                 return from alt in query
-                       orderby alt.Name
-                       select alt;
+                    orderby alt.Name
+                    select alt;
             }, cache => default);
 
             return activityLogTypes;
@@ -158,7 +162,6 @@ namespace Nop.Services.Logging
         /// </returns>
         public virtual async Task<IPagedList<ActivityLog>> GetAllActivitiesAsync(DateTime? createdOnFrom = null, DateTime? createdOnTo = null,
             int? customerId = null, int? activityLogTypeId = null, string ipAddress = null, string entityName = null, int? entityId = null,
-            bool? viewed = default,
             int pageIndex = 0, int pageSize = int.MaxValue)
         {
             return await _activityLogRepository.GetAllPagedAsync(query =>
@@ -187,9 +190,6 @@ namespace Nop.Services.Logging
                 if (entityId.HasValue && entityId.Value > 0)
                     query = query.Where(logItem => entityId.Value == logItem.EntityId);
 
-                if (viewed.HasValue)
-                    query = query.Where(logItem => logItem.Viewed.Equals(viewed.Value));
-
                 query = query.OrderByDescending(logItem => logItem.CreatedOnUtc).ThenBy(logItem => logItem.Id);
 
                 return query;
@@ -207,10 +207,6 @@ namespace Nop.Services.Logging
         public virtual async Task<ActivityLog> GetActivityByIdAsync(int activityLogId)
         {
             return await _activityLogRepository.GetByIdAsync(activityLogId);
-        }
-        public virtual async Task UpdateActivityAsync(ActivityLog activityLog)
-        {
-            await _activityLogRepository.UpdateAsync(activityLog);
         }
 
         /// <summary>

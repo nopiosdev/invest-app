@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog
@@ -14,7 +15,7 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         {
             Locales = new List<ProductTagLocalizedModel>();
         }
-
+        
         #endregion
 
         #region Properties

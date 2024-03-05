@@ -1,4 +1,8 @@
-﻿using Nop.Core.Domain.Customers;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Payments;
 using Nop.Services.Configuration;
 using Nop.Services.Customers;
@@ -13,8 +17,8 @@ namespace Nop.Services.Payments
     {
         #region Fields
 
-        protected readonly ISettingService _settingService;
-        protected readonly PaymentSettings _paymentSettings;
+        private readonly ISettingService _settingService;
+        private readonly PaymentSettings _paymentSettings;
 
         #endregion
 

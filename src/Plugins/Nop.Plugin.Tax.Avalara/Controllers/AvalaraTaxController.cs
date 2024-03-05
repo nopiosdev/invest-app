@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Core.Caching;
@@ -25,10 +28,14 @@ namespace Nop.Plugin.Tax.Avalara.Controllers
     {
         #region Fields
 
-        protected readonly AvalaraTaxManager _avalaraTaxManager;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly INotificationService _notificationService;
-        protected readonly IStaticCacheManager _cacheManager;
+        private readonly AvalaraTaxManager _avalaraTaxManager;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
+        private readonly IStaticCacheManager _cacheManager;
+        private readonly ITaxCategoryService _taxCategoryService;
+        private readonly ITaxPluginManager _taxPluginManager;
 
         #endregion
 
@@ -55,9 +62,13 @@ namespace Nop.Plugin.Tax.Avalara.Controllers
                 taxSettings)
         {
             _avalaraTaxManager = avalaraTaxManager;
+            _genericAttributeService = genericAttributeService;
             _localizationService = localizationService;
             _notificationService = notificationService;
+            _permissionService = permissionService;
             _cacheManager = cacheManager;
+            _taxCategoryService = taxCategoryService;
+            _taxPluginManager = taxPluginManager;
         }
 
         #endregion

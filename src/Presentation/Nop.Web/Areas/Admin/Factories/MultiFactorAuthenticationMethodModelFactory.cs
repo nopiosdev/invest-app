@@ -1,4 +1,7 @@
-﻿using Nop.Services.Authentication.MultiFactor;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Services.Authentication.MultiFactor;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.MultiFactorAuthentication;
 using Nop.Web.Framework.Models.Extensions;
@@ -12,7 +15,7 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly IMultiFactorAuthenticationPluginManager _multiFactorAuthenticationPluginManager;
+        private readonly IMultiFactorAuthenticationPluginManager _multiFactorAuthenticationPluginManager;
 
         #endregion
 

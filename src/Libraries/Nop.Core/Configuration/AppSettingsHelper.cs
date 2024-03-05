@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Nop.Core.Infrastructure;
@@ -12,7 +15,7 @@ namespace Nop.Core.Configuration
     {
         #region Fields
 
-        protected static Dictionary<string, int> _configurationOrder;
+        private static Dictionary<string, int> _configurationOrder;
 
         #endregion
 

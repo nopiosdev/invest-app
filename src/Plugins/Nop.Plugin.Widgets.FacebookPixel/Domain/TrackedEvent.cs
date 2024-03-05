@@ -1,4 +1,6 @@
-﻿namespace Nop.Plugin.Widgets.FacebookPixel.Domain
+﻿using System.Collections.Generic;
+
+namespace Nop.Plugin.Widgets.FacebookPixel.Domain
 {
     /// <summary>
     /// Represents tracked event details

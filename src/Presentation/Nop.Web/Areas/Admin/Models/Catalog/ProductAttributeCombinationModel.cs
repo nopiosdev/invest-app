@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Nop.Core.Domain.Catalog;
-using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog
 {
@@ -17,7 +18,6 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
             ProductAttributes = new List<ProductAttributeModel>();
             ProductPictureModels = new List<ProductPictureModel>();
             Warnings = new List<string>();
-            PictureIds = new List<int>();
         }
 
         #endregion
@@ -51,8 +51,8 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         [NopResourceDisplayName("Admin.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.NotifyAdminForQuantityBelow")]
         public int NotifyAdminForQuantityBelow { get; set; }
 
-        [NopResourceDisplayName("Admin.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.Pictures")]
-        public IList<int> PictureIds { get; set; }
+        [NopResourceDisplayName("Admin.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.Picture")]
+        public int PictureId { get; set; }
 
         [NopResourceDisplayName("Admin.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.MinStockQuantity")]
         public int MinStockQuantity { get; set; }

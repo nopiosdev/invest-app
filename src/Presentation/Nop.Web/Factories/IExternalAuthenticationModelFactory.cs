@@ -1,4 +1,6 @@
-﻿using Nop.Web.Models.Customer;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Web.Models.Customer;
 
 namespace Nop.Web.Factories
 {

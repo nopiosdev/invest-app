@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Plugin.Tax.Avalara.Models.Customer;
@@ -14,11 +17,11 @@ namespace Nop.Plugin.Tax.Avalara.Controllers
     {
         #region Fields
 
-        protected readonly AvalaraTaxManager _avalaraTaxManager;
-        protected readonly AvalaraTaxSettings _avalaraTaxSettings;
-        protected readonly ICustomerService _customerService;
-        protected readonly ITaxPluginManager _taxPluginManager;
-        protected readonly IWorkContext _workContext;
+        private readonly AvalaraTaxManager _avalaraTaxManager;
+        private readonly AvalaraTaxSettings _avalaraTaxSettings;
+        private readonly ICustomerService _customerService;
+        private readonly ITaxPluginManager _taxPluginManager;
+        private readonly IWorkContext _workContext;
 
         #endregion
 

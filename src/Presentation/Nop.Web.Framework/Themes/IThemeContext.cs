@@ -1,4 +1,7 @@
-﻿namespace Nop.Web.Framework.Themes
+﻿
+using System.Threading.Tasks;
+
+namespace Nop.Web.Framework.Themes
 {
     /// <summary>
     /// Represents a theme context

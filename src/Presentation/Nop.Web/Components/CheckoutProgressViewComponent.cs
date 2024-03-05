@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
 using Nop.Web.Models.Checkout;
@@ -7,7 +8,7 @@ namespace Nop.Web.Components
 {
     public partial class CheckoutProgressViewComponent : NopViewComponent
     {
-        protected readonly ICheckoutModelFactory _checkoutModelFactory;
+        private readonly ICheckoutModelFactory _checkoutModelFactory;
 
         public CheckoutProgressViewComponent(ICheckoutModelFactory checkoutModelFactory)
         {

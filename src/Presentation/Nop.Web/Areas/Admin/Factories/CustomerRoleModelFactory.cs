@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Catalog;
@@ -18,11 +22,11 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
-        protected readonly ICustomerService _customerService;
-        protected readonly IProductService _productService;
-        protected readonly IUrlRecordService _urlRecordService;
-        protected readonly IWorkContext _workContext;
+        private readonly IBaseAdminModelFactory _baseAdminModelFactory;
+        private readonly ICustomerService _customerService;
+        private readonly IProductService _productService;
+        private readonly IUrlRecordService _urlRecordService;
+        private readonly IWorkContext _workContext;
 
         #endregion
 

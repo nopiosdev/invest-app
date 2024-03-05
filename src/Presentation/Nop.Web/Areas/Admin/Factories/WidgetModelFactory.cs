@@ -1,4 +1,9 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Routing;
+using Nop.Core;
 using Nop.Services.Cms;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Cms;
@@ -13,8 +18,8 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly IWidgetPluginManager _widgetPluginManager;
-        protected readonly IWorkContext _workContext;
+        private readonly IWidgetPluginManager _widgetPluginManager;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -85,6 +90,30 @@ namespace Nop.Web.Areas.Admin.Factories
             });
 
             return model;
+        }
+
+        /// <summary>
+        /// Prepare render widget models
+        /// </summary>
+        /// <param name="widgetZone">Widget zone name</param>
+        /// <param name="additionalData">Additional data</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the list of render widget models
+        /// </returns>
+        public virtual async Task<IList<RenderWidgetModel>> PrepareRenderWidgetModelsAsync(string widgetZone, object additionalData = null)
+        {
+            //get active widgets by widget zone
+            var widgets = await _widgetPluginManager.LoadActivePluginsAsync(await _workContext.GetCurrentCustomerAsync(), widgetZone: widgetZone);
+
+            //prepare models
+            var models = widgets.Select(widget => new RenderWidgetModel
+            {
+                WidgetViewComponent = widget.GetWidgetViewComponent(widgetZone),
+                WidgetViewComponentArguments = new RouteValueDictionary { ["widgetZone"] = widgetZone, ["additionalData"] = additionalData }
+            }).ToList();
+
+            return models;
         }
 
         #endregion

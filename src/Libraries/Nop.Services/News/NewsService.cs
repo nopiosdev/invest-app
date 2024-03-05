@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.News;
 using Nop.Data;
@@ -13,10 +17,10 @@ namespace Nop.Services.News
     {
         #region Fields
 
-        protected readonly IRepository<NewsComment> _newsCommentRepository;
-        protected readonly IRepository<NewsItem> _newsItemRepository;
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly IStoreMappingService _storeMappingService;
+        private readonly IRepository<NewsComment> _newsCommentRepository;
+        private readonly IRepository<NewsItem> _newsItemRepository;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly IStoreMappingService _storeMappingService;
 
         #endregion
 

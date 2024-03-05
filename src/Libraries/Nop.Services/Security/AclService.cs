@@ -1,4 +1,8 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
@@ -15,11 +19,11 @@ namespace Nop.Services.Security
     {
         #region Fields
 
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly ICustomerService _customerService;
-        protected readonly IRepository<AclRecord> _aclRecordRepository;
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly IWorkContext _workContext;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly ICustomerService _customerService;
+        private readonly IRepository<AclRecord> _aclRecordRepository;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly IWorkContext _workContext;
 
         #endregion
 

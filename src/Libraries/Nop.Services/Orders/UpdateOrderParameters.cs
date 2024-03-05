@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Discounts;
+﻿using System;
+using System.Collections.Generic;
+using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
 

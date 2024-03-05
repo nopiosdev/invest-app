@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -13,10 +15,21 @@ namespace Nop.Web.Framework.TagHelpers.Public
     [HtmlTargetElement("nop-captcha", TagStructure = TagStructure.WithoutEndTag)]
     public partial class NopGenerateCaptchaTagHelper : TagHelper
     {
+        #region Properties
+
+        /// <summary>
+        /// ViewContext
+        /// </summary>
+        [HtmlAttributeNotBound]
+        [ViewContext]
+        public ViewContext ViewContext { get; set; }
+
+        #endregion
+
         #region Fields
 
-        protected readonly CaptchaSettings _captchaSettings;
-        protected readonly IHtmlHelper _htmlHelper;
+        private readonly CaptchaSettings _captchaSettings;
+        private readonly IHtmlHelper _htmlHelper;
 
         #endregion
 
@@ -58,7 +71,7 @@ namespace Nop.Web.Framework.TagHelpers.Public
                     captchaHtmlContent = await _htmlHelper.GenerateCheckBoxReCaptchaV2Async(_captchaSettings);
                     break;
                 case CaptchaType.ReCaptchaV3:
-                    captchaHtmlContent = await _htmlHelper.GenerateReCaptchaV3Async(_captchaSettings, ActionName);
+                    captchaHtmlContent = await _htmlHelper.GenerateReCaptchaV3Async(_captchaSettings);
                     break;
                 default:
                     throw new InvalidOperationException("Invalid captcha type.");
@@ -70,23 +83,6 @@ namespace Nop.Web.Framework.TagHelpers.Public
             output.Content.SetHtmlContent(captchaHtmlContent);
         }
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// ActionName
-        /// </summary>
-        [HtmlAttributeName("action-name")]
-        public string ActionName { get; set; }
-
-        /// <summary>
-        /// ViewContext
-        /// </summary>
-        [HtmlAttributeNotBound]
-        [ViewContext]
-        public ViewContext ViewContext { get; set; }
-                
         #endregion
     }
 }

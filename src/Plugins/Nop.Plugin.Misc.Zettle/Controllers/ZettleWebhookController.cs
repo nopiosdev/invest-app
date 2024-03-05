@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Plugin.Misc.Zettle.Services;
 
 namespace Nop.Plugin.Misc.Zettle.Controllers
@@ -7,7 +8,7 @@ namespace Nop.Plugin.Misc.Zettle.Controllers
     {
         #region Fields
 
-        protected readonly ZettleService _zettleService;
+        private readonly ZettleService _zettleService;
 
         #endregion
 

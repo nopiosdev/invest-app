@@ -1,4 +1,5 @@
-﻿using Nop.Core;
+﻿using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Plugin.Pickup.PickupInStore.Domain;
 
 namespace Nop.Plugin.Pickup.PickupInStore.Services

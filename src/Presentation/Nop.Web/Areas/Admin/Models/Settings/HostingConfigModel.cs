@@ -1,5 +1,5 @@
-﻿using Nop.Web.Framework.Models;
-using Nop.Web.Framework.Mvc.ModelBinding;
+﻿using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Settings
 {
@@ -22,8 +22,6 @@ namespace Nop.Web.Areas.Admin.Models.Settings
         [NopResourceDisplayName("Admin.Configuration.AppSettings.Hosting.KnownProxies")]
         public string KnownProxies { get; set; }
 
-        [NopResourceDisplayName("Admin.Configuration.AppSettings.Hosting.KnownNetworks")]
-        public string KnownNetworks { get; set; }
         #endregion
     }
 }

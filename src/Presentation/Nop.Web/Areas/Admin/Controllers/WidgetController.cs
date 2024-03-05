@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Cms;
 using Nop.Core.Events;
 using Nop.Services.Cms;
@@ -15,12 +16,12 @@ namespace Nop.Web.Areas.Admin.Controllers
     {
         #region Fields
 
-        protected readonly IEventPublisher _eventPublisher;
-        protected readonly IPermissionService _permissionService;
-        protected readonly ISettingService _settingService;
-        protected readonly IWidgetModelFactory _widgetModelFactory;
-        protected readonly IWidgetPluginManager _widgetPluginManager;
-        protected readonly WidgetSettings _widgetSettings;
+        private readonly IEventPublisher _eventPublisher;
+        private readonly IPermissionService _permissionService;
+        private readonly ISettingService _settingService;
+        private readonly IWidgetModelFactory _widgetModelFactory;
+        private readonly IWidgetPluginManager _widgetPluginManager;
+        private readonly WidgetSettings _widgetSettings;
 
         #endregion
 

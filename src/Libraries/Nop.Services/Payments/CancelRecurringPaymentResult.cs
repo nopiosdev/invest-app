@@ -1,4 +1,7 @@
-﻿namespace Nop.Services.Payments
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace Nop.Services.Payments
 {
     /// <summary>
     /// Cancel recurring payment result

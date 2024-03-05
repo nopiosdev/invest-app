@@ -1,4 +1,7 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Nop.Core;
 
 namespace Nop.Services.Common
 {
@@ -9,7 +12,7 @@ namespace Nop.Services.Common
     {
         #region Fields
 
-        protected readonly HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
 
         #endregion
 

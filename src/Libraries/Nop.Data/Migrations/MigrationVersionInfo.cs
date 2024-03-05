@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Runner.VersionTableInfo;
+﻿using System;
+using FluentMigrator.Runner.VersionTableInfo;
 using Nop.Core;
 
 namespace Nop.Data.Migrations

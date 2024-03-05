@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Media;
 
@@ -30,8 +32,8 @@ namespace Nop.Web.Models.ShoppingCart
         public IList<ShoppingCartItemModel> Items { get; set; }
 
         public IList<string> Warnings { get; set; }
-
-        #region Nested Classes
+        
+		#region Nested Classes
 
         public partial record ShoppingCartItemModel : BaseNopEntityModel
         {
@@ -44,7 +46,7 @@ namespace Nop.Web.Models.ShoppingCart
 
             public string Sku { get; set; }
 
-            public PictureModel Picture { get; set; }
+            public PictureModel Picture {get;set;}
 
             public int ProductId { get; set; }
 
@@ -76,6 +78,6 @@ namespace Nop.Web.Models.ShoppingCart
             public IList<string> Warnings { get; set; }
         }
 
-        #endregion
+		#endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using Nop.Plugin.Pickup.PickupInStore.Models;
+﻿using System.Threading.Tasks;
+using Nop.Plugin.Pickup.PickupInStore.Models;
 
 namespace Nop.Plugin.Pickup.PickupInStore.Factories
 {

@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using System.Collections.Generic;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Boards
 {
@@ -9,7 +10,7 @@ namespace Nop.Web.Models.Boards
             ForumTopics = new List<ForumTopicRowModel>();
         }
 
-        public IList<ForumTopicRowModel> ForumTopics { get; protected set; }
+        public IList<ForumTopicRowModel> ForumTopics { get; private set; }
 
         public bool ViewAllLinkEnabled { get; set; }
 

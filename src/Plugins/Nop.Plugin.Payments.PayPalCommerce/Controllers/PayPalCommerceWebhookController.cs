@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Plugin.Payments.PayPalCommerce.Services;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Controllers
@@ -7,8 +8,8 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Controllers
     {
         #region Fields
 
-        protected readonly PayPalCommerceSettings _settings;
-        protected readonly ServiceManager _serviceManager;
+        private readonly PayPalCommerceSettings _settings;
+        private readonly ServiceManager _serviceManager;
 
         #endregion
 

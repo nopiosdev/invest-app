@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
@@ -22,14 +25,14 @@ namespace Nop.Web.Framework.Mvc.Routing
     {
         #region Fields
 
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly IActionContextAccessor _actionContextAccessor;
-        protected readonly ICategoryService _categoryService;
-        protected readonly IManufacturerService _manufacturerService;
-        protected readonly IStoreContext _storeContext;
-        protected readonly ITopicService _topicService;
-        protected readonly IUrlHelperFactory _urlHelperFactory;
-        protected readonly IUrlRecordService _urlRecordService;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly IActionContextAccessor _actionContextAccessor;
+        private readonly ICategoryService _categoryService;
+        private readonly IManufacturerService _manufacturerService;
+        private readonly IStoreContext _storeContext;
+        private readonly ITopicService _topicService;
+        private readonly IUrlHelperFactory _urlHelperFactory;
+        private readonly IUrlRecordService _urlRecordService;
 
         #endregion
 

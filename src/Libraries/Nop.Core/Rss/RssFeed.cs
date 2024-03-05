@@ -1,4 +1,8 @@
-﻿using System.Xml;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace Nop.Core.Rss
@@ -55,22 +59,22 @@ namespace Nop.Core.Rss
         /// <summary>
         /// Title
         /// </summary>
-        public XElement Title { get; protected set; }
+        public XElement Title { get; private set; }
 
         /// <summary>
         /// Description
         /// </summary>
-        public XElement Description { get; protected set; }
+        public XElement Description { get; private set; }
 
         /// <summary>
         /// Link
         /// </summary>
-        public XElement Link { get; protected set; }
+        public XElement Link { get; private set; }
 
         /// <summary>
         /// Last build date
         /// </summary>
-        public XElement LastBuildDate { get; protected set; }
+        public XElement LastBuildDate { get; private set; }
 
         #endregion
 

@@ -1,4 +1,6 @@
-﻿using Nop.Core;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Seo;
 
 namespace Nop.Services.Seo

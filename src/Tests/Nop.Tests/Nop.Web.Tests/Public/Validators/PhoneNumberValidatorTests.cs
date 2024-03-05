@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using Nop.Core.Domain.Customers;
 using Nop.Web.Framework.Validators;
 using NUnit.Framework;

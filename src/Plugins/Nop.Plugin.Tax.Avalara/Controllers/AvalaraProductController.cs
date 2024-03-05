@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Plugin.Tax.Avalara.Services;
 using Nop.Services.Localization;
 using Nop.Services.Messages;
@@ -12,11 +13,11 @@ namespace Nop.Plugin.Tax.Avalara.Controllers
     {
         #region Fields
 
-        protected readonly AvalaraTaxManager _avalaraTaxManager;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly INotificationService _notificationService;
-        protected readonly IPermissionService _permissionService;
-        protected readonly ITaxPluginManager _taxPluginManager;
+        private readonly AvalaraTaxManager _avalaraTaxManager;
+        private readonly ILocalizationService _localizationService;
+        private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
+        private readonly ITaxPluginManager _taxPluginManager;
 
         #endregion
 

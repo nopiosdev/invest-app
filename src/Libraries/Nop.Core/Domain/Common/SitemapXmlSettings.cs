@@ -1,4 +1,5 @@
-﻿using Nop.Core.Configuration;
+﻿using System.Collections.Generic;
+using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.Common
 {
@@ -65,7 +66,7 @@ namespace Nop.Core.Domain.Common
         /// <summary>
         /// Gets or sets a value indicating after which period of time the sitemap files will be rebuilt (in hours)
         /// </summary>
-        public int RebuildSitemapXmlAfterHours { get; set; }
+        public int RebuildSitemapXmlAfterHours { get; set;}
 
         /// <summary>
         /// Gets or sets the wait time (in seconds) before the operation can be started again

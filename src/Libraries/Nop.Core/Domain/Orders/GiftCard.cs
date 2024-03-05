@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using System;
+using Nop.Core.Domain.Catalog;
 
 namespace Nop.Core.Domain.Orders
 {
@@ -6,7 +7,7 @@ namespace Nop.Core.Domain.Orders
     /// Represents a gift card
     /// </summary>
     public partial class GiftCard : BaseEntity
-    {
+    {        
         /// <summary>
         /// Gets or sets the associated order item identifier
         /// </summary>

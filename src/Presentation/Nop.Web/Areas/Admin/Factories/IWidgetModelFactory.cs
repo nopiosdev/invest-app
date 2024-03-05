@@ -1,4 +1,6 @@
-﻿using Nop.Web.Areas.Admin.Models.Cms;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Web.Areas.Admin.Models.Cms;
 
 namespace Nop.Web.Areas.Admin.Factories
 {
@@ -26,5 +28,16 @@ namespace Nop.Web.Areas.Admin.Factories
         /// The task result contains the widget list model
         /// </returns>
         Task<WidgetListModel> PrepareWidgetListModelAsync(WidgetSearchModel searchModel);
+
+        /// <summary>
+        /// Prepare render widget models
+        /// </summary>
+        /// <param name="widgetZone">Widget zone name</param>
+        /// <param name="additionalData">Additional data</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the list of render widget models
+        /// </returns>
+        Task<IList<RenderWidgetModel>> PrepareRenderWidgetModelsAsync(string widgetZone, object additionalData = null);
     }
 }

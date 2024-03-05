@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Blogs
 {
@@ -20,7 +22,7 @@ namespace Nop.Web.Areas.Admin.Models.Blogs
         #endregion
 
         #region Properties
-
+        
         public int? BlogPostId { get; set; }
 
         [NopResourceDisplayName("Admin.ContentManagement.Blog.Comments.List.CreatedOnFrom")]
@@ -37,7 +39,7 @@ namespace Nop.Web.Areas.Admin.Models.Blogs
         [NopResourceDisplayName("Admin.ContentManagement.Blog.Comments.List.SearchApproved")]
         public int SearchApprovedId { get; set; }
 
-        public IList<SelectListItem> AvailableApprovedOptions { get; set; }
+        public IList<SelectListItem> AvailableApprovedOptions { get; set; }        
 
         #endregion
     }

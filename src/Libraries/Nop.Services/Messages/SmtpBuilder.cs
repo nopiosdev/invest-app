@@ -1,6 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Nop.Core;
@@ -15,8 +17,8 @@ namespace Nop.Services.Messages
     {
         #region Fields
 
-        protected readonly EmailAccountSettings _emailAccountSettings;
-        protected readonly IEmailAccountService _emailAccountService;
+        private readonly EmailAccountSettings _emailAccountSettings;
+        private readonly IEmailAccountService _emailAccountService;
 
         #endregion
 
@@ -48,8 +50,7 @@ namespace Nop.Services.Messages
                 ?? throw new NopException("Email account could not be loaded");
             }
 
-            var client = new SmtpClient
-            {
+            var client = new SmtpClient {
                 ServerCertificateValidationCallback = ValidateServerCertificate
             };
 
@@ -63,7 +64,7 @@ namespace Nop.Services.Messages
                 if (emailAccount.UseDefaultCredentials)
                 {
                     await client.AuthenticateAsync(CredentialCache.DefaultNetworkCredentials);
-                }
+                } 
                 else if (!string.IsNullOrWhiteSpace(emailAccount.Username))
                 {
                     await client.AuthenticateAsync(new NetworkCredential(emailAccount.Username, emailAccount.Password));

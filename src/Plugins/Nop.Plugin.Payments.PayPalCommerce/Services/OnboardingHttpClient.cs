@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Nop.Core;
@@ -13,7 +16,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Services
     {
         #region Fields
 
-        protected readonly HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
 
         #endregion
 

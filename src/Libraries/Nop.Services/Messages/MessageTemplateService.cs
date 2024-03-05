@@ -1,4 +1,8 @@
-﻿using Nop.Core.Caching;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Caching;
 using Nop.Core.Domain.Messages;
 using Nop.Data;
 using Nop.Services.Localization;
@@ -13,12 +17,12 @@ namespace Nop.Services.Messages
     {
         #region Fields
 
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly ILanguageService _languageService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ILocalizedEntityService _localizedEntityService;
-        protected readonly IRepository<MessageTemplate> _messageTemplateRepository;
-        protected readonly IStoreMappingService _storeMappingService;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedEntityService _localizedEntityService;
+        private readonly IRepository<MessageTemplate> _messageTemplateRepository;
+        private readonly IStoreMappingService _storeMappingService;
 
         #endregion
 

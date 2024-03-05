@@ -17,9 +17,10 @@
  *      be misrepresented as being the original software.
  * 
  *   3. This notice may not be removed or altered from any source distribution.
- */
+ */ 
 #endregion
 
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -37,9 +38,9 @@ namespace Nop.Services.Html.CodeFormatter
     /// </remarks>
     public partial class HtmlFormat : SourceFormat
     {
-        protected readonly CSharpFormat _csf; //to format embedded C# code
-        protected readonly JavaScriptFormat _jsf; //to format client-side JavaScript code
-        protected readonly Regex _attributeRegex;
+        private readonly CSharpFormat csf; //to format embedded C# code
+        private readonly JavaScriptFormat jsf; //to format client-side JavaScript code
+        private readonly Regex attribRegex;
 
         /// <summary/>
         public HtmlFormat()
@@ -53,18 +54,18 @@ namespace Nop.Services.Html.CodeFormatter
             const string regAttributes = @"(?<=&lt;(?!%)/?!?\??[\w:-]+).*?(?=(?<!%)/?&gt;)";
             const string regEntity = @"&amp;\w+;";
             const string regAttributeMatch = @"(=?"".*?""|=?'.*?')|([\w:-]+)";
-
+            
             //the regex object will handle all the replacements in one pass
-            var regAll = "(" + regJavaScript + ")|(" + regComment + ")|("
-                + regAspTag + ")|(" + regAspCode + ")|("
+            var regAll = "(" + regJavaScript + ")|(" + regComment + ")|(" 
+                + regAspTag + ")|(" + regAspCode + ")|(" 
                 + regTagDelimiter + ")|(" + regTagName + ")|("
                 + regAttributes + ")|(" + regEntity + ")";
 
             CodeRegex = new Regex(regAll, RegexOptions.IgnoreCase | RegexOptions.Singleline);
-            _attributeRegex = new Regex(regAttributeMatch, RegexOptions.Singleline);
+            attribRegex = new Regex(regAttributeMatch, RegexOptions.Singleline);
 
-            _csf = new CSharpFormat();
-            _jsf = new JavaScriptFormat();
+            csf = new CSharpFormat();
+            jsf = new JavaScriptFormat();
         }
 
         /// <summary>
@@ -74,7 +75,7 @@ namespace Nop.Services.Html.CodeFormatter
         /// <param name="match">The <see cref="Match"/> resulting from a 
         /// single regular expression match.</param>
         /// <returns>A string containing the HTML code fragment.</returns>
-        protected string AttributeMatchEval(Match match)
+        private string AttributeMatchEval(Match match)
         {
             if (match.Groups[1].Success) //attribute value
                 return "<span class=\"kwrd\">" + match + "</span>";
@@ -97,7 +98,7 @@ namespace Nop.Services.Html.CodeFormatter
             if (match.Groups[1].Success) //JavaScript code
             {
                 //string s = match.ToString();
-                return _jsf.FormatSubCode(match.ToString());
+                return jsf.FormatSubCode(match.ToString());
             }
 
             if (match.Groups[2].Success) //comment
@@ -127,7 +128,7 @@ namespace Nop.Services.Html.CodeFormatter
 
             if (match.Groups[4].Success) //asp C# code
             {
-                return _csf.FormatSubCode(match.ToString());
+                return csf.FormatSubCode(match.ToString());
             }
 
             if (match.Groups[5].Success) //tag delimiter
@@ -142,7 +143,7 @@ namespace Nop.Services.Html.CodeFormatter
 
             if (match.Groups[7].Success) //attributes
             {
-                return _attributeRegex.Replace(match.ToString(), AttributeMatchEval);
+                return attribRegex.Replace(match.ToString(), AttributeMatchEval);
             }
 
             if (match.Groups[8].Success) //entity

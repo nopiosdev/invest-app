@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Common;
+﻿using System;
+using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;

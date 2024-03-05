@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
 using Nop.Web.Models.Customer;
@@ -177,10 +179,5 @@ namespace Nop.Web.Factories
         /// The task result contains the list of the customer attribute model
         /// </returns>
         Task<IList<CustomerAttributeModel>> PrepareCustomCustomerAttributesAsync(Customer customer, string overrideAttributesXml = "");
-
-        Task<TransactionModel> PrepareTransactionModelAsync(Customer customer, TransactionModel model = null);
-        Task<WithdrawModel> PrepareWithdawModelModelAsync(Customer customer, WithdrawModel model = null);
-        Task<AnalyticsModel> PrepareAnalyticsModelAsync(Customer customer);
-        Task PrepareWithdrawalMethodCustomerInfoModelAsync(IList<WithdrawalMethodCustomerInfoModel> model, Customer customer);
     }
 }

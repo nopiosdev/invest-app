@@ -1,4 +1,5 @@
-﻿using FluentMigrator;
+﻿using System.Collections.Generic;
+using FluentMigrator;
 using Nop.Data;
 using Nop.Data.Mapping;
 using Nop.Data.Migrations;
@@ -13,8 +14,8 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Data
     {
         #region Fields
 
-        protected readonly ILanguageService _languageService;
-        protected readonly ILocalizationService _localizationService;
+        private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
 
         #endregion
 

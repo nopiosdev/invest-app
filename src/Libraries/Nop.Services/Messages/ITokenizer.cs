@@ -1,4 +1,6 @@
-﻿namespace Nop.Services.Messages
+﻿using System.Collections.Generic;
+
+namespace Nop.Services.Messages
 {
     /// <summary>
     /// Tokenizer

@@ -1,4 +1,7 @@
-﻿using Nop.Services.Tax;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Services.Tax;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Tax;
 using Nop.Web.Framework.Models.Extensions;
@@ -12,8 +15,8 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly ITaxCategoryService _taxCategoryService;
-        protected readonly ITaxPluginManager _taxPluginManager;
+        private readonly ITaxCategoryService _taxCategoryService;
+        private readonly ITaxPluginManager _taxPluginManager;
 
         #endregion
 
@@ -30,7 +33,7 @@ namespace Nop.Web.Areas.Admin.Factories
         #endregion
 
         #region Methods
-
+        
         /// <summary>
         /// Prepare tax provider search model
         /// </summary>

@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Cms;
 using Nop.Core.Domain.Customers;
@@ -6,6 +11,7 @@ using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Events;
+using Nop.Core.Infrastructure;
 using Nop.Services.Authentication.External;
 using Nop.Services.Authentication.MultiFactor;
 using Nop.Services.Cms;
@@ -21,7 +27,6 @@ using Nop.Services.Shipping.Pickup;
 using Nop.Services.Tax;
 using Nop.Services.Themes;
 using Nop.Web.Areas.Admin.Factories;
-using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Areas.Admin.Models.Plugins;
 using Nop.Web.Areas.Admin.Models.Plugins.Marketplace;
 using Nop.Web.Framework.Controllers;
@@ -32,29 +37,29 @@ namespace Nop.Web.Areas.Admin.Controllers
     {
         #region Fields
 
-        protected readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
-        protected readonly IAuthenticationPluginManager _authenticationPluginManager;
-        protected readonly ICommonModelFactory _commonModelFactory;
-        protected readonly ICustomerActivityService _customerActivityService;
-        protected readonly IEventPublisher _eventPublisher;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IMultiFactorAuthenticationPluginManager _multiFactorAuthenticationPluginManager;
-        protected readonly INotificationService _notificationService;
-        protected readonly IPermissionService _permissionService;
-        protected readonly IPaymentPluginManager _paymentPluginManager;
-        protected readonly IPickupPluginManager _pickupPluginManager;
-        protected readonly IPluginModelFactory _pluginModelFactory;
-        protected readonly IPluginService _pluginService;
-        protected readonly ISettingService _settingService;
-        protected readonly IShippingPluginManager _shippingPluginManager;
-        protected readonly IUploadService _uploadService;
-        protected readonly IWidgetPluginManager _widgetPluginManager;
-        protected readonly IWorkContext _workContext;
-        protected readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
-        protected readonly PaymentSettings _paymentSettings;
-        protected readonly ShippingSettings _shippingSettings;
-        protected readonly TaxSettings _taxSettings;
-        protected readonly WidgetSettings _widgetSettings;
+        private readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
+        private readonly IAuthenticationPluginManager _authenticationPluginManager;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly IEventPublisher _eventPublisher;
+        private readonly ILocalizationService _localizationService;
+        private readonly IMultiFactorAuthenticationPluginManager _multiFactorAuthenticationPluginManager;
+        private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
+        private readonly IPaymentPluginManager _paymentPluginManager;
+        private readonly IPickupPluginManager _pickupPluginManager;
+        private readonly IPluginModelFactory _pluginModelFactory;
+        private readonly IPluginService _pluginService;
+        private readonly ISettingService _settingService;
+        private readonly IShippingPluginManager _shippingPluginManager;
+        private readonly IUploadService _uploadService;
+        private readonly IWebHelper _webHelper;
+        private readonly IWidgetPluginManager _widgetPluginManager;
+        private readonly IWorkContext _workContext;
+        private readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
+        private readonly PaymentSettings _paymentSettings;
+        private readonly ShippingSettings _shippingSettings;
+        private readonly TaxSettings _taxSettings;
+        private readonly WidgetSettings _widgetSettings;
 
         #endregion
 
@@ -62,7 +67,6 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         public PluginController(ExternalAuthenticationSettings externalAuthenticationSettings,
             IAuthenticationPluginManager authenticationPluginManager,
-            ICommonModelFactory commonModelFactory,
             ICustomerActivityService customerActivityService,
             IEventPublisher eventPublisher,
             ILocalizationService localizationService,
@@ -76,6 +80,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             ISettingService settingService,
             IShippingPluginManager shippingPluginManager,
             IUploadService uploadService,
+            IWebHelper webHelper,
             IWidgetPluginManager widgetPluginManager,
             IWorkContext workContext,
             MultiFactorAuthenticationSettings multiFactorAuthenticationSettings,
@@ -86,7 +91,6 @@ namespace Nop.Web.Areas.Admin.Controllers
         {
             _externalAuthenticationSettings = externalAuthenticationSettings;
             _authenticationPluginManager = authenticationPluginManager;
-            _commonModelFactory = commonModelFactory;
             _customerActivityService = customerActivityService;
             _eventPublisher = eventPublisher;
             _localizationService = localizationService;
@@ -100,6 +104,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _settingService = settingService;
             _shippingPluginManager = shippingPluginManager;
             _uploadService = uploadService;
+            _webHelper = webHelper;
             _widgetPluginManager = widgetPluginManager;
             _workContext = workContext;
             _multiFactorAuthenticationSettings = multiFactorAuthenticationSettings;
@@ -111,21 +116,54 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #endregion
 
+        #region Utils
+
+        //TODO: make CommonModelFactory.PreparePluginsWarningModelAsync method public and delete this one
+        protected virtual async Task<List<string>> GetPluginsWarningModelAsync()
+        {
+            var warnings = new List<string>();
+
+            var pluginInfo = Singleton<IPluginsInfo>.Instance;
+
+            foreach (var pluginName in pluginInfo.IncompatiblePlugins) 
+                warnings.Add(string.Format($"<b>{pluginName.Key}</b> plugin: {pluginName.Value}"));
+
+            var assemblyCollisions = _pluginService.GetAssemblyCollisions();
+
+            if (!assemblyCollisions.Any())
+                return warnings;
+
+            var warningFormat = await _localizationService
+                .GetResourceAsync("Admin.System.Warnings.PluginRequiredAssembly");
+
+            //check whether there are any collision of loaded assembly
+            foreach (var assembly in assemblyCollisions)
+            {
+                //get plugin references message
+                var message = assembly.Collisions
+                    .Select(item => string.Format(warningFormat, item.PluginName, item.AssemblyName))
+                    .Aggregate("", (current, all) => all + ", " + current).TrimEnd(',', ' ');
+
+                warnings.Add(string.Format(
+                    await _localizationService.GetResourceAsync("Admin.System.Warnings.AssemblyHasCollision"),
+                    assembly.ShortName, assembly.AssemblyFullNameInMemory, message));
+            }
+
+            return warnings;
+        }
+
+        #endregion
+
         #region Methods
 
-        public virtual async Task<IActionResult> List(bool showWarnings = true)
+        public virtual async Task<IActionResult> List()
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManagePlugins))
                 return AccessDeniedView();
 
             var model = await _pluginModelFactory.PreparePluginSearchModelAsync(new PluginSearchModel());
 
-            if (!showWarnings)
-                return View(model);
-
-            var warnings = new List<SystemWarningModel>();
-            await _commonModelFactory.PreparePluginsWarningModelAsync(warnings);
-
+            var warnings = await GetPluginsWarningModelAsync();
             if (warnings.Any())
                 _notificationService.WarningNotification(string.Join("<br />", warnings), false);
 
@@ -208,7 +246,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 await _notificationService.ErrorNotificationAsync(exc);
             }
 
-            return RedirectToAction("List", new { showWarnings = false });
+            return RedirectToAction("List");
         }
 
         [HttpPost, ActionName("List")]
@@ -229,11 +267,11 @@ namespace Nop.Web.Areas.Admin.Controllers
                 var pluginDescriptor = await _pluginService.GetPluginDescriptorBySystemNameAsync<IPlugin>(systemName, LoadPluginsMode.All);
                 if (pluginDescriptor == null)
                     //No plugin found with the specified id
-                    return RedirectToAction("List", new { showWarnings = false });
+                    return RedirectToAction("List");
 
                 //check whether plugin is not installed
                 if (pluginDescriptor.Installed)
-                    return RedirectToAction("List", new { showWarnings = false });
+                    return RedirectToAction("List");
 
                 await _pluginService.PreparePluginToInstallAsync(pluginDescriptor.SystemName, await _workContext.GetCurrentCustomerAsync());
                 pluginDescriptor.ShowInPluginsList = false;
@@ -244,7 +282,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 await _notificationService.ErrorNotificationAsync(exc);
             }
 
-            return RedirectToAction("List", new { showWarnings = false });
+            return RedirectToAction("List");
         }
 
         [HttpPost, ActionName("List")]
@@ -265,11 +303,11 @@ namespace Nop.Web.Areas.Admin.Controllers
                 var pluginDescriptor = await _pluginService.GetPluginDescriptorBySystemNameAsync<IPlugin>(systemName, LoadPluginsMode.All);
                 if (pluginDescriptor == null)
                     //No plugin found with the specified id
-                    return RedirectToAction("List", new { showWarnings = false });
+                    return RedirectToAction("List");
 
                 //check whether plugin is installed
                 if (!pluginDescriptor.Installed)
-                    return RedirectToAction("List", new { showWarnings = false });
+                    return RedirectToAction("List");
 
                 await _pluginService.PreparePluginToUninstallAsync(pluginDescriptor.SystemName);
                 pluginDescriptor.ShowInPluginsList = false;
@@ -280,7 +318,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 await _notificationService.ErrorNotificationAsync(exc);
             }
 
-            return RedirectToAction("List", new { showWarnings = false });
+            return RedirectToAction("List");
         }
 
         [HttpPost, ActionName("List")]
@@ -302,7 +340,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 //check whether plugin is not installed
                 if (pluginDescriptor.Installed)
-                    return RedirectToAction("List", new { showWarnings = false });
+                    return RedirectToAction("List");
 
                 await _pluginService.PreparePluginToDeleteAsync(pluginDescriptor.SystemName);
                 pluginDescriptor.ShowInPluginsList = false;
@@ -313,7 +351,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 await _notificationService.ErrorNotificationAsync(exc);
             }
 
-            return RedirectToAction("List", new { showWarnings = false });
+            return RedirectToAction("List");
         }
 
         [HttpPost, ActionName("List")]
@@ -363,7 +401,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             _pluginService.ResetChanges();
 
-            return RedirectToAction("List", new { showWarnings = false });
+            return RedirectToAction("List");
         }
 
         public virtual async Task<IActionResult> EditPopup(string systemName)
@@ -374,7 +412,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             //try to get a plugin with the specified system name
             var pluginDescriptor = await _pluginService.GetPluginDescriptorBySystemNameAsync<IPlugin>(systemName, LoadPluginsMode.All);
             if (pluginDescriptor == null)
-                return RedirectToAction("List", new { showWarnings = false });
+                return RedirectToAction("List");
 
             //prepare model
             var model = await _pluginModelFactory.PreparePluginModelAsync(null, pluginDescriptor);
@@ -391,7 +429,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             //try to get a plugin with the specified system name
             var pluginDescriptor = await _pluginService.GetPluginDescriptorBySystemNameAsync<IPlugin>(model.SystemName, LoadPluginsMode.All);
             if (pluginDescriptor == null)
-                return RedirectToAction("List", new { showWarnings = false });
+                return RedirectToAction("List");
 
             if (ModelState.IsValid)
             {

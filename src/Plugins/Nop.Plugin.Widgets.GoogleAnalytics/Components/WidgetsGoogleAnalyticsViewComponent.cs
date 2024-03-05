@@ -1,5 +1,8 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Directory;
@@ -19,20 +22,20 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Components
     {
         #region Fields
 
-        protected const string ORDER_ALREADY_PROCESSED_ATTRIBUTE_NAME = "GoogleAnalytics.OrderAlreadyProcessed";
+        private const string ORDER_ALREADY_PROCESSED_ATTRIBUTE_NAME = "GoogleAnalytics.OrderAlreadyProcessed";
 
-        protected readonly CurrencySettings _currencySettings;
-        protected readonly GoogleAnalyticsSettings _googleAnalyticsSettings;
-        protected readonly ICategoryService _categoryService;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly ILogger _logger;
-        protected readonly IOrderService _orderService;
-        protected readonly IProductService _productService;
-        protected readonly ISettingService _settingService;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IWorkContext _workContext;
+        private readonly CurrencySettings _currencySettings;
+        private readonly GoogleAnalyticsSettings _googleAnalyticsSettings;
+        private readonly ICategoryService _categoryService;
+        private readonly ICurrencyService _currencyService;
+        private readonly ICustomerService _customerService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILogger _logger;
+        private readonly IOrderService _orderService;
+        private readonly IProductService _productService;
+        private readonly ISettingService _settingService;
+        private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -69,7 +72,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Components
 
         #region Utilities
 
-        protected static string FixIllegalJavaScriptChars(string text)
+        private string FixIllegalJavaScriptChars(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -80,7 +83,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Components
         }
 
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task<Order> GetLastOrderAsync()
+        private async Task<Order> GetLastOrderAsync()
         {
             var store = await _storeContext.GetCurrentStoreAsync();
             var customer = await _workContext.GetCurrentCustomerAsync();
@@ -90,7 +93,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Components
         }
 
         /// <returns>A task that represents the asynchronous operation</returns>
-        protected async Task<string> GetEcommerceScriptAsync(Order order)
+        private async Task<string> GetEcommerceScriptAsync(Order order)
         {
             var analyticsTrackingScript = _googleAnalyticsSettings.TrackingScript + "\n";
             analyticsTrackingScript = analyticsTrackingScript.Replace("{GOOGLEID}", _googleAnalyticsSettings.GoogleId);
@@ -116,6 +119,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Components
 
                 var analyticsEcommerceScript = @"gtag('event', 'purchase', {
                     'transaction_id': '{ORDERID}',
+                    'affiliation': '{SITE}',
                     'value': {TOTAL},
                     'currency': '{CURRENCY}',
                     'tax': {TAX},
@@ -125,6 +129,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Components
                     ]
                 });";
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{ORDERID}", FixIllegalJavaScriptChars(order.CustomOrderNumber));
+                analyticsEcommerceScript = analyticsEcommerceScript.Replace("{SITE}", FixIllegalJavaScriptChars(store.Name));
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{TOTAL}", order.OrderTotal.ToString("0.00", usCulture));
                 var currencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId)).CurrencyCode;
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{CURRENCY}", currencyCode);
@@ -140,11 +145,10 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Components
                         sb.AppendLine(",");
 
                     var analyticsEcommerceDetailScript = @"{
-                    'item_id': '{PRODUCTSKU}',
-                    'item_name': '{PRODUCTNAME}',
-                    'affiliation': '{SITE}',
-                    'item_category': '{CATEGORYNAME}',
-                    'index': {LISTPOSITION},
+                    'id': '{PRODUCTSKU}',
+                    'name': '{PRODUCTNAME}',
+                    'category': '{CATEGORYNAME}',
+                    'list_position': {LISTPOSITION},
                     'quantity': {QUANTITY},
                     'price': '{UNITPRICE}'
                     }
@@ -159,7 +163,6 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Components
 
                     analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{PRODUCTSKU}", FixIllegalJavaScriptChars(sku));
                     analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{PRODUCTNAME}", FixIllegalJavaScriptChars(product.Name));
-                    analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{SITE}", FixIllegalJavaScriptChars(store.Name));
                     var category = (await _categoryService.GetCategoryByIdAsync((await _categoryService.GetProductCategoriesByProductIdAsync(item.ProductId)).FirstOrDefault()?.CategoryId ?? 0))?.Name;
                     analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{CATEGORYNAME}", FixIllegalJavaScriptChars(category));
                     analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{LISTPOSITION}", listingPosition.ToString());
@@ -206,7 +209,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Components
                 //Special case, if we are in last step of checkout, we can use order total for conversion value
                 var isOrderCompletedPage = controller.ToString().Equals("checkout", StringComparison.InvariantCultureIgnoreCase) &&
                     action.ToString().Equals("completed", StringComparison.InvariantCultureIgnoreCase);
-                if (isOrderCompletedPage && _googleAnalyticsSettings.EnableEcommerce)
+                if (isOrderCompletedPage && _googleAnalyticsSettings.EnableEcommerce && _googleAnalyticsSettings.UseJsToSendEcommerceInfo)
                 {
                     var lastOrder = await GetLastOrderAsync();
                     script += await GetEcommerceScriptAsync(lastOrder);

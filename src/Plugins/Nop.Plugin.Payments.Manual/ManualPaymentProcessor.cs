@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
@@ -20,11 +24,11 @@ namespace Nop.Plugin.Payments.Manual
     {
         #region Fields
 
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IOrderTotalCalculationService _orderTotalCalculationService;
-        protected readonly ISettingService _settingService;
-        protected readonly IWebHelper _webHelper;
-        protected readonly ManualPaymentSettings _manualPaymentSettings;
+        private readonly ILocalizationService _localizationService;
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly ISettingService _settingService;
+        private readonly IWebHelper _webHelper;
+        private readonly ManualPaymentSettings _manualPaymentSettings;
 
         #endregion
 

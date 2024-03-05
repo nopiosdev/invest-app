@@ -1,4 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -9,9 +13,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Stores;
-using Nop.Core.Events;
 using Nop.Data;
-using Nop.Services.Attributes;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -33,35 +35,34 @@ namespace Nop.Services.Orders
     {
         #region Fields
 
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly IAclService _aclService;
-        protected readonly IActionContextAccessor _actionContextAccessor;
-        protected readonly IAttributeParser<CheckoutAttribute, CheckoutAttributeValue> _checkoutAttributeParser;
-        protected readonly IAttributeService<CheckoutAttribute, CheckoutAttributeValue> _checkoutAttributeService;
-        protected readonly ICurrencyService _currencyService;
-        protected readonly ICustomerService _customerService;
-        protected readonly IDateRangeService _dateRangeService;
-        protected readonly IDateTimeHelper _dateTimeHelper;
-        protected readonly IEventPublisher _eventPublisher;
-        protected readonly IGenericAttributeService _genericAttributeService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly IPermissionService _permissionService;
-        protected readonly IPriceCalculationService _priceCalculationService;
-        protected readonly IPriceFormatter _priceFormatter;
-        protected readonly IProductAttributeParser _productAttributeParser;
-        protected readonly IProductAttributeService _productAttributeService;
-        protected readonly IProductService _productService;
-        protected readonly IRepository<ShoppingCartItem> _sciRepository;
-        protected readonly IShippingService _shippingService;
-        protected readonly IStaticCacheManager _staticCacheManager;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IStoreService _storeService;
-        protected readonly IStoreMappingService _storeMappingService;
-        protected readonly IUrlHelperFactory _urlHelperFactory;
-        protected readonly IUrlRecordService _urlRecordService;
-        protected readonly IWorkContext _workContext;
-        protected readonly OrderSettings _orderSettings;
-        protected readonly ShoppingCartSettings _shoppingCartSettings;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly IAclService _aclService;
+        private readonly IActionContextAccessor _actionContextAccessor;
+        private readonly ICheckoutAttributeParser _checkoutAttributeParser;
+        private readonly ICheckoutAttributeService _checkoutAttributeService;
+        private readonly ICurrencyService _currencyService;
+        private readonly ICustomerService _customerService;
+        private readonly IDateRangeService _dateRangeService;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IPermissionService _permissionService;
+        private readonly IPriceCalculationService _priceCalculationService;
+        private readonly IPriceFormatter _priceFormatter;
+        private readonly IProductAttributeParser _productAttributeParser;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductService _productService;
+        private readonly IRepository<ShoppingCartItem> _sciRepository;
+        private readonly IShippingService _shippingService;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly IStoreContext _storeContext;
+        private readonly IStoreService _storeService;
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly IUrlHelperFactory _urlHelperFactory;
+        private readonly IUrlRecordService _urlRecordService;
+        private readonly IWorkContext _workContext;
+        private readonly OrderSettings _orderSettings;
+        private readonly ShoppingCartSettings _shoppingCartSettings;
 
         #endregion
 
@@ -70,13 +71,12 @@ namespace Nop.Services.Orders
         public ShoppingCartService(CatalogSettings catalogSettings,
             IAclService aclService,
             IActionContextAccessor actionContextAccessor,
-            IAttributeParser<CheckoutAttribute, CheckoutAttributeValue> checkoutAttributeParser,
-            IAttributeService<CheckoutAttribute, CheckoutAttributeValue> checkoutAttributeService,
+            ICheckoutAttributeParser checkoutAttributeParser,
+            ICheckoutAttributeService checkoutAttributeService,
             ICurrencyService currencyService,
             ICustomerService customerService,
             IDateRangeService dateRangeService,
             IDateTimeHelper dateTimeHelper,
-            IEventPublisher eventPublisher,
             IGenericAttributeService genericAttributeService,
             ILocalizationService localizationService,
             IPermissionService permissionService,
@@ -106,7 +106,6 @@ namespace Nop.Services.Orders
             _customerService = customerService;
             _dateRangeService = dateRangeService;
             _dateTimeHelper = dateTimeHelper;
-            _eventPublisher = eventPublisher;
             _genericAttributeService = genericAttributeService;
             _localizationService = localizationService;
             _permissionService = permissionService;
@@ -250,12 +249,15 @@ namespace Nop.Services.Orders
             if (!requiredProducts.Any())
                 return warnings;
 
+            var finalRequiredProducts = requiredProducts.GroupBy(p => p.Id)
+                .Select(g => new { Product = g.First(), Count = g.Count() });
+
             //get warnings
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
             var warningLocale = await _localizationService.GetResourceAsync("ShoppingCart.RequiredProductWarning");
-            foreach (var requiredProduct in requiredProducts)
+            foreach (var requiredProduct in finalRequiredProducts)
             {
-                var productsRequiringRequiredProduct = await GetProductsRequiringProductAsync(cart, requiredProduct);
+                var productsRequiringRequiredProduct = await GetProductsRequiringProductAsync(cart, requiredProduct.Product);
 
                 //get the required quantity of the required product
                 var requiredProductRequiredQuantity = quantity * requiredProductQuantity +
@@ -264,15 +266,15 @@ namespace Nop.Services.Orders
                         .Sum(item => item.Quantity * requiredProductQuantity);
 
                 //whether required product is already in the cart in the required quantity
-                var quantityToAdd = requiredProductRequiredQuantity - (cart.FirstOrDefault(item => item.ProductId == requiredProduct.Id)?.Quantity ?? 0);
+                var quantityToAdd = requiredProductRequiredQuantity * requiredProduct.Count - (cart.FirstOrDefault(item => item.ProductId == requiredProduct.Product.Id)?.Quantity ?? 0);
                 if (quantityToAdd <= 0)
                     continue;
 
                 //prepare warning message
-                var url = urlHelper.RouteUrl(nameof(Product), new { SeName = await _urlRecordService.GetSeNameAsync(requiredProduct) });
-                var requiredProductName = WebUtility.HtmlEncode(await _localizationService.GetLocalizedAsync(requiredProduct, x => x.Name));
+                var url = urlHelper.RouteUrl(nameof(Product), new { SeName = await _urlRecordService.GetSeNameAsync(requiredProduct.Product) });
+                var requiredProductName = WebUtility.HtmlEncode(await _localizationService.GetLocalizedAsync(requiredProduct.Product, x => x.Name));
                 var requiredProductWarning = _catalogSettings.UseLinksInRequiredProductWarnings
-                    ? string.Format(warningLocale, $"<a href=\"{url}\">{requiredProductName}</a>", requiredProductRequiredQuantity)
+                    ? string.Format(warningLocale, $"<a href=\"{url}\">{requiredProductName}</a>", requiredProductRequiredQuantity * requiredProduct.Count)
                     : string.Format(warningLocale, requiredProductName, requiredProductRequiredQuantity);
 
                 //add to cart (if possible)
@@ -281,7 +283,7 @@ namespace Nop.Services.Orders
                     //do not add required products to prevent circular references
                     var addToCartWarnings = await GetShoppingCartItemWarningsAsync(
                         customer: customer,
-                        product: requiredProduct,
+                        product: requiredProduct.Product,
                         attributesXml: null,
                         customerEnteredPrice: decimal.Zero,
                         shoppingCartType: shoppingCartType,
@@ -603,12 +605,8 @@ namespace Nop.Services.Orders
             await _sciRepository.DeleteAsync(shoppingCartItem);
 
             //reset "HasShoppingCartItems" property used for performance optimization
-            var hasShoppingCartItems = !IsCustomerShoppingCartEmpty(customer);
-            if (hasShoppingCartItems != customer.HasShoppingCartItems)
-            {
-                customer.HasShoppingCartItems = hasShoppingCartItems;
-                await _customerService.UpdateCustomerAsync(customer);
-            }
+            customer.HasShoppingCartItems = !IsCustomerShoppingCartEmpty(customer);
+            await _customerService.UpdateCustomerAsync(customer);
 
             //validate checkout attributes
             if (ensureOnlyActiveCheckoutAttributes &&
@@ -648,32 +646,6 @@ namespace Nop.Services.Orders
                 await UpdateShoppingCartItemAsync(customer, cartItem.Id, cartItem.AttributesXml, cartItem.CustomerEnteredPrice,
                     quantity: cartItem.Quantity - shoppingCartItem.Quantity * requiredProductQuantity,
                     resetCheckoutData: false);
-            }
-        }
-
-        /// <summary>
-        /// Clear shopping cart
-        /// </summary>
-        /// <param name="customer">Customer</param>
-        /// <param name="storeId">Store ID</param>
-        /// <returns>A task that represents the asynchronous operation</returns>
-        public virtual async Task ClearShoppingCartAsync(Customer customer, int storeId)
-        {
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-
-            var cart = await GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, storeId);
-
-            //delete items
-            await _sciRepository.DeleteAsync(cart, publishEvent: false);
-            await _eventPublisher.PublishAsync(new ClearShoppingCartEvent(cart));
-
-            //reset "HasShoppingCartItems" property used for performance optimization
-            var hasShoppingCartItems = !IsCustomerShoppingCartEmpty(customer);
-            if (hasShoppingCartItems != customer.HasShoppingCartItems)
-            {
-                customer.HasShoppingCartItems = hasShoppingCartItems;
-                await _customerService.UpdateCustomerAsync(customer);
             }
         }
 
@@ -1184,7 +1156,7 @@ namespace Nop.Services.Orders
             if (shoppingCart.Count > _shoppingCartSettings.MaximumShoppingCartItems)
                 warnings.Add(string.Format(await _localizationService.GetResourceAsync("ShoppingCart.MaximumShoppingCartItems"), _shoppingCartSettings.MaximumShoppingCartItems));
 
-            var hasStandardProducts = false;
+            var hasStandartProducts = false;
             var hasRecurringProducts = false;
 
             foreach (var sci in shoppingCart)
@@ -1199,11 +1171,11 @@ namespace Nop.Services.Orders
                 if (product.IsRecurring)
                     hasRecurringProducts = true;
                 else
-                    hasStandardProducts = true;
+                    hasStandartProducts = true;
             }
 
             //don't mix standard and recurring products
-            if (hasStandardProducts && hasRecurringProducts)
+            if (hasStandartProducts && hasRecurringProducts)
                 warnings.Add(await _localizationService.GetResourceAsync("ShoppingCart.CannotMixStandardAndAutoshipProducts"));
 
             //recurring cart validation
@@ -1222,17 +1194,17 @@ namespace Nop.Services.Orders
                 return warnings;
 
             //selected attributes
-            var attributes1 = await _checkoutAttributeParser.ParseAttributesAsync(checkoutAttributesXml);
+            var attributes1 = await _checkoutAttributeParser.ParseCheckoutAttributesAsync(checkoutAttributesXml);
 
             //existing checkout attributes
             var excludeShippableAttributes = !await ShoppingCartRequiresShippingAsync(shoppingCart);
             var store = await _storeContext.GetCurrentStoreAsync();
-            var attributes2 = await _checkoutAttributeService.GetAllAttributesAsync(_staticCacheManager, _storeMappingService, store.Id, excludeShippableAttributes);
+            var attributes2 = await _checkoutAttributeService.GetAllCheckoutAttributesAsync(store.Id, excludeShippableAttributes);
 
             //validate conditional attributes only (if specified)
             attributes2 = await attributes2.WhereAwait(async x =>
             {
-                var conditionMet = await _checkoutAttributeParser.IsConditionMetAsync(x.ConditionAttributeXml, checkoutAttributesXml);
+                var conditionMet = await _checkoutAttributeParser.IsConditionMetAsync(x, checkoutAttributesXml);
                 return !conditionMet.HasValue || conditionMet.Value;
             }).ToListAsync();
 
@@ -1687,12 +1659,9 @@ namespace Nop.Services.Orders
                 await _sciRepository.InsertAsync(shoppingCartItem);
 
                 //updated "HasShoppingCartItems" property used for performance optimization
-                var hasShoppingCartItems = !IsCustomerShoppingCartEmpty(customer);
-                if (hasShoppingCartItems != customer.HasShoppingCartItems)
-                {
-                    customer.HasShoppingCartItems = hasShoppingCartItems;
-                    await _customerService.UpdateCustomerAsync(customer);
-                }
+                customer.HasShoppingCartItems = !IsCustomerShoppingCartEmpty(customer);
+
+                await _customerService.UpdateCustomerAsync(customer);
             }
 
             return warnings;
@@ -1704,9 +1673,12 @@ namespace Nop.Services.Orders
                 if (!requiredProducts.Any())
                     return;
 
-                foreach (var requiredProduct in requiredProducts)
+                var finalRequiredProducts = requiredProducts.GroupBy(p => p.Id)
+                    .Select(g => new { Product = g.First(), Count = g.Count() });
+
+                foreach (var requiredProduct in finalRequiredProducts)
                 {
-                    var productsRequiringRequiredProduct = await GetProductsRequiringProductAsync(cart, requiredProduct);
+                    var productsRequiringRequiredProduct = await GetProductsRequiringProductAsync(cart, requiredProduct.Product);
 
                     //get the required quantity of the required product
                     var requiredProductRequiredQuantity = (qty > 0 ? qty : quantity) +
@@ -1715,15 +1687,15 @@ namespace Nop.Services.Orders
                             .Sum(item => item.Quantity);
 
                     //whether required product is already in the cart in the required quantity
-                    var quantityToAdd = requiredProductRequiredQuantity - (cart.FirstOrDefault(item => item.ProductId == requiredProduct.Id)?.Quantity ?? 0);
+                    var quantityToAdd = requiredProductRequiredQuantity * requiredProduct.Count - (cart.FirstOrDefault(item => item.ProductId == requiredProduct.Product.Id)?.Quantity ?? 0);
                     if (quantityToAdd <= 0)
                         continue;
 
                     if (addRequiredProducts && product.AutomaticallyAddRequiredProducts)
                     {
                         //do not add required products to prevent circular references
-                        var addToCartWarnings = await AddToCartAsync(customer, requiredProduct, shoppingCartType, storeId,
-                            quantity: quantityToAdd, addRequiredProducts: requiredProduct.AutomaticallyAddRequiredProducts);
+                        var addToCartWarnings = await AddToCartAsync(customer, requiredProduct.Product, shoppingCartType, storeId,
+                            quantity: quantityToAdd, addRequiredProducts: requiredProduct.Product.AutomaticallyAddRequiredProducts);
 
                         if (addToCartWarnings.Any())
                         {
@@ -1793,6 +1765,7 @@ namespace Nop.Services.Orders
                 shoppingCartItem.UpdatedOnUtc = DateTime.UtcNow;
 
                 await _sciRepository.UpdateAsync(shoppingCartItem);
+                await _customerService.UpdateCustomerAsync(customer);
             }
             else
             {
@@ -1855,6 +1828,9 @@ namespace Nop.Services.Orders
                 //gift card
                 foreach (var code in await _customerService.ParseAppliedGiftCardCouponCodesAsync(fromCustomer))
                     await _customerService.ApplyGiftCardCouponCodeAsync(toCustomer, code);
+
+                //save customer
+                await _customerService.UpdateCustomerAsync(toCustomer);
             }
 
             //move selected checkout attributes
@@ -1913,14 +1889,18 @@ namespace Nop.Services.Orders
             RecurringProductCyclePeriod? cyclePeriod = null;
             int? totalCycles = null;
 
-            var conflictError = await _localizationService.GetResourceAsync("ShoppingCart.ConflictingShipmentSchedules");
-
             foreach (var sci in shoppingCart)
             {
-                var product = await _productService.GetProductByIdAsync(sci.ProductId) ?? throw new NopException($"Product (Id={sci.ProductId}) cannot be loaded");
+                var product = await _productService.GetProductByIdAsync(sci.ProductId);
+                if (product == null)
+                {
+                    throw new NopException($"Product (Id={sci.ProductId}) cannot be loaded");
+                }
 
                 if (!product.IsRecurring)
                     continue;
+
+                var conflictError = await _localizationService.GetResourceAsync("ShoppingCart.ConflictingShipmentSchedules");
 
                 //cycle length
                 if (cycleLength.HasValue && cycleLength.Value != product.RecurringCycleLength)

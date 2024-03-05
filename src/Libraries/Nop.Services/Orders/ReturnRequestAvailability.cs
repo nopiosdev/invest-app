@@ -1,4 +1,7 @@
-﻿namespace Nop.Services.Orders
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace Nop.Services.Orders
 {
     /// <summary>
     /// Represents the return request availability

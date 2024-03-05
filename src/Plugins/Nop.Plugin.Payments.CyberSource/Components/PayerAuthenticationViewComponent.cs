@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Nop.Core;
@@ -17,10 +18,10 @@ namespace Nop.Plugin.Payments.CyberSource.Components
     {
         #region Fields
 
-        protected readonly CyberSourceSettings _cyberSourceSettings;
-        protected readonly IPaymentPluginManager _paymentPluginManager;
-        protected readonly IStoreContext _storeContext;
-        protected readonly IWorkContext _workContext;
+        private readonly CyberSourceSettings _cyberSourceSettings;
+        private readonly IPaymentPluginManager _paymentPluginManager;
+        private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
 
         #endregion
 

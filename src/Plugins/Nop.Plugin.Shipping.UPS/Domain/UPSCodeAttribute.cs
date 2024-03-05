@@ -1,4 +1,6 @@
-﻿namespace Nop.Plugin.Shipping.UPS.Domain
+﻿using System;
+
+namespace Nop.Plugin.Shipping.UPS.Domain
 {
     /// <summary>
     /// Represents custom attribute for UPS code

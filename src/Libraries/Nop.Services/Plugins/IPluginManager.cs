@@ -1,4 +1,6 @@
-﻿using Nop.Core.Domain.Customers;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Customers;
 
 namespace Nop.Services.Plugins
 {

@@ -1,4 +1,5 @@
-﻿using FluentMigrator;
+﻿using System.Collections.Generic;
+using FluentMigrator;
 using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Configuration;
@@ -12,10 +13,10 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Data
     {
         #region Fields
 
-        protected readonly PayPalCommerceSettings _payPalCommerceSettings;
-        protected readonly ILanguageService _languageService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ISettingService _settingService;
+        private readonly PayPalCommerceSettings _payPalCommerceSettings;
+        private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ISettingService _settingService;
 
         #endregion
 
@@ -57,7 +58,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Data
             //settings
             if (!_settingService.SettingExists(_payPalCommerceSettings, settings => settings.DisplayPayLaterMessages))
                 _payPalCommerceSettings.DisplayPayLaterMessages = false;
-
+            
             _settingService.SaveSetting(_payPalCommerceSettings);
         }
 

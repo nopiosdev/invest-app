@@ -1,4 +1,6 @@
-﻿namespace Nop.Core.Infrastructure
+﻿using System.Collections.Generic;
+
+namespace Nop.Core.Infrastructure
 {
     /// <summary>
     /// Provides a singleton dictionary for a certain key and vlaue type.

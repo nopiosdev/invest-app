@@ -6,7 +6,7 @@ namespace Nop.Web.Components
 {
     public partial class NewsRssHeaderLinkViewComponent : NopViewComponent
     {
-        protected readonly NewsSettings _newsSettings;
+        private readonly NewsSettings _newsSettings;
 
         public NewsRssHeaderLinkViewComponent(NewsSettings newsSettings)
         {

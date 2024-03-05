@@ -1,8 +1,10 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.Routing;
 using Nop.Core.Domain.Cms;
 using Nop.Services.Configuration;
-using Nop.Web.Factories;using Nop.Web.Framework.Factories;
+using Nop.Web.Factories;
 using NUnit.Framework;
 
 namespace Nop.Tests.Nop.Web.Tests.Public.Factories

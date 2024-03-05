@@ -1,4 +1,6 @@
-﻿using Nop.Core;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Data;
 using Nop.Plugin.Pickup.PickupInStore.Domain;
@@ -18,15 +20,15 @@ namespace Nop.Plugin.Pickup.PickupInStore.Services
         /// <remarks>
         /// {0} : current store ID
         /// </remarks>
-        protected readonly CacheKey _pickupPointAllKey = new("Nop.pickuppoint.all-{0}", PICKUP_POINT_PATTERN_KEY);
-        protected const string PICKUP_POINT_PATTERN_KEY = "Nop.pickuppoint.";
+        private readonly CacheKey _pickupPointAllKey = new("Nop.pickuppoint.all-{0}", PICKUP_POINT_PATTERN_KEY);
+        private const string PICKUP_POINT_PATTERN_KEY = "Nop.pickuppoint.";
 
         #endregion
 
         #region Fields
 
-        protected readonly IRepository<StorePickupPoint> _storePickupPointRepository;
-        protected readonly IStaticCacheManager _staticCacheManager;
+        private readonly IRepository<StorePickupPoint> _storePickupPointRepository;
+        private readonly IStaticCacheManager _staticCacheManager;
 
         #endregion
 

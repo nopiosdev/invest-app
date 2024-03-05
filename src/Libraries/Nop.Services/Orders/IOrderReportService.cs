@@ -1,4 +1,7 @@
-﻿using Nop.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
@@ -78,8 +81,8 @@ namespace Nop.Services.Orders
         /// <param name="vendorId">Vendor identifier; 0 to load all records</param>
         /// <param name="createdFromUtc">Order created date from (UTC); null to load all records</param>
         /// <param name="createdToUtc">Order created date to (UTC); null to load all records</param>
-        /// <param name="osIds">Order status identifiers; null to load all orders</param>
-        /// <param name="psIds">Payment status identifiers; null to load all orders</param>
+        /// <param name="os">Order status; null to load all records</param>
+        /// <param name="ps">Order payment status; null to load all records</param>
         /// <param name="billingCountryId">Billing country identifier; 0 to load all records</param>
         /// <param name="groupBy">0 - group by day, 1 - group by week, 2 - group by total month</param>
         /// <param name="pageIndex">Page index</param>
@@ -96,8 +99,8 @@ namespace Nop.Services.Orders
             int vendorId = 0,
             DateTime? createdFromUtc = null,
             DateTime? createdToUtc = null,
-            List<int> osIds = null,
-            List<int> psIds = null,
+            OrderStatus? os = null,
+            PaymentStatus? ps = null,
             int billingCountryId = 0,
             GroupByOptions groupBy = GroupByOptions.Day,
             int pageIndex = 0,
@@ -126,7 +129,7 @@ namespace Nop.Services.Orders
         /// </returns>
         Task<IPagedList<BestsellersReportLine>> BestSellersReportAsync(
             int categoryId = 0,
-            int manufacturerId = 0,
+            int manufacturerId = 0, 
             int storeId = 0,
             int vendorId = 0,
             DateTime? createdFromUtc = null,
@@ -139,7 +142,7 @@ namespace Nop.Services.Orders
             int pageIndex = 0,
             int pageSize = int.MaxValue,
             bool showHidden = false);
-
+        
         /// <summary>
         /// Get a total amount of best sellers
         /// </summary>
@@ -170,7 +173,7 @@ namespace Nop.Services.Orders
             ShippingStatus? ss = null,
             int billingCountryId = 0,
             bool showHidden = false);
-
+            
         /// <summary>
         /// Gets a list of products (identifiers) purchased by other customers who purchased a specified product
         /// </summary>

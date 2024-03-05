@@ -1,4 +1,6 @@
-﻿using Nop.Services.Common;
+﻿using System;
+using System.Threading.Tasks;
+using Nop.Services.Common;
 using NUnit.Framework;
 
 namespace Nop.Tests.Nop.Services.Tests.Common
@@ -19,10 +21,7 @@ namespace Nop.Tests.Nop.Services.Tests.Common
         {
             var attribute = new global::Nop.Core.Domain.Common.GenericAttribute
             {
-                Key = "test",
-                KeyGroup = "test",
-                Value = "test",
-                CreatedOrUpdatedDateUTC = null
+                Key = "test", KeyGroup = "test", Value = "test", CreatedOrUpdatedDateUTC = null
             };
 
             await _genericAttributeService.InsertAttributeAsync(attribute);

@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using System.Linq;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Localization;
 using Nop.Data;
 
@@ -23,16 +24,16 @@ namespace Nop.Services.Catalog
             if (orderBy == ProductSortingEnum.NameAsc || orderBy == ProductSortingEnum.NameDesc)
             {
                 var currentLanguageId = currentLanguage.Id;
-
+                
                 var query =
                     from product in productsQuery
                     join localizedProperty in localizedPropertyRepository.Table on new
-                    {
-                        product.Id,
-                        languageId = currentLanguageId,
-                        keyGroup = nameof(Product),
-                        key = nameof(Product.Name)
-                    }
+                        {
+                            product.Id,
+                            languageId = currentLanguageId,
+                            keyGroup = nameof(Product),
+                            key = nameof(Product.Name)
+                        }
                         equals new
                         {
                             Id = localizedProperty.EntityId,
@@ -58,7 +59,7 @@ namespace Nop.Services.Catalog
 
                 return productsQuery;
             }
-
+            
             return orderBy switch
             {
                 ProductSortingEnum.PriceAsc => productsQuery.OrderBy(p => p.Price),

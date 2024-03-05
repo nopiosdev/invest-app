@@ -6,7 +6,7 @@ namespace Nop.Web.Components
 {
     public partial class BlogRssHeaderLinkViewComponent : NopViewComponent
     {
-        protected readonly BlogSettings _blogSettings;
+        private readonly BlogSettings _blogSettings;
 
         public BlogRssHeaderLinkViewComponent(BlogSettings blogSettings)
         {

@@ -1,4 +1,8 @@
-﻿using Nop.Core.Domain.Customers;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Shipping;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
@@ -12,7 +16,7 @@ namespace Nop.Services.Shipping.Pickup
     {
         #region Fields
 
-        protected readonly ShippingSettings _shippingSettings;
+        private readonly ShippingSettings _shippingSettings;
 
         #endregion
 

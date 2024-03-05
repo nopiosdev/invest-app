@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Blogs;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
@@ -7,8 +8,8 @@ namespace Nop.Web.Components
 {
     public partial class BlogMonthsViewComponent : NopViewComponent
     {
-        protected readonly BlogSettings _blogSettings;
-        protected readonly IBlogModelFactory _blogModelFactory;
+        private readonly BlogSettings _blogSettings;
+        private readonly IBlogModelFactory _blogModelFactory;
 
         public BlogMonthsViewComponent(BlogSettings blogSettings, IBlogModelFactory blogModelFactory)
         {

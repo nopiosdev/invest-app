@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Discounts;
 using Nop.Services.Discounts;
 using Nop.Web.Framework.Models;
@@ -10,9 +14,10 @@ namespace Nop.Web.Framework.Factories
     /// </summary>
     public partial class DiscountSupportedModelFactory : IDiscountSupportedModelFactory
     {
+
         #region Fields
 
-        protected readonly IDiscountService _discountService;
+        private readonly IDiscountService _discountService;
 
         #endregion
 

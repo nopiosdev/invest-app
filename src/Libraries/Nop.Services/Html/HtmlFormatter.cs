@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace Nop.Services.Html
@@ -10,7 +11,7 @@ namespace Nop.Services.Html
     {
         #region Fields
 
-        protected readonly IBBCodeHelper _bbCodeHelper;
+        private readonly IBBCodeHelper _bbCodeHelper;
 
         #endregion
 
@@ -25,11 +26,6 @@ namespace Nop.Services.Html
 
         #region Utilities
 
-        /// <summary>
-        /// Ensure only allowed HTML tags
-        /// </summary>
-        /// <param name="text">Text to check</param>
-        /// <returns>True - if the text contains only valid tags, false otherwise</returns>
         protected static string EnsureOnlyAllowedHtml(string text)
         {
             if (string.IsNullOrEmpty(text))
@@ -38,7 +34,6 @@ namespace Nop.Services.Html
             const string allowedTags = "br,hr,b,i,u,a,div,ol,ul,li,blockquote,img,span,p,em,strong,font,pre,h1,h2,h3,h4,h5,h6,address,cite";
 
             var m = Regex.Matches(text, "<.*?>", RegexOptions.IgnoreCase);
-            
             for (var i = m.Count - 1; i >= 0; i--)
             {
                 var tag = text[(m[i].Index + 1)..(m[i].Index + m[i].Length)].Trim().ToLower();
@@ -50,12 +45,6 @@ namespace Nop.Services.Html
             return text;
         }
 
-        /// <summary>
-        /// Indicates whether the HTML tag is valid
-        /// </summary>
-        /// <param name="tag">HTMl tag to check</param>
-        /// <param name="tags">List of valid tags</param>
-        /// <returns>True - if the tag if valid, false otherwise</returns>
         protected static bool IsValidTag(string tag, string tags)
         {
             var allowedTags = tags.Split(',');

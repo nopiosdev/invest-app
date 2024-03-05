@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Messages;
 using Nop.Services.Localization;
@@ -19,14 +22,14 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         #region Fields
 
-        protected readonly CatalogSettings _catalogSettings;
-        protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ILocalizedModelFactory _localizedModelFactory;
-        protected readonly IMessageTemplateService _messageTemplateService;
-        protected readonly IMessageTokenProvider _messageTokenProvider;
-        protected readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
-        protected readonly IStoreService _storeService;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly IBaseAdminModelFactory _baseAdminModelFactory;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedModelFactory _localizedModelFactory;
+        private readonly IMessageTemplateService _messageTemplateService;
+        private readonly IMessageTokenProvider _messageTokenProvider;
+        private readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
+        private readonly IStoreService _storeService;
 
         #endregion
 

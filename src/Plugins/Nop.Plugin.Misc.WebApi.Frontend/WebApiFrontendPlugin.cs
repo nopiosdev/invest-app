@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Routing;
 using Nop.Core;
 using Nop.Services.Common;
 using Nop.Services.Plugins;
@@ -15,8 +17,8 @@ namespace Nop.Plugin.Misc.WebApi.Frontend
     {
         #region Fields
 
-        protected readonly IPermissionService _permissionService;
-        protected readonly IWebHelper _webHelper;
+        private readonly IPermissionService _permissionService;
+        private readonly IWebHelper _webHelper;
 
         #endregion
 
@@ -46,7 +48,7 @@ namespace Nop.Plugin.Misc.WebApi.Frontend
         /// </summary>
         /// <returns>A task that represents the asynchronous operation</returns>
         public override async Task InstallAsync()
-        {
+        {            
             await base.InstallAsync();
         }
 

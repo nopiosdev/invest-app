@@ -1,4 +1,7 @@
-﻿using Nop.Core.Domain.Customers;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
 using Nop.Services.Payments;
@@ -25,7 +28,7 @@ namespace Nop.Services.Orders
         /// A task that represents the asynchronous operation
         /// The task result contains the place order result
         /// </returns>
-        Task<PlaceOrderResult> PlaceOrderAsync(ProcessPaymentRequest processPaymentRequest, bool byPassPaymentProcess = false);
+        Task<PlaceOrderResult> PlaceOrderAsync(ProcessPaymentRequest processPaymentRequest);
 
         /// <summary>
         /// Update order totals
@@ -278,11 +281,8 @@ namespace Nop.Services.Orders
         /// Place order items in current user shopping cart.
         /// </summary>
         /// <param name="order">The order</param>
-        /// <returns>
-        /// A task that represents the asynchronous operation
-        /// The task result contains the warnings
-        /// </returns>
-        Task<IList<string>> ReOrderAsync(Order order);
+        /// <returns>A task that represents the asynchronous operation</returns>
+        Task ReOrderAsync(Order order);
 
         /// <summary>
         /// Check whether return request is allowed
@@ -338,6 +338,5 @@ namespace Nop.Services.Orders
         /// <param name="recurringPayment">Recurring payment</param>
         /// <returns>A task that represents the asynchronous operation</returns>
         Task<int> GetCyclesRemainingAsync(RecurringPayment recurringPayment);
-        Task RollBackOrderAsync(Order order);
     }
 }

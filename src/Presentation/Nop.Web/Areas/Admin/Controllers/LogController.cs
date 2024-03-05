@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
@@ -6,7 +9,6 @@ using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Logging;
 using Nop.Web.Framework.Controllers;
-using ILogger = Nop.Services.Logging.ILogger;
 
 namespace Nop.Web.Areas.Admin.Controllers
 {
@@ -14,12 +16,12 @@ namespace Nop.Web.Areas.Admin.Controllers
     {
         #region Fields
 
-        protected readonly ICustomerActivityService _customerActivityService;
-        protected readonly ILocalizationService _localizationService;
-        protected readonly ILogger _logger;
-        protected readonly ILogModelFactory _logModelFactory;
-        protected readonly INotificationService _notificationService;
-        protected readonly IPermissionService _permissionService;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILogger _logger;
+        private readonly ILogModelFactory _logModelFactory;
+        private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
 
         #endregion
 

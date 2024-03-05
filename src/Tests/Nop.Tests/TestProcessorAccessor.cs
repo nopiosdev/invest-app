@@ -1,4 +1,5 @@
-﻿using FluentMigrator;
+﻿using System.Collections.Generic;
+using FluentMigrator;
 using FluentMigrator.Runner.Processors;
 using Nop.Data.Migrations;
 
@@ -17,7 +18,7 @@ namespace Nop.Tests
 
         #endregion
 
-        #region Utilities
+        #region Utils
 
         /// <summary>
         /// Configure processor

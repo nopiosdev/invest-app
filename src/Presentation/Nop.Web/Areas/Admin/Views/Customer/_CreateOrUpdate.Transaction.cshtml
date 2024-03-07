@@ -1,0 +1,78 @@
+﻿@model CustomerModel
+
+<div class="card-body">
+    @await Html.PartialAsync("Table", new DataTablesModel
+    {
+    Name = "transactions-grid",
+    UrlRead = new DataUrl("List", "Transaction", new RouteValueDictionary { [nameof(Model.TransactionSearchModel.CustomerId)] = Model.Id }),
+    SearchButtonId = "search-transactions",
+    Length = Model.TransactionSearchModel.Length,
+    LengthMenu = Model.TransactionSearchModel.AvailablePageSizes,
+    // Filters = new List<FilterParameter>
+    // {
+    // new FilterParameter(nameof(Model.CreatedOnFrom)),
+    // new FilterParameter(nameof(Model.CreatedOnTo)),
+    // new FilterParameter(nameof(Model.StatusId)),
+    // new FilterParameter(nameof(Model.TransactionTypeId)),
+    // },
+    ColumnCollection = new List<ColumnProperty>
+    {
+    new ColumnProperty(nameof(TransactionModel.CreateOnUtc))
+    {
+    Title = T("Admin.Transaction.Fields.CreateOnUtc").Text,
+    Render = new RenderDate(),
+    },
+    new ColumnProperty(nameof(TransactionModel.FormattedTransactionAmount))
+    {
+    Title = T("Admin.Transaction.Fields.TransactionAmount").Text,
+    Width = "150"
+    },
+    new ColumnProperty(nameof(TransactionModel.StatusString))
+    {
+    Title = T("Admin.Transaction.Fields.Status").Text,
+    Width = "150",
+    Render = new RenderCustom("renderColumnTransactionStatus")
+    },
+    new ColumnProperty(nameof(TransactionModel.TransactionTypeString))
+    {
+    Title = T("Admin.Transaction.Fields.TransactionType").Text,
+    Width = "150"
+    },
+    new ColumnProperty(nameof(TransactionModel.Id))
+    {
+    Title = T("Admin.Common.Edit").Text,
+    Width = "50",
+    ClassName =  NopColumnClassDefaults.Button,
+    Render = new RenderButtonEdit(new DataUrl("~/Admin/Transaction/Edit"))
+    }
+    }
+    })
+
+    <script>
+        function renderColumnTransactionStatus(data, type, row, meta) {
+            var color;
+            switch (row.Status) {
+                case 100:
+                    color = 'green';
+                    break;
+                case 200:
+                    color = 'yellow';
+                    break;
+                case 300:
+                    color = 'red';
+                    break;
+                case 400:
+                    color = 'red';
+                    break;
+            }
+            return '<span class="grid-report-item ' + color + '">' + data + '</span >';
+        }
+    </script>
+
+</div>
+<div class="card-footer">
+    <a href="@Url.Action("Create","Transaction",new { customerId = Model.Id })" class="btn btn-primary">
+        <i class="far fa-save"></i>
+        @T("Admin.Customer.AddDebitTransaction")
+    </a>
+</div>

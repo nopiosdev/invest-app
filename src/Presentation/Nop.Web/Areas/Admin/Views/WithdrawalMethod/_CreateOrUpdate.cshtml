@@ -1,0 +1,25 @@
+﻿@model WithdrawalMethodModel
+
+@{
+    var customer = await workContext.GetCurrentCustomerAsync();
+    const string hideInfoBlockAttributeName = "WithdrawalMethodPage.HideInfoBlock";
+    var hideInfoBlock = await genericAttributeService.GetAttributeAsync<bool>(customer, hideInfoBlockAttributeName);
+
+    const string hideFieldsInfoBlockAttributeName = "WithdrawalMethodPage.HideFieldsInfoBlock";
+    var hideFieldsInfoBlock = await genericAttributeService.GetAttributeAsync<bool>(customer, hideFieldsInfoBlockAttributeName);
+
+}
+
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="form-horizontal">
+            <nop-cards id="withdrawal-method-cards">
+                <nop-card asp-name="withdrawal-method-info" asp-icon="fas fa-info" asp-title="@T("Admin.Customers.WithdrawalMethods.Info")" asp-hide-block-attribute-name="@hideInfoBlockAttributeName" asp-hide="@hideInfoBlock" asp-advanced="false">@await Html.PartialAsync("_CreateOrUpdate.Info", Model)</nop-card>
+                <nop-card asp-name="withdrawal-method-fields-info" asp-icon="fas fa-info" asp-title="@T("Admin.Customers.WithdrawalMethods.Info")" asp-hide-block-attribute-name="@hideFieldsInfoBlockAttributeName" asp-hide="@hideFieldsInfoBlock" asp-advanced="false">@await Html.PartialAsync("_CreateOrUpdate.WithdrawalMethodFields", Model)</nop-card>
+            </nop-cards>
+        </div>
+    </div>
+</section>

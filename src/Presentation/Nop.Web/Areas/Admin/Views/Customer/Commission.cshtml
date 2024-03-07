@@ -1,0 +1,128 @@
+﻿@model CustomerCommissionSearchModel
+
+@{
+    //page title
+    ViewBag.PageTitle = T("Admin.Customers.CustomerCommission").Text;
+    //active menu item (system name)
+    NopHtml.SetActiveMenuItemSystemName("Customer Commission list");
+}
+
+@{
+    const string hideSearchBlockAttributeName = "CustomerCommissionListPage.HideSearchBlock";
+    var hideSearchBlock = await genericAttributeService.GetAttributeAsync<bool>(await workContext.GetCurrentCustomerAsync(), hideSearchBlockAttributeName);
+}
+
+<form asp-controller="Customer" asp-action="List" method="post">
+    <div class="content-header clearfix">
+        <h1 class="float-left">
+            @T("Admin.Customers.CustomerCommission")
+        </h1>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="form-horizontal">
+                <div class="cards-group">
+                    <div class="card card-default card-search">
+                        <div class="card-body">
+                            <div class="row search-row @(!hideSearchBlock ? "opened" : "")" data-hideAttribute="@hideSearchBlockAttributeName">
+                                <div class="search-text">@T("Admin.Common.Search")</div>
+                                <div class="icon-search"><i class="fas fa-search" aria-hidden="true"></i></div>
+                                <div class="icon-collapse"><i class="far fa-angle-@(!hideSearchBlock ? "up" : "down")" aria-hidden="true"></i></div>
+                            </div>
+                            <div class="search-body @(hideSearchBlock ? "closed" : "")">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="form-group row">
+                                            <div class="col-md-4">
+                                                <nop-label asp-for="SelectCustomer" />
+                                            </div>
+                                            <div class="col-md-8">
+                                                <nop-select asp-for="SelectCustomer" asp-items="Model.AvailableCustomer" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="text-center col-12">
+                                        <button type="button" id="search-customer-commission" class="btn btn-primary btn-search">
+                                            <i class="fas fa-search"></i>
+                                            @T("Admin.Common.Search")
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-default">
+                        <div class="card-body">
+                            @await Html.PartialAsync("Table", new DataTablesModel
+                            {
+                            Name = "customer-commission-grid",
+                            UrlRead = new DataUrl("CustomerCommissionList", "Customer"),
+                            Length = Model.PageSize,
+                            LengthMenu = Model.AvailablePageSizes,
+                            Filters = new List<FilterParameter>
+                            {
+                            new FilterParameter(nameof(Model.SelectCustomer)),
+                            },
+                            ColumnCollection = new List<ColumnProperty>
+                            {
+                            // new ColumnProperty(nameof(CustomerCommissionModel.CreatedOn))
+                            // {
+                            // Title = T("Admin.Customers.CustomerCommissionModel.CreatedOn").Text,
+                            // Render = new RenderDate()
+                            // },
+                            new ColumnProperty(nameof(CustomerCommissionModel.PaidCustomer))
+                            {
+                            Title = T("Admin.Customers.CustomerCommissionModel.PaidCustomer").Text,
+                            Render=new RenderLink(new DataUrl("~/Admin/Customer/Edit", nameof(CustomerCommissionModel.CustomerId)))
+                            },
+                            new ColumnProperty(nameof(CustomerCommissionModel.PaidAmount))
+                            {
+                            Title = T("Admin.Customers.CustomerCommissionModel.PaidAmount").Text,
+                            },
+                            }
+                            })
+                        </div>
+                        <div class="card-footer">
+                            <p id="totalPaidCommission">@T("Admin.Customers.CustomerCommissionModel.TotalPaidCommission"): <span></span></p>
+                            <button type="submit" id="btnRefreshCustomerCommissionGrid" style="display: none"></button>
+                            <script>
+                                $(document).ready(function () {
+                                    $('#search-customer-commission').click(function () {
+                                        //refresh grid
+                                        updateTable('#customer-commission-grid');
+
+                                        var postData = {
+                                            SelectCustomer: $('#@Html.IdFor(model => model.SelectCustomer)').val(),
+                                        };
+
+                                        $.ajax({
+                                            cache: false,
+                                            type: "POST",
+                                            url: "@(Url.Action("CustomerCommissionList", "Customer"))",
+                                            data: addAntiForgeryToken(postData),
+                                            success: function (data, textStatus, jqXHR) {
+                                                console.log(data);
+                                                if (data) {
+                                                    $('#totalPaidCommission span').text(data.TotalPaidAmount);
+                                                }
+                                            }
+                                        });
+
+                                        //return false to don't reload a page
+                                        return false;
+                                    });
+                                    $('#search-customer-commission').click();
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

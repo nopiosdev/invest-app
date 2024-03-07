@@ -1,0 +1,33 @@
+@using Nop.Core.Domain.Transaction;
+@model TransactionModel
+
+<div class="card-body">
+        <div class="ps-3 w-100">
+            <div class="title">
+                @* Wallet type *@
+                <h2>@Model.WithdrawalMethodModel.Name</h2>
+            </div>
+
+            @foreach (var item1 in Model.WithdrawalMethodModel.Fields)
+            {
+                @* Withdrawal method *@
+                <div class="ps-3 w-100">
+                    <div class="d-flex align-items-start">
+                        <h5>@item1.Name</h5>
+                    </div>
+                    <div class="ps-4">
+                        @foreach (var item2 in item1.Fields)
+                        {
+                            @* Withdrawal method fields *@
+                            <div class="form-block">
+                                <div class="inputs">
+                                    <label>@item2.Name:</label>
+                                    <span>@item2.Value</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+</div>

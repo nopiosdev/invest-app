@@ -1,0 +1,228 @@
+﻿@using Nop.Core
+@model CustomerInfoModel
+@inject Nop.Core.IWebHelper webHelper
+@{
+    Layout = "_CustomLayout";
+
+    //title
+    NopHtml.AddTitleParts(T("PageTitle.Transactions").Text);
+    //page class
+    NopHtml.AppendPageCssClassParts("html-login-page");
+}
+
+
+<div class="page customer-stock-page">
+    <div class="custom-tabs-wrapper">
+        <div class="tabs-header">
+            <h2 class="tabs-heading">@T("Account.Transactions")</h2>
+            <div class="tabs-navigation">
+                <ul>
+                    <li class="active">
+                        <a href="javascript:void(0)" data-id="DepositTab">@T("Account.Deposits")</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" data-id="WithdrawTab">@T("Account.Withdrawals")</a> 
+                    </li>  
+                </ul>
+            </div>
+        </div>
+        <div class="tabs-content">
+
+            <div id="DepositTab" class="tab active">
+                <div class="datatable-grid ">
+                    <table id="DepositTable" class="table datatable stock-datatable" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>@T("Transaction.Method")</th>
+                                <th>@T("Transaction.Amount")</th>
+                                <th>@T("Transaction.Status")</th>
+                                <th>@T("Transaction.Date")</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+            <div id="WithdrawTab" class="tab">
+                <div class="datatable-grid ">
+                    <table id="WithdrawTable" class="table datatable stock-datatable" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>@T("Transaction.Method")</th>
+                                <th>@T("Transaction.Amount")</th>
+                                <th>@T("Transaction.Status")</th>
+                                <th>@T("Transaction.Date")</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<script asp-location="Footer"> 
+    
+    function WithdrawTable(){
+        var table = $('#WithdrawTable').DataTable({
+            "ajax": {
+                "url": "@Url.RouteUrl("GetTransactionData", new {transactionType="debit"})",
+                "dataType": "json",
+                "contentType": "application/json; charset=utf-8",
+                "dataSrc": function (resp) {
+                    return resp;
+                },
+                error: function () {
+                    alert("Something went wrong!");
+                }
+            },
+            "searching": true,
+            "language": {
+                "searchPlaceholder": "Search by TAS Project Number"
+            },
+            "paging": true,
+            "info": false,
+            "initComplete": function (settings, json) {
+                colorNegativeValue("#billingTransGrid");
+            },
+            "order": [],
+            "aoColumns": [
+                {
+                    "mData": "WithdrawlMethod",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data != "" ? data:"-";
+                    }
+                },
+                {
+                    "mData": "Amount",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                }, 
+                {
+                    "mData": "Status",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        var color = '';
+
+                        switch (data) {
+                            case 'Pending':
+                                color = 'grey';
+                                break;
+                            case 'Declined':
+                                color = '#FF4433';
+                                break;
+                            case 'Cancelled':
+                                color = '#FF4433';
+                                break;
+                            case 'Completed':
+                                color = '#1cb183';
+                                break;
+                        }
+
+                        return '<span style="color:'+ color +'">' + data + '</span>';
+                    }
+                },
+                {
+                    "mData": "Date",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+            ],
+            initComplete: function () {
+                
+            }
+        });
+    }
+
+    function DepositTable(){
+        var table = $('#DepositTable').DataTable({
+            "ajax": {
+                "url": "@Url.RouteUrl("GetTransactionData", new {transactionType="credit"})",
+                "dataType": "json",
+                "contentType": "application/json; charset=utf-8",
+                "dataSrc": function (resp) {
+                    return resp;
+
+                },
+                error: function () {
+                    alert("Something went wrong!");
+                }
+            },
+            "searching": true,
+            "language": {
+                "searchPlaceholder": "Search by TAS Project Number"
+            },
+            "paging": true,
+            "info": false,
+            "initComplete": function (settings, json) {
+                colorNegativeValue("#billingTransGrid");
+            },
+            "order": [],
+            "aoColumns": [
+                {
+                    "mData": "WithdrawlMethod",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data != "" ? data:"-";
+                    }
+                },
+                {
+                    "mData": "Amount",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                }, 
+                 {
+                    "mData": "Status",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        var color = '';
+
+                        switch (data) {
+                            case 'Pending':
+                                color = 'grey';
+                                break;
+                            case 'Declined':
+                                color = '#FF4433';
+                                break;
+                            case 'Cancelled':
+                                color = '#FF4433';
+                                break;
+                            case 'Completed':
+                                color = '#1cb183';
+                                break;
+                        }
+
+                        return '<span style="color:'+ color +'">' + data + '</span>';
+                    }
+                },
+                {
+                    "mData": "Date",
+                    "className": "text-start",
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+            ],
+            initComplete: function () {
+                
+            }
+        });
+    }
+
+    $(document).ready(function(){
+        WithdrawTable();
+        DepositTable();
+    });
+
+</script>
+

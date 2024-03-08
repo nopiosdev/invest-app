@@ -1,0 +1,423 @@
+﻿@using Nop.Services.Localization
+@using Nop.Core
+@inject ILocalizationService localizationService
+@inject IStoreContext storeContext
+
+@{
+    Layout = "_CustomLayout";
+
+    var homepageTitle = await localizationService.GetLocalizedAsync(await storeContext.GetCurrentStoreAsync(), s => s.HomepageTitle);
+
+    //title
+    if (!string.IsNullOrEmpty(homepageTitle))
+    {
+        NopHtml.AddTitleParts(homepageTitle);
+    }
+
+    var homepageDescription = await localizationService.GetLocalizedAsync(await storeContext.GetCurrentStoreAsync(), s => s.HomepageDescription);
+
+    //meta
+    if (!string.IsNullOrEmpty(homepageDescription))
+    {
+        NopHtml.AddMetaDescriptionParts(homepageDescription);
+    }
+
+    //page class
+    NopHtml.AppendPageCssClassParts("html-home-page");
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+    .btn-chart-filter {
+        background-color: #30333a;
+        border: 1px solid #404040;
+        border-top: 1.02px solid #404040;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+    }
+
+    .btn-chart-filter:hover,
+    .btn-chart-filter.active {
+        background-color: #4a4a4a;
+        border-color: #4a4a4a;
+        color: #fff;
+    }
+
+</style>
+
+<div class="page home-page">
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="custom-dash-wrapper">
+                <div class="dash-header">
+                    <h2 class="dash-heading">@T("Account.Dashboard")</h2>
+                    <div class="buttons">
+                        <a href="@Url.RouteUrl("Invest")" class="custom-btn btn-success">
+                            <span class="icon">
+                                <span class="fa fa-plus"></span>
+                            </span>
+                            <span class="text">@T("Account.AddFunds")</span>
+                        </a>
+                        <a href="@Url.RouteUrl("Withdraw")" class="custom-btn btn-danger">
+                            <span class="icon">
+                                <span class="fa fa-minus"></span>
+                            </span>
+                            <span class="text">@T("Account.WithDrawFunds")</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8">
+                    <div class="values">
+                        <div class="account-value">
+                            <h6>@T("Account.AccountValue")</h6>
+                            <h3 class="accountValue">0</h3>
+                        </div>
+                        <div class="net-contri">
+                            <h6>@T("Account.NetContribution")</h6>
+                            <h3 class="netContribution">0</h3>
+                        </div>
+                        <div class="net-contri">
+                            <h6>@T("Account.InvestedAmount")</h6>
+                            <h3 class="investAmount">0</h3>
+                        </div>
+                    </div>
+                    <div class="line-chart-box w-100 p-3">
+                        <div class="col-xl-12 line-chart-filter"></div>
+                        <canvas id="line-Chart" class="line-graph"></canvas>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="parent-info">
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 py-2 pb-3 pt-4 w-100">
+                            <div class="info-box">
+                                <a href="@Url.RouteUrl("Analytics")">
+                                    <div class="child-box">
+                                        <h5>@T("Account.NetReturn")</h5>
+                                        <h6 class="green">@DateTime.Now.ToString("MMMM")</h6>
+                                    </div>
+                                    <h3 class="px-10 netReturn">0</h3>
+                                    <h6 class="green netReturnPercentage">0 %</h6>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 py-2 pb-3 w-100">
+                            <div class="info-box">
+                                <a href="#">
+                                    <div class="d-flex">
+                                        <div class="" style="flex:1">
+                                            <h4>Trading Bots & Signals</h4>
+                                            <p class="px-10">
+                                                Choose from our recommended trading bots on supported trading platforms or copy trades using signals on supported brokers.
+                                            </p>
+                                        </div>
+                                        <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="150px" height="150px" viewBox="0 0 300.000000 300.000000" preserveAspectRatio="xMidYMid meet">  <g transform="translate(0.000000,300.000000) scale(0.100000,-0.100000)" fill="#ffffff" stroke="none"> <path d="M1947 2863 c-13 -21 -45 -77 -72 -125 -49 -85 -50 -86 -75 -73 -42 21 -126 44 -211 55 -124 17 -282 -8 -409 -63 -11 -5 -29 22 -75 113 -58 116 -81 141 -100 109 -4 -6 21 -64 55 -130 34 -66 60 -121 58 -123 -76 -49 -103 -69 -152 -115 -129 -123 -192 -242 -240 -453 l-6 -28 779 0 780 0 -6 38 c-11 70 -53 187 -94 260 -49 89 -160 208 -244 264 l-62 40 69 120 c56 96 67 122 58 134 -19 21 -28 17 -53 -23z m-252 -199 c50 -14 104 -26 120 -27 17 -1 36 -9 42 -19 7 -9 42 -37 77 -62 80 -57 170 -154 219 -237 37 -63 87 -201 87 -240 0 -19 -13 -19 -740 -19 -727 0 -740 0 -740 19 0 40 51 178 87 239 54 88 134 175 219 238 40 30 76 58 79 64 4 6 10 8 15 5 4 -3 27 2 51 11 162 60 333 70 484 28z" /> <path d="M1089 2431 c-73 -74 11 -199 102 -151 24 13 49 61 49 95 0 38 -50 85 -90 85 -22 0 -41 -9 -61 -29z m103 -18 c26 -23 24 -78 -4 -97 -29 -21 -51 -20 -76 2 -31 27 -35 55 -11 85 24 31 63 35 91 10z" /> <path d="M1797 2440 c-31 -25 -44 -78 -27 -111 33 -64 94 -77 141 -30 82 82 -24 212 -114 141z m103 -30 c27 -27 25 -56 -5 -85 -13 -14 -33 -25 -45 -25 -28 0 -60 35 -60 67 0 57 69 84 110 43z" /> <path d="M449 1980 c-43 -13 -74 -38 -97 -79 -22 -38 -22 -46 -22 -440 0 -380 1 -404 20 -440 33 -66 114 -101 187 -82 43 12 96 61 112 104 7 18 11 167 11 417 0 250 -4 399 -11 417 -15 42 -68 92 -109 103 -40 11 -55 11 -91 0z m111 -45 c62 -32 60 -20 60 -472 0 -275 -4 -420 -11 -436 -37 -81 -199 -75 -237 8 -9 19 -12 143 -12 432 l0 405 39 39 c34 34 44 39 85 39 26 0 60 -7 76 -15z" /> <path d="M2456 1980 c-38 -12 -85 -57 -102 -97 -20 -47 -20 -798 0 -846 20 -50 78 -95 131 -103 62 -9 131 26 163 82 22 39 22 40 20 454 l-3 415 -23 31 c-43 57 -122 84 -186 64z m151 -73 l33 -37 0 -406 c0 -358 -2 -409 -16 -434 -24 -39 -68 -62 -120 -62 -52 0 -87 20 -114 65 -19 30 -20 53 -20 427 0 432 0 427 60 468 29 20 44 23 89 19 47 -3 59 -9 88 -40z" /> <path d="M732 1339 l3 -611 33 -29 c32 -29 33 -29 157 -29 l125 0 0 -221 c0 -209 1 -223 22 -260 51 -92 166 -111 249 -42 54 46 59 70 59 308 l0 215 120 0 120 0 0 -208 c0 -114 4 -222 10 -241 19 -68 84 -113 161 -113 60 0 107 27 137 80 21 38 22 51 22 261 l0 221 126 0 126 0 34 34 34 34 0 606 0 606 -770 0 -770 0 2 -611z m1508 -4 l0 -586 -25 -24 c-23 -24 -30 -25 -140 -25 -162 0 -151 17 -154 -255 -2 -179 -5 -224 -18 -245 -48 -82 -183 -80 -233 3 -18 29 -20 51 -20 246 0 185 -2 217 -17 233 -14 15 -32 18 -133 18 -99 0 -119 -3 -132 -17 -13 -15 -17 -62 -23 -247 l-8 -229 -27 -30 c-23 -26 -35 -31 -88 -35 -61 -4 -62 -4 -102 36 l-40 40 -1 208 c0 115 -2 217 -4 227 -8 42 -22 47 -147 47 -113 0 -120 1 -143 25 l-25 24 0 586 0 585 740 0 740 0 0 -585z" /> <path d="M161 1894 c0 -11 3 -14 6 -6 3 7 2 16 -1 19 -3 4 -6 -2 -5 -13z" /> </g> </svg>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 py-2 pb-3 w-100">
+                            <div class="info-box">
+                                <a href="@Url.RouteUrl("ContactUs")">
+                                    <div class="d-flex">
+                                        <div class="" style="flex:1">
+                                            <h4>Help Center & FAQ</h4>
+                                            <p class="px-10">
+                                                Get Help & Answers from customer serivce or the community.
+                                            </p>
+                                        </div>
+                                        <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="150px" height="150px" viewBox="0 0 200.000000 200.000000" preserveAspectRatio="xMidYMid meet">  <g transform="translate(-50.000000,250.000000) scale(0.150000,-0.150000)" fill="#ffffff" stroke="none"> <path d="M883 1475 c-263 -71 -424 -337 -358 -590 69 -262 336 -426 590 -360 262 69 426 336 360 590 -69 262 -340 428 -592 360z m222 -59 c73 -19 131 -52 187 -104 175 -163 183 -429 20 -604 -231 -247 -641 -142 -728 187 -59 221 80 458 306 521 60 16 154 17 215 0z" /> <path d="M945 1281 c-64 -16 -115 -69 -115 -121 0 -17 6 -20 45 -20 32 0 45 4 45 14 0 22 49 56 79 56 58 0 93 -57 71 -116 -6 -16 -33 -51 -60 -79 -48 -50 -70 -88 -70 -126 0 -16 7 -19 50 -19 49 0 50 1 50 30 0 22 12 42 51 81 28 28 57 66 65 85 56 133 -60 251 -211 215z" /> <path d="M940 758 l0 -48 50 0 50 0 0 48 0 47 -50 0 -50 0 0 -47z" /> </g> </svg>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var chartdata = [];
+    const Utils = {
+        months: ({ count }) => {
+            const currentDate = new Date();
+            const months = [];
+            for (let i = 0; i < count; i++) {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                months.push(currentDate.toLocaleString('en-us', { month: 'short' }));
+            }
+            return months.reverse();
+        }
+    };
+
+    const genericOptions = {
+        fill: false,
+        interaction: {
+            intersect: false
+        },
+        radius: 0,
+    };
+
+    const config = {
+        type: 'line',
+        data: {
+            labels: Utils.months({ count: 7 }),
+            datasets: [{
+                label: 'My First Dataset',
+                data: [65, 59, NaN, 48, 56, 57, 40],
+                borderColor: 'rgb(75, 192, 192)',
+                spanGaps: true
+            }]
+        },
+        options: genericOptions
+    };
+
+    const ctx = document.getElementById('line-Chart').getContext('2d');
+
+    var lineChart = new Chart(ctx, config);
+
+    var currencySymbol = "";
+
+
+    function myMomentFormat(value, type) {
+        var resp = "";
+        if (type == "year") {
+            resp = moment(value).format("YYYY");
+        }
+        if (type == "month") {
+            resp = moment(value).format("MMMM").toLowerCase();
+        }
+        if (type == "week") {
+            resp = moment(value).week();
+        }
+        return resp;
+    }
+
+    function calculateDataArray(dataArray, type) {
+        var dataArray_filter = [];
+        var date_key = [];
+        var date_value = [];
+        if (type != "") {
+
+            var temp_week = "";
+            var tempWeekArray = [];
+            var temp_week_array = [];
+            var week_array = [];
+            dataArray.forEach((item) => {
+                var filter_count = 0;
+                var week_array = [];
+                var chartDataFilter = chartdata.filter(x => myMomentFormat(x.key, type) == item);
+                var lastIndex = chartDataFilter[chartDataFilter.length - 1];
+                //console.log("chartDataFilter array last index ",lastIndex);
+                // chartDataFilter.forEach((childitem) => {
+                //     filter_count = filter_count + childitem.value;
+                // });
+                if (type == "week") {
+                    if (moment(lastIndex.key).format("MMMM").toLowerCase() != temp_week) {
+                        temp_week = moment(lastIndex.key).format("MMMM").toLowerCase();
+                        temp_week_array.push(temp_week);
+                    }
+                    dataArray_filter.push({ "key": moment(lastIndex.key).format("MMM DD, YYYY"), "value": lastIndex.value });
+                }
+                else if (type == "month") {
+                    dataArray_filter.push({ "key": moment(lastIndex.key).format("MMM YYYY"), "value": lastIndex.value });
+                }
+                else {
+                    dataArray_filter.push({ "key": item, "value": lastIndex.value });
+                }
+            });
+
+            //console.log(type + " : ",dataArray_filter);
+            if (type == "week") {
+                //console.log("temp_week_array ",temp_week_array);
+                temp_week_array.forEach((item) => {
+                    tempWeekArray.push(dataArray_filter.filter(x => moment(x.key).format("MMMM").toLowerCase() == item).reverse());
+                });
+                //console.log("tempWeekArray ",tempWeekArray);
+                tempWeekArray.forEach((item) => {
+                    item.forEach((i) => {
+                        week_array.push(i);
+                    });
+                });
+                //console.log("week_array ",week_array);
+                dataArray_filter = week_array;
+            }
+        } else {
+            dataArray_filter = dataArray;
+        }
+        dataArray_filter.forEach((item) => {
+            date_key.push(item.key);
+            date_value.push(item.value);
+        });
+        return { "key": date_key, "value": date_value };
+    }
+
+    function chartFilters() {
+        var currentYear = "";
+        var currentMonth = "";
+        var currentWeek = "";
+        var yearFilter = [];
+        var monthFilter = [];
+        var weekFilter = [];
+
+        chartDataFilterObj = {};
+
+        chartdata.forEach((item) => {
+            var moment_year = moment(item.key).format("YYYY");
+            var moment_month = moment(item.key).format("MMMM").toLowerCase();
+            var moment_week = moment(item.key).week();
+            if (moment_year != currentYear) {
+                yearFilter.push(moment_year);
+                currentYear = moment_year;
+            }
+            if (moment_month != currentMonth) {
+                monthFilter.push(moment_month);
+                currentMonth = moment_month;
+            }
+            if (moment_week != currentWeek) {
+                weekFilter.push(moment_week);
+                currentWeek = moment_week;
+            }
+        });
+        chartDataFilterObj = {
+            "year": yearFilter,
+            "month": monthFilter,
+            "week": weekFilter.sort(),
+        };
+
+        return chartDataFilterObj;
+    }
+
+    function setUpDashboard(type) {
+        var date_key = [];
+        var date_value = [];
+        var date_key_value = [];
+
+        var ChartFilter_html = "";
+
+        lineChart.destroy();
+
+        $.ajax({
+            url: "@Url.Action("GetStatisticsValues", "Customer")",
+            type: 'GET',
+            beforeSend: function () { },
+            success: function (resp) {
+                console.log("GetStatisticsValues resp ", resp);
+                var data = resp.ChartValues;
+                    currencySymbol = resp.currenySymbol
+
+                for (item in data) {
+                    date_key.push(item);
+                    date_value.push(data[item]);
+                    date_key_value.push({ "key": item, "value": data[item] });
+                }
+                chartdata = date_key_value;
+                   
+                // config.data.labels = date_key;
+                // config.data.datasets = [{
+                //     label: 'Statistics',
+                //     data: date_value,
+                //     borderColor: 'rgb(75, 192, 192)',
+                //     spanGaps: true
+                // }];
+
+                // lineChart = new Chart(ctx, config);
+
+
+                ChartFilter_html = `<div class="form-block">
+                                        <div class="inputs justify-content-start gap-2">
+                                            <button class="btn btn-chart-filter week-select">Weekly</button>
+                                            <button class="btn btn-chart-filter month-select">Monthly</button>
+                                            <button class="btn btn-chart-filter year-select">Yearly</button>
+                                        </div>
+                                    </div>`;
+                $(".line-chart-filter").html(ChartFilter_html);
+                $(".line-chart-filter .week-select").click();
+
+            }
+        });
+    }
+    /* custom formatter*/
+    function customNumberFormat(value, currencySymbol) {
+        const formattedValue = value.toFixed(2);
+        return currencySymbol + ' ' + formattedValue;
+    }
+
+    $(document).on("click", ".btn-chart-filter", function () {
+        var that = $(this);
+        var date_key = [];
+        var date_value = [];
+
+        var className = that.hasClass("year-select") ? "year" : that.hasClass("month-select") ? "month" : that.hasClass("week-select") ? "week" : "";
+        var filterChartDataArray = chartFilters();
+
+
+        if (that.hasClass("active")) {
+            that.toggleClass("active");
+        }
+        else {
+            $(".btn-chart-filter").removeClass("active");
+            that.addClass("active");
+        }
+
+        var filter_data = chartdata.filter(x => x);
+        if (className == "year" && that.hasClass("active")) {
+            filter_data = calculateDataArray(filterChartDataArray.year, "year");
+        }
+        else if (className == "month" && that.hasClass("active")) {
+            filter_data = calculateDataArray(filterChartDataArray.month, "month");
+        }
+        else if (className == "week" && that.hasClass("active")) {
+            filter_data = calculateDataArray(filterChartDataArray.week.reverse(), "week");
+        }
+        else {
+            filter_data = calculateDataArray(filter_data, "");
+        }
+
+        console.log("config datasets " + className + " : ", filter_data);
+
+        config.data.labels = filter_data.key;
+            config.data.datasets = [{
+            label: 'Statistics',
+            data: filter_data.value,
+            borderColor: 'rgb(75, 192, 192)',
+            spanGaps: true
+        }];
+
+        config.options = {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.dataset.label || '';
+
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += customNumberFormat(context.parsed.y, currencySymbol);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        };
+
+
+        lineChart.destroy();
+        lineChart = new Chart(ctx, config);
+
+    });
+
+    $(function () {
+        setUpDashboard();
+    });
+
+</script>

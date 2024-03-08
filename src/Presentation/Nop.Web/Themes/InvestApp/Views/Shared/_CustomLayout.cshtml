@@ -1,0 +1,81 @@
+﻿@inject Nop.Core.IWebHelper webHelper
+@{
+    Layout = "_Root";
+}
+@{
+    //current category ID
+    var currentCategoryId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("category", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentCategoryId = Convert.ToInt32(Url.ActionContext.RouteData.Values["categoryId"].ToString());
+    }
+
+    //current manufacturer ID
+    var currentManufacturerId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("manufacturer", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentManufacturerId = Convert.ToInt32(Url.ActionContext.RouteData.Values["manufacturerId"].ToString());
+    }
+
+    //current product ID
+    var currentProductId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("product", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("productdetails", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentProductId = Convert.ToInt32(Url.ActionContext.RouteData.Values["productId"].ToString());
+    }
+
+    var currentPageUrl = webHelper.GetRawUrl(Context.Request);
+}
+
+<div id="sideDrawer" class="drawer-wrapper">
+    <div class="side-drawer">
+        <div class="drawer-header">
+            <img src="@Url.Content("~/Themes/InvestApp/Content/images/stock-logo.svg")" />
+        </div>
+        <div class="drawer-body">
+            <div class="sub-container">
+                <ul class="drawer-total">
+                    <li class="portfolio-total">
+                        <h5>@T("Account.AccountValue"):</h5>
+                        <h2 class="accountValue">0</h2>
+                    </li>
+                    <li class="portfolio-total">
+                        <h5>@T("Account.NetReturn"):</h5>
+                        <h3 class="text-secondary netReturn">0</h3>
+                    </li>
+                    <!-- <li class="profit-loss-total">
+                        <h6>Investement:</h6>
+                        <h3 id="investmentTxt">0</h3>
+                    </li> -->
+                </ul>
+                <ul class="drawer-list">
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Dashboard")) ? Html.Raw("class=\"active\"") : "")>
+                        <a href="@Url.RouteUrl("Dashboard")">@T("Customer.Dashboard")</a>
+                    </li>
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Analytics")) ? Html.Raw("class=\"active\"") : "")>
+                        <a href="@Url.RouteUrl("Analytics")">@T("Customer.Analytics")</a>
+                    </li>
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Transactions")) ? Html.Raw("class=\"active\"") : "")>
+                        <a href="@Url.RouteUrl("Transactions")">@T("Customer.Transactions")</a>
+                    </li>
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Invest")) ? Html.Raw("class=\"active\"") : "")>
+                        <a href="@Url.RouteUrl("Invest")">@T("Customer.Invest")</a>
+                    </li>
+                    <li @(currentPageUrl.Equals(Url.RouteUrl("Withdraw")) ? Html.Raw("class=\"active\"") : "")>
+                        <a href="@Url.RouteUrl("Withdraw")">@T("Customer.Withdraw")</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="drawer-footer"></div>
+    </div>
+    <div class="side-drawer-content">
+        @{ await Html.RenderPartialAsync("_Header"); }
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.MainColumnBefore })
+        @RenderBody()
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.MainColumnAfter })
+    </div>
+</div>

@@ -4,9 +4,9 @@
 
 @if (Model.AvailableCurrencies.Count > 1)
 {
-    <div class="currency-selector">
+    <div class="currency-selector inputs">
         @{
-            var returnUrl = webHelper.GetRawUrl(Context.Request);
+            var returnUrl = "";//webHelper.GetRawUrl(Context.Request);
             var currencies = await Model.AvailableCurrencies.SelectAwait(async x => new SelectListItem
             {
                 Text = x.Name,

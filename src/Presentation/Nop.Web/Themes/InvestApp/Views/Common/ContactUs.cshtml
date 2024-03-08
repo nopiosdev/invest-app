@@ -8,6 +8,8 @@
     NopHtml.AppendPageCssClassParts("html-contact-page");
 }
 
+ @await Component.InvokeAsync(typeof(AdminHeaderLinksViewComponent))
+
 <div class="page contact-page">
     <div class="user-layout p-0">
         <div class="row contact-wrapper">

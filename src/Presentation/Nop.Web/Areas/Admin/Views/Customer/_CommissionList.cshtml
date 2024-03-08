@@ -33,36 +33,54 @@
     <p id="totalPaidCommission">@T("Admin.Customers.CustomerCommissionModel.TotalPaidCommission"): <span></span></p>
     <button type="submit" id="btnRefreshCustomerCommissionGrid" style="display: none"></button>
     <script>
-        function TotalCommission() {
-            //refresh grid
-            updateTable('#customer-commission-grid');
+        // function TotalCommission() {
+        //     //refresh grid
+        //     updateTable('#customer-commission-grid');
 
-            var postData = {
-                SelectCustomer: $('#@Html.IdFor(model => model.Id)').val(),
-                UnGrouped: true
-            };
+        //     var postData = {
+        //         SelectCustomer: $('#@Html.IdFor(model => model.Id)').val(),
+        //         UnGrouped: true
+        //     };
 
-            $.ajax({
-                cache: false,
-                type: "POST",
-                url: "@(Url.Action("CustomerCommissionList", "Customer"))",
-                data: addAntiForgeryToken(postData),
-                success: function (data, textStatus, jqXHR) {
-                    console.log(data);
-                    if (data) {
-                        $('#totalPaidCommission span').text(data.TotalPaidAmount);
-                    }
-                }
-            });
-        }
+        //     $.ajax({
+        //         cache: false,
+        //         type: "POST",
+        //         url: "@(Url.Action("CustomerCommissionList", "Customer"))",
+        //         data: addAntiForgeryToken(postData),
+        //         success: function (data, textStatus, jqXHR) {
+        //             console.log(data);
+        //             if (data) {
+        //                 $('#totalPaidCommission span').text(data.TotalPaidAmount);
+        //             }
+        //         }
+        //     });
+        // }
         $(document).ready(function () {
-            $('#customer-commission-grid_wrapper .data-tables-refresh').click(function () {
-                TotalCommission();
+            $('#customer-commission-grid').DataTable().on('draw', function () {
+                //refresh grid
+                updateTable('#customer-commission-grid');
+
+                var postData = {
+                    SelectCustomer: $('#@Html.IdFor(model => model.Id)').val(),
+                    UnGrouped: true
+                };
+
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("CustomerCommissionList", "Customer"))",
+                    data: addAntiForgeryToken(postData),
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        if (data) {
+                            $('#totalPaidCommission span').text(data.TotalPaidAmount);
+                        }
+                    }
+                });
 
                 //return false to don't reload a page
                 return false;
             });
-            TotalCommission();
         });
     </script>
 </div>

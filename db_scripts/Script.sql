@@ -341,6 +341,15 @@ BEGIN
 END
 GO
 
+IF NOT EXISTS (SELECT * FROM PermissionRecord WHERE SystemName = 'ManageTransaction')
+BEGIN
+   INSERT INTO PermissionRecord ([Name],[SystemName],[Category]) VALUES
+   ('Admin area. Manage Transaction', 'ManageTransaction', 'Customers')
+   
+   PRINT 'SUCCESSFULLY INSERTED ON [PermissionRecord]'
+END
+GO
+
 IF COL_LENGTH('Store','StoreEmailAddress') IS NULL
 BEGIN
     ALTER TABLE [Store] ADD [StoreEmailAddress] varchar(500)
@@ -432,5 +441,13 @@ BEGIN
     ALTER TABLE [dbo].[Customer] ADD [GoalId] INT NULL
 
 	PRINT 'SUCCESSFULLY ALTERED TABLE [Customer]'
+END
+GO
+
+IF COL_LENGTH('Commission','Percentage') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Commission] ADD [Percentage] DECIMAL(18,2) NOT NULL
+
+	PRINT 'SUCCESSFULLY ALTERED TABLE [Commission]'
 END
 GO

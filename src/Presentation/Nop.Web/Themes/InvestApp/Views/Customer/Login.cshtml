@@ -14,6 +14,7 @@
 
     //register URL with return URL (if specified)
     var registerUrl = Url.RouteUrl("Register", new { returnUrl = this.Context.Request.Query["returnUrl"] }, webHelper.GetCurrentRequestProtocol());
+    await Html.RenderPartialAsync("_Notifications");
 } 
 
 <script>

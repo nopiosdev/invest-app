@@ -24,8 +24,8 @@
                                 <div class="col wrapperSection">
                                     <div>
                                         <div class="reg-title text-left">
-                                            <h3>Start Trading Smarter</h3>
-                                            <p>Intelligent Stocks helps you invest your money by automating trades with AI</p>
+                                            <h3>Start Investing Smarter</h3>
+                                            <p>@T("Platform.Company.Name") helps you invest your money smarter using AI</p>
                                         </div>
                                         <div asp-validation-summary="ModelOnly" class="message-error"></div>
 
@@ -381,55 +381,55 @@
                                             </div>
                                         </div>
                                         @* <div class="row">
-                                            <div class="form-group">
-                                                <div class="col">
-                                                    <div class="form-group">
-                                                        <div class="fieldset">
-                                                            <div class="form-fields">
-                                                                <div class="reg-inputs">
-                                                                    <label asp-for="FormId" asp-postfix=":"></label>
-                                                                    <nop-editor asp-for="FormId" />
-                                                                    <span asp-validation-for="FormId"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="form-group">
+                                        <div class="col">
+                                        <div class="form-group">
+                                        <div class="fieldset">
+                                        <div class="form-fields">
+                                        <div class="reg-inputs">
+                                        <label asp-for="FormId" asp-postfix=":"></label>
+                                        <nop-editor asp-for="FormId" />
+                                        <span asp-validation-for="FormId"></span>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
                                         </div>
                                         <div class="row">
-                                            <div class="form-group">
-                                                <div class="col">
-                                                    <div class="form-group">
-                                                        <div class="fieldset">
-                                                            <div class="form-fields">
-                                                                <div class="reg-inputs">
-                                                                    <label asp-for="ProofOfAddress" asp-postfix=":"></label>
-                                                                    <nop-editor asp-for="ProofOfAddress" />
-                                                                    <span asp-validation-for="ProofOfAddress"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="form-group">
+                                        <div class="col">
+                                        <div class="form-group">
+                                        <div class="fieldset">
+                                        <div class="form-fields">
+                                        <div class="reg-inputs">
+                                        <label asp-for="ProofOfAddress" asp-postfix=":"></label>
+                                        <nop-editor asp-for="ProofOfAddress" />
+                                        <span asp-validation-for="ProofOfAddress"></span>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
                                         </div>
                                         <div class="row">
-                                            <div class="form-group">
-                                                <div class="col">
-                                                    <div class="form-group">
-                                                        <div class="fieldset">
-                                                            <div class="form-fields">
-                                                                <div class="reg-inputs">
-                                                                    <label asp-for="Document" asp-postfix=":"></label>
-                                                                    <nop-editor asp-for="Document" />
-                                                                    <span asp-validation-for="Document"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="form-group">
+                                        <div class="col">
+                                        <div class="form-group">
+                                        <div class="fieldset">
+                                        <div class="form-fields">
+                                        <div class="reg-inputs">
+                                        <label asp-for="Document" asp-postfix=":"></label>
+                                        <nop-editor asp-for="Document" />
+                                        <span asp-validation-for="Document"></span>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
                                         </div> *@
                                         <div class="row">
                                             <div class="form-group">
@@ -511,7 +511,7 @@
                                                         {
                                                             <div class="fieldset">
                                                                 <div class="title">
-                                                                    <strong>@T("Account.UserAgreement")</strong>
+                                                                    @T("Account.UserAgreement")
                                                                 </div>
                                                                 <div class="form-fields">
                                                                     @if (Model.AcceptPrivacyPolicyEnabled)
@@ -530,7 +530,7 @@
                                                                                 });
                                                                             });
                                                                         </script>
-                                                                        <div class="reg-inputs accept-consent">
+                                                                        <div class="reg-inputs accept-consent mt-2">
                                                                             <input id="accept-consent" type="checkbox" name="accept-consent" />
                                                                             <label for="accept-consent">@T("Account.Fields.AcceptPrivacyPolicy")</label>
                                                                             @if (Model.AcceptPrivacyPolicyPopup)
@@ -541,7 +541,7 @@
                                                                                         $('#read-privacyinfo').on('click',
                                                                                             function (e) {
                                                                                                 displayPopupContentFromUrl(
-                                                                                                    '@Url.RouteUrl("TopicPopup", new {SystemName = "privacyinfo"})',
+                                                                                                    '@Url.RouteUrl("TopicPopup", new { SystemName = "privacyinfo" })',
                                                                                                     '@T("Account.Fields.AcceptPrivacyPolicy")');
                                                                                             });
                                                                                     });
@@ -600,11 +600,16 @@
                                     </div>
                                 </div>
                             </div>
-                         </div>
+                        </div>
                         <div class="buttons">
                             <button type="submit" name="register-button" id="register-button" class="button-1 register-next-step-button reg-btn">@T("Account.Register.Button")</button>
                         </div>
                     </form>
+                    <div class="links">
+                        <span class="forgot-password">
+                            <a class="reg-btn" asp-route="Login">@T("Account.Login.ReturnToLogin")</a>
+                        </span>
+                    </div>
                     <div class="site-instruction">
                         <p>All investments involve risk, including the possible loss of principal. Investors should consider their investment objectives and risks carefully before investing.</p>
                     </div>

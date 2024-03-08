@@ -2,10 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\Presentation",
     "\\src\\Presentation\\Nop.Web",
-    "\\src\\Presentation\\Nop.Web\\Controllers"
+    "\\src\\Presentation\\Nop.Web\\Themes",
+    "\\src\\Presentation\\Nop.Web\\Themes\\InvestApp"
   ],
-  "SelectedNode": "\\src\\Presentation\\Nop.Web\\Controllers\\CustomerController.cs",
+  "SelectedNode": "\\src\\NopCommerce.sln",
   "PreviewInSolutionExplorer": false
 }

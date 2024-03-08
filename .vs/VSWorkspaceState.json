@@ -1,8 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\.github"
+    "\\src",
+    "\\src\\Presentation",
+    "\\src\\Presentation\\Nop.Web",
+    "\\src\\Presentation\\Nop.Web\\Controllers"
   ],
-  "SelectedNode": "\\.github",
+  "SelectedNode": "\\src\\Presentation\\Nop.Web\\Controllers\\CustomerController.cs",
   "PreviewInSolutionExplorer": false
 }

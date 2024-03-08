@@ -92,7 +92,7 @@
                             <button type="submit" id="btnRefreshCustomerCommissionGrid" style="display: none"></button>
                             <script>
                                 $(document).ready(function () {
-                                    $('#search-customer-commission').click(function () {
+                                    $('#customer-commission-grid').DataTable().on('draw', function () {
                                         //refresh grid
                                         updateTable('#customer-commission-grid');
 
@@ -116,7 +116,7 @@
                                         //return false to don't reload a page
                                         return false;
                                     });
-                                    $('#search-customer-commission').click();
+                                    //$('#search-customer-commission').click();
                                 });
                             </script>
                         </div>

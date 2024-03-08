@@ -214,7 +214,7 @@ namespace Nop.Web.Controllers
                 var body = _htmlFormatter.FormatText(model.Enquiry, false, true, false, false, false, false);
 
                 await _workflowMessageService.SendContactUsMessageAsync((await _workContext.GetWorkingLanguageAsync()).Id,
-                    model.Email.Trim(), model.FullName, subject, body);
+                    model.Email.Trim(), model.FullName, subject, body, model.PhoneNumber);
 
                 model.SuccessfullySent = true;
                 model.Result = await _localizationService.GetResourceAsync("ContactUs.YourEnquiryHasBeenSent");

@@ -82,6 +82,10 @@
     {
       "SystemName": "ExternalAuth.Facebook",
       "Version": "1.80"
+    },
+    {
+      "SystemName": "miniOrange.TFA",
+      "Version": "1.00"
     }
   ],
   "PluginNamesToUninstall": [],

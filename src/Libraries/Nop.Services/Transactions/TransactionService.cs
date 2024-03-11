@@ -254,7 +254,7 @@ namespace Nop.Services.Transactions
             await _transactionRepository.DeleteAsync(transaction);
         }
 
-        public virtual async Task MarkDepositTransactionAsCompletedAsync(Order order, bool sendEmail = true)
+        public virtual async Task MarkCreditTransactionAsCompletedAsync(Order order, bool sendEmail = true)
         {
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
@@ -267,11 +267,11 @@ namespace Nop.Services.Transactions
                 order.PaymentStatus.Equals(PaymentStatus.Paid) &&
                 order.OrderStatus.Equals(OrderStatus.Complete))
             {
-                await MarkDepositTransactionAsCompletedAsync(transaction: transaction, sendEmail: sendEmail);
+                await MarkCreditTransactionAsCompletedAsync(transaction: transaction, sendEmail: sendEmail);
             }
         }
 
-        public virtual async Task MarkDepositTransactionAsCompletedAsync(Transaction transaction, bool sendEmail = true)
+        public virtual async Task MarkCreditTransactionAsCompletedAsync(Transaction transaction, bool sendEmail = true)
         {
             var customer = await _customerService.GetCustomerByIdAsync(transaction.CustomerId);
             if (customer is not null)

@@ -2704,7 +2704,7 @@ namespace Nop.Services.Orders
                 await ProcessOrderPaidAsync(order);
 
                 //update transaction
-                await _transactionService.MarkDepositTransactionAsCompletedAsync(order: order);
+                await _transactionService.MarkCreditTransactionAsCompletedAsync(order: order);
             }
         }
 

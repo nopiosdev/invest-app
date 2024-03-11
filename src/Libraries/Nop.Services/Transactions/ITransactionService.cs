@@ -39,9 +39,9 @@ namespace Nop.Services.Transactions
 
         Task DeleteTransactionAsync(Transaction transaction);
 
-        Task MarkDepositTransactionAsCompletedAsync(Order order, bool sendEmail = true);
+        Task MarkCreditTransactionAsCompletedAsync(Order order, bool sendEmail = true);
 
-        Task MarkDepositTransactionAsCompletedAsync(Transaction transaction, bool sendEmail = true);
+        Task MarkCreditTransactionAsCompletedAsync(Transaction transaction, bool sendEmail = true);
 
         Task GenerateReturnAmountAsync();
         /// <summary>

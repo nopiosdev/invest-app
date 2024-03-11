@@ -353,7 +353,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                         if (transaction.TransactionType.Equals(TransactionType.Credit))
                         {
-                            await _transactionService.MarkDepositTransactionAsCompletedAsync(transaction: transaction, sendEmail: false);
+                            await _transactionService.MarkCreditTransactionAsCompletedAsync(transaction: transaction, sendEmail: false);
                         }
                         else if (transaction.TransactionType.Equals(TransactionType.Debit))
                         {

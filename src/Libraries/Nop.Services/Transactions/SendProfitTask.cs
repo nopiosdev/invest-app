@@ -106,7 +106,7 @@ namespace Nop.Services.Transactions
                         };
 
                         await _transactionService.InsertTransactionAsync(debitTransaction, false);
-                        await _transactionService.MarkDepositTransactionAsCompletedAsync(transaction: debitTransaction, false);
+                        await _transactionService.MarkCreditTransactionAsCompletedAsync(transaction: debitTransaction, false);
 
                         #endregion
 
@@ -200,7 +200,7 @@ namespace Nop.Services.Transactions
                         //                ReturnTransactionId = returnTransaction.Id
                         //            };
                         //            await _transactionService.InsertTransactionAsync(transaction);
-                        //            await _transactionService.MarkDepositTransactionAsCompletedAsync(transaction: transaction);
+                        //            await _transactionService.MarkCreditTransactionAsCompletedAsync(transaction: transaction);
 
                         //            await _transactionService.InsertCommissionAsync(new Commission()
                         //            {

@@ -236,7 +236,7 @@ h2.tabs-heading{ font-size: 1.5em; }
 .registration-page .reg-title p {font-size:14px;}
 /* .registration-page .date-of-birth{} */
 .registration-page .field-validation-error{ color: red; }
-.registration-page .message-error ul{ padding: 0px;color: red;font-size: 15px; }
+.registration-page .message-error ul,.message-error ul li{ padding: 0px;color: red;font-size: 15px; }
 
 /* new css */
 /* .registration-page{  } */

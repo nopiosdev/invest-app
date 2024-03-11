@@ -20,10 +20,12 @@ using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
+using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
 using Nop.Services.Shipping;
 using Nop.Services.Tax;
+using Nop.Services.Transactions;
 using Nop.Web.Extensions;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Controllers;
@@ -66,6 +68,9 @@ namespace Nop.Web.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
         private readonly TaxSettings _taxSettings;
+        protected readonly ITransactionService _transactionService;
+        protected readonly INotificationService _notificationService;
+        protected readonly ICustomerActivityService _customerActivityService;
 
         #endregion
 
@@ -98,7 +103,10 @@ namespace Nop.Web.Controllers
             PaymentSettings paymentSettings,
             RewardPointsSettings rewardPointsSettings,
             ShippingSettings shippingSettings,
-            TaxSettings taxSettings)
+            TaxSettings taxSettings,
+            ITransactionService transactionService,
+            INotificationService notificationService,
+            ICustomerActivityService customerActivityService)
         {
             _addressSettings = addressSettings;
             _captchaSettings = captchaSettings;
@@ -128,6 +136,9 @@ namespace Nop.Web.Controllers
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
             _taxSettings = taxSettings;
+            _transactionService = transactionService;
+            _notificationService = notificationService;
+            _customerActivityService = customerActivityService;
         }
 
         #endregion
@@ -1328,7 +1339,22 @@ namespace Nop.Web.Controllers
                         return Content(await _localizationService.GetResourceAsync("Checkout.RedirectMessage"));
                     }
 
-                    return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
+                    //return RedirectToRoute("CheckoutCompleted", new { orderId = placeOrderResult.PlacedOrder.Id });
+
+                    var transaction = await _transactionService.MakeTransactionAfterOrderCreation(placeOrderResult.PlacedOrder, customer);
+                    if (transaction is not null)
+                    {
+                        await _customerActivityService.InsertActivityAsync("TransactionLog",
+                            string.Format(await _localizationService.GetResourceAsync("ActivityLog.Customer.Invest.Transaction.Pending"), transaction.TransactionAmount), transaction);
+
+                        _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Successfull"));
+                    }
+                    else
+                    {
+                        _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Customer.Invest.Transaction.Unsuccessfull"));
+
+                    }
+                    return RedirectToRoute("Invest");
                 }
 
                 foreach (var error in placeOrderResult.Errors)

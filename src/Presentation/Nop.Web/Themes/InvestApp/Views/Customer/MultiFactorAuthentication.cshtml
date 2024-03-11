@@ -25,6 +25,10 @@
     }
 } *@
 
+<style>
+    .multi-factor-authentication-page{font-size:16px;}
+</style>
+
 <div class="page account-page multi-factor-authentication-page">
     <div class="page-title">
         @if (isRegisterCustomer)
@@ -42,11 +46,11 @@
             @T("Account.MultiFactorAuthentication.Description")
         </div>
          <form asp-route="MultiFactorAuthenticationSettings" method="post">
-            <div class="fieldset">
+            <div class="fieldset mb-4">
                 <div class="title">
                     <strong>@T("Account.MultiFactorAuthentication.Settings")</strong>
                 </div>
-                <div class="form-fields">
+                <div class="form-fields mb-4">
                     @if (!string.IsNullOrEmpty(Model.Message))
                     {
                         <div class="message-error">
@@ -60,11 +64,11 @@
                     </div>
                 </div>
             </div>
-            <div class="fieldset">
+            <div class="fieldset mb-5">
                 <div class="title">
                     <strong>@T("Account.MultiFactorAuthentication.Providers")</strong>
                 </div>
-                <div class="form-fields">
+                <div class="form-fields ">
                     <div class="section payment-method">
                         @if (Model.Providers.Count > 0)
                         {
@@ -79,7 +83,7 @@
             </div>
             
             <div class="buttons">
-                <button type="submit" id="save-mfa-settings-button" name="save-mfa-settsing-button" class="button-1 save-customer-mfa-button">@T("Common.Save")</button>
+                <button type="submit" id="save-mfa-settings-button" name="save-mfa-settsing-button" class="button-1 save-customer-mfa-button custom-btn btn-success">@T("Common.Save")</button>
             </div>
         </form>
         @* @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.CustomerMultiFactorAuthenticationBottom, additionalData = Model }) *@

@@ -2700,7 +2700,12 @@ namespace Nop.Services.Orders
             await CheckOrderStatusAsync(order);
 
             if (order.PaymentStatus == PaymentStatus.Paid)
+            {
                 await ProcessOrderPaidAsync(order);
+
+                //update transaction
+                await _transactionService.MarkDepositTransactionAsCompletedAsync(order: order);
+            }
         }
 
         /// <summary>
